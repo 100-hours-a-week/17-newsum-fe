@@ -1,0 +1,48 @@
+/* src/index.css */
+
+/* 1. 웹 폰트 Import (반드시 파일 맨 위에 위치해야 합니다) */
+/* 이전에 Noto Sans KR을 사용하기로 했으므로 해당 import 구문을 사용합니다. */
+/* 다른 폰트를 원하시면 해당 폰트의 import URL로 변경하세요. */
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700&display=swap');
+
+/* 2. 전역 Box Sizing 설정 (레이아웃 크기 계산을 예측 가능하게 함) */
+html {
+  box-sizing: border-box;
+  -webkit-font-smoothing: antialiased; /* 폰트 렌더링 개선 (웹킷 계열) */
+  -moz-osx-font-smoothing: grayscale; /* 폰트 렌더링 개선 (파이어폭스) */
+}
+
+/* 모든 요소와 가상 요소가 부모로부터 box-sizing을 상속받도록 함 */
+*, *::before, *::after {
+  box-sizing: inherit;
+}
+
+/* 3. 기본적인 Body 스타일 및 기본 폰트 설정 */
+body {
+  margin: 0; /* 브라우저가 기본으로 제공하는 body 마진 제거 */
+  padding: 0; /* 브라우저가 기본으로 제공하는 body 패딩 제거 */
+  font-family: 'Noto Sans KR', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif; /* theme.ts와 동일한 폰트 스택 적용 */
+  /* background-color: #F4F6F8; */ /* 필요하다면 theme.ts의 background.default와 맞춰줄 수 있지만, 보통 CssBaseline이 처리해 줍니다. */
+  /* color: #212121; */ /* 기본 텍스트 색상 설정 (선택 사항, 보통 CssBaseline이 처리) */
+  line-height: 1.5; /* 기본 줄 간격 설정 (선택 사항) */
+}
+
+/* 4. (선택 사항) 기본 링크 스타일 초기화 */
+a {
+  text-decoration: none; /* 기본 밑줄 제거 */
+  color: inherit; /* 부모 요소의 글자 색상 상속 */
+}
+a:hover {
+  /* 필요시 링크 호버 스타일 추가 */
+  /* text-decoration: underline; */
+}
+
+/* 5. (선택 사항) 이미지 관련 기본 스타일 */
+img {
+  max-width: 100%; /* 이미지가 부모 요소를 넘어가지 않도록 */
+  height: auto; /* 가로 너비에 맞춰 세로 비율 유지 */
+  display: block; /* 이미지 하단의 불필요한 공백 제거 */
+}
+
+/* 6. 기타 필요한 전역 스타일 */
+/* 예: 특정 스크롤바 스타일 등 */
