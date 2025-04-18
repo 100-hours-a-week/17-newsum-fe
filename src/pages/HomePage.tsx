@@ -59,7 +59,7 @@ const HomePage: React.FC = () => {
   // API 테스트 함수
   const handleApiTest = async () => {
     try {
-      const response = await fetch('http://localhost:8080/test');
+      const response = await fetch('/test');
       const data = await response.text();
       setApiTestResult(`API Test Successful: ${data}`);
     } catch (err) {
