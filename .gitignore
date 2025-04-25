@@ -7,35 +7,18 @@ yarn-error.log*
 pnpm-debug.log*
 lerna-debug.log*
 
-# Shell
-*.sh
+node_modules
+dist
+dist-ssr
+*.local
 
-# Dependency directories
-/node_modules/
-
-# Vite build output
-/dist/
-/dist-ssr/
-
-# Environment Variables (중요!)
-.env*
-!.env.example # 예시: .env.example 파일은 포함시키고 싶을 경우
-
-# IDE / Editor directories and files
+# Editor directories and files
 .vscode/*
 !.vscode/extensions.json
-.idea/
+.idea
+.DS_Store
 *.suo
 *.ntvs*
 *.njsproj
 *.sln
-
-# OS generated files
-.DS_Store
-Thumbs.db # Windows 썸네일 캐시 추가
-
-# Temporary files
 *.sw?
-
-# Test coverage
-/coverage/ # 테스트 커버리지 폴더 추가
