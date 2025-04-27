@@ -33,7 +33,7 @@ jobs:
           pr_number=${{ github.event.pull_request.number }}
           reviewer=${{ steps.select-reviewer.outputs.reviewer }}
           curl -s -X POST -H "Authorization: token ${{ secrets.REVIEW_TOKEN }}" \
-            -d '{"reviewers":["@100-hours-a-week/'"$fullstack_team"'"]}' \
+            -d '{"requested_teams":["@100-hours-a-week/'"$fullstack_team"'"]}' \
             "https://api.github.com/repos/${{ github.repository }}/pulls/$pr_number/requested_reviewers"
 
       # dev to main으로 PR 올라왔을 때
