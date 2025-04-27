@@ -36,7 +36,8 @@ jobs:
         run: |
           pr_number=${{ github.event.pull_request.number }}
           reviewer=${{ steps.select-reviewer.outputs.reviewer }}
-          curl -s -X POST -H "Authorization: token ${{ secrets.REVIEW_TOKEN }}" -d '{"reviewers":["'"$reviewer"'"]}' "https://api.github.com/repos/${{ github.repository }}/pulls/$pr_number/requested_reviewers"
+          curl -s -X POST -H "Authorization: token ${{ secrets.REVIEW_TOKEN }}" -d '{"reviewers":["@100-hours-a-week/newsum_fullstack"]}' "https://api.github.com/repos/${{ github.repository }}/pulls/$pr_number/requested_reviewers"
+          curl -s -X POST -H "Authorization: token ${{ secrets.REVIEW_TOKEN }}" -d '{"reviewers":["@100-hours-a-week/newsum_fullstack"]}' "https://api.github.com/repos/${{ github.repository }}/pulls/$pr_number/requested_teams"
 
           # echo "Selected team: $fullstack_team"
           # echo "::set-output name=reviewer::$fullstack_team"
