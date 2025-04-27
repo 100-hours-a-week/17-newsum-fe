@@ -1,6 +1,5 @@
 name: Set reviewers based on branch
 
-# PR이 열리거나, 커밋이 추가되거나, 닫힌 PR이 다시 열릴 때마다 실행
 on:
   pull_request:
     types: [opened, synchronize, reopened]
@@ -16,13 +15,28 @@ jobs:
       - name: feature에서 dev로 PR 올라올 때 FullStack팀으로 리뷰어 설정 
         if: github.base_ref == 'dev' && github.head_ref != 'main'
         run: |
-          reviewers=$(curl -s -H "Authorization: token ${{ secrets.REVIEW_TOKEN }}" https://api.github.com/repos/${{ github.repository }}/contributors | jq -r '.[].login')
-          echo "Reviewers : $reviewers"
+          # GitHub 조직에 속한 팀 목록을 가져오기
+          teams=$(curl -s -H "Authorization: token ${{ secrets.REVIEW_TOKEN }}" \
+          https://api.github.com/orgs/100-hours-a-week/teams | jq -r '.[].slug')
+          
+          echo "Teams: $teams"  # 팀 목록 출력
+          
+          # 원하는 팀을 리뷰어로 추가 (예: 17팀)
+          curl -X POST -H "Authorization: token ${{ secrets.REVIEW_TOKEN }}" \
+          -d "{\"reviewers\": [\"@100-hours-a-week/17\"]}" \
+          https://api.github.com/repos/${{ github.repository }}/pulls/${{ github.event.pull_request.number }}/requested_reviewers
       
       # dev to main으로 PR 올라왔을 때
       - name: dev에서 main으로 PR 올라올 때 전체 팀으로 리뷰어 설정
         if: github.base_ref == 'main' && github.head_ref == 'dev'
         run: |
+          # GitHub 조직에 속한 팀 목록을 가져오기
+          teams=$(curl -s -H "Authorization: token ${{ secrets.REVIEW_TOKEN }}" \
+          https://api.github.com/orgs/100-hours-a-week/teams | jq -r '.[].slug')
+          
+          echo "Teams: $teams"  # 팀 목록 출력
+          
+          # 전체 팀을 리뷰어로 설정
           curl -X POST -H "Authorization: token ${{ secrets.REVIEW_TOKEN }}" \
-          -d '{"reviewers":["@100-hours-a-week/17"]}' \
+          -d "{\"reviewers\": [\"@100-hours-a-week/17\"]}" \
           https://api.github.com/repos/${{ github.repository }}/pulls/${{ github.event.pull_request.number }}/requested_reviewers
