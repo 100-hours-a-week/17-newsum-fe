@@ -16,14 +16,14 @@ jobs:
       - name: feature에서 dev로 PR 올라올 때 FullStack팀으로 리뷰어 설정 
         if: github.base_ref == 'dev' && github.head_ref != 'main'
         run: |
-          curl -X POST -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
-          -d '{"reviewers": "@100-hours-a-week/NewSum_FullStack"}' \
+          curl -X POST -H "Authorization: token ${{ secrets.REVIEW_TOKEN }}" \
+          -d '{"reviewers": ["@100-hours-a-week/NewSum_FullStack"]}' \
           https://api.github.com/repos/${{ github.repository }}/pulls/${{ github.event.pull_request.number }}/requested_reviewers
       
       # dev to main으로 PR 올라왔을 때
       - name: dev에서 main으로 PR 올라올 때 전체 팀으로 리뷰어 설정
         if: github.base_ref == 'main' && github.head_ref == 'dev'
         run: |
-          curl -X POST -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
-          -d '{"reviewers":"@100-hours-a-week/17"}' \
+          curl -X POST -H "Authorization: token ${{ secrets.REVIEW_TOKEN }}" \
+          -d '{"reviewers":["@100-hours-a-week/17"]}' \
           https://api.github.com/repos/${{ github.repository }}/pulls/${{ github.event.pull_request.number }}/requested_reviewers
