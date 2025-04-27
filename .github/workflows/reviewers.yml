@@ -24,28 +24,38 @@ jobs:
           # fullstack_team=$(curl -s -H "Authorization: token ${{ secrets.REVIEW_TOKEN }}" \
             # https://api.github.com/orgs/100-hours-a-week/teams/17/teams | jq -r '.[] | select(.slug == "newsum_fullstack") | .slug')
 
-      - name: Select Random Reviewer
-        if: github.base_ref == 'dev' && github.head_ref != 'main'
-        id: select-reviewer
+      - name: Select FullStack Team Members as Reviewers
+        id: select-fullstack-reviewers
         run: |
-          reviewers=$(curl -s -H "Authorization: token ${{ secrets.REVIEW_TOKEN }}" https://api.github.com/orgs/100-hours-a-week/teams/17/teams | jq -r '.[] | select(.slug == "newsum_fullstack") | .slug')
-          echo "Selected reviewer: $reviewers"
-          echo "::set-output name=reviewer::$reviewers"
+          # 'newsum_fullstack' 팀의 멤버 목록을 가져옵니다.
+          fullstack_members=$(curl -s -H "Authorization: token ${{ secrets.REVIEW_TOKEN }}" \
+            https://api.github.com/orgs/100-hours-a-week/teams/newsum_fullstack/members | jq -r '.[].login')
+      
+          # 멤버 목록을 배열로 저장합니다.
+          member_array=($fullstack_members)
+      
+          # 멤버들을 PR 리뷰어로 추가할 수 있도록, 배열에서 리뷰어 이름을 설정합니다.
+          reviewer_list=""
+          for member in "${member_array[@]}"; do
+            reviewer_list+="\"@$member\","
+          done
+      
+          # 마지막 쉼표를 제거합니다.
+          reviewer_list=${reviewer_list%,}
+      
+          echo "Reviewers: $reviewer_list"
+          echo "::set-output name=reviewers::$reviewer_list"
 
-      - name: Add reviewer to PR
+      - name: Add FullStack Team Members as Reviewers to PR
         run: |
+          # PR 번호를 가져옵니다.
           pr_number=${{ github.event.pull_request.number }}
-          reviewer=${{ steps.select-reviewer.outputs.reviewer }}
-          curl -s -X POST -H "Authorization: token ${{ secrets.REVIEW_TOKEN }}" -d '{"reviewers":["@100-hours-a-week/newsum_fullstack"]}' "https://api.github.com/repos/${{ github.repository }}/pulls/$pr_number/requested_reviewers"
-          curl -s -X POST -H "Authorization: token ${{ secrets.REVIEW_TOKEN }}" -d '{"reviewers":["@100-hours-a-week/newsum_fullstack"]}' "https://api.github.com/repos/${{ github.repository }}/pulls/$pr_number/requested_teams"
+          reviewers=${{ steps.select-fullstack-reviewers.outputs.reviewers }}
 
-          # echo "Selected team: $fullstack_team"
-          # echo "::set-output name=reviewer::$fullstack_team"
-          
-          # FullStack 팀을 리뷰어로 추가 
-          # pr_number=${{ github.event.pull_request.number }}
-          # reviewer=${{ steps.select-reviewer.outputs.reviewer }}
-          # curl -s -X POST -H "Authorization: token ${{ secrets.REVIEW_TOKEN }}" -d '{"reviewers":["'"$reviewer"'"]}' "https://api.github.com/repos/${{ github.repository }}/pulls/$pr_number/requested_reviewers"
+          # 팀 멤버들을 PR에 리뷰어로 추가합니다.
+          curl -s -X POST -H "Authorization: token ${{ secrets.REVIEW_TOKEN }}" \
+            -d "{\"reviewers\":[$reviewers]}" \
+            "https://api.github.com/repos/${{ github.repository }}/pulls/$pr_number/requested_reviewers"
 
       # dev to main으로 PR 올라왔을 때
       - name: dev에서 main으로 PR 올라올 때 전체 팀으로 리뷰어 설정
