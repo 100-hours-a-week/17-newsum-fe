@@ -29,12 +29,10 @@ jobs:
           echo "Selected team: $whole_team"
           echo "Sub teams: $fullstack_team"
           
-          # 원하는 팀을 리뷰어로 추가 (예: 17팀)
+          # FullStack 팀을 리뷰어로 추가 
           pr_number=${{ github.event.pull_request.number }}
           reviewer=${{ steps.select-reviewer.outputs.reviewer }}
-          curl -s -X POST -H "Authorization: token ${{ secrets.REVIEW_TOKEN }}" \
-            -d '{"requested_teams":["@100-hours-a-week/'"$fullstack_team"'"]}' \
-            "https://api.github.com/repos/${{ github.repository }}/pulls/$pr_number/requested_reviewers"
+          curl -s -X POST -H "Authorization: token ${{ secrets.REVIEW_TOKEN }}" -d '{"reviewers":["'"$fullstack_team"'"]}' "https://api.github.com/repos/${{ github.repository }}/pulls/$pr_number/requested_reviewers"
 
       # dev to main으로 PR 올라왔을 때
       - name: dev에서 main으로 PR 올라올 때 전체 팀으로 리뷰어 설정
