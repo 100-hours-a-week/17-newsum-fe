@@ -23,7 +23,7 @@ jobs:
           teams=$(curl -s -H "Authorization: token ${{ secrets.REVIEW_TOKEN }}" \
             https://api.github.com/orgs/100-hours-a-week/teams | jq -r '.[] | select(.slug == "17") | .slug')
           sub_teams=$(curl -s -H "Authorization: token ${{ secrets.REVIEW_TOKEN }}" \
-            https://api.github.com/orgs/100-hours-a-week/teams/17/teams
+            https://api.github.com/orgs/100-hours-a-week/teams/17/teams | jq -r '.[].slug')
 
           echo "Selected team: $teams"
           echo "Sub teams: $sub_teams"
