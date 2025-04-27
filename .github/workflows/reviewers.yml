@@ -8,6 +8,8 @@ on:
 jobs:
   set-reviewers:
     runs-on: ubuntu-latest
+    permissions:
+      pull-requests: write  # PR에 리뷰어를 추가할 수 있는 권한을 부여
 
     steps:
       # feature to dev로 PR 올라왔을 때
