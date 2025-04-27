@@ -20,18 +20,21 @@ jobs:
           # teams=$(curl -s -H "Authorization: token ${{ secrets.REVIEW_TOKEN }}" \
           # https://api.github.com/orgs/100-hours-a-week/teams | jq -r '.[].slug')
 
-          teams=$(curl -s -H "Authorization: token ${{ secrets.REVIEW_TOKEN }}" \
+          whole_team=$(curl -s -H "Authorization: token ${{ secrets.REVIEW_TOKEN }}" \
             https://api.github.com/orgs/100-hours-a-week/teams | jq -r '.[] | select(.slug == "17") | .slug')
-          sub_teams=$(curl -s -H "Authorization: token ${{ secrets.REVIEW_TOKEN }}" \
-            https://api.github.com/orgs/100-hours-a-week/teams/17/teams | jq -r '.[].slug')
+          fullstack_team=$(curl -s -H "Authorization: token ${{ secrets.REVIEW_TOKEN }}" \
+            https://api.github.com/orgs/100-hours-a-week/teams/17/teams | jq -r '.[] | select(.slug == "newsum_fullstack") | .slug')
+            
 
-          echo "Selected team: $teams"
-          echo "Sub teams: $sub_teams"
+          echo "Selected team: $whole_team"
+          echo "Sub teams: $fullstack_team"
           
           # 원하는 팀을 리뷰어로 추가 (예: 17팀)
-          # pr_number=${{ github.event.pull_request.number }}
-          # reviewer=${{ steps.select-reviewer.outputs.reviewer }}
-          # curl -s -X POST -H "Authorization: token ${{ secrets.REVIEW_TOKEN }}" -d '{"reviewers":["'"$reviewer"'"]}' "https://api.github.com/repos/${{ github.repository }}/pulls/$pr_number/requested_reviewers"
+          pr_number=${{ github.event.pull_request.number }}
+          reviewer=${{ steps.select-reviewer.outputs.reviewer }}
+          curl -s -X POST -H "Authorization: token ${{ secrets.REVIEW_TOKEN }}" \
+            -d '{"reviewers":["@100-hours-a-week/'"$fullstack_team"'"]}' \
+            "https://api.github.com/repos/${{ github.repository }}/pulls/$pr_number/requested_reviewers"
 
       # dev to main으로 PR 올라왔을 때
       - name: dev에서 main으로 PR 올라올 때 전체 팀으로 리뷰어 설정
