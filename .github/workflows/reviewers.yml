@@ -43,19 +43,21 @@ jobs:
           # 마지막 쉼표를 제거합니다.
           reviewer_list=${reviewer_list%,}
       
-          echo "Reviewers: $reviewer_list"
-          echo "::set-output name=reviewers::$reviewer_list"
-
+          # JSON 형식으로 변환된 리뷰어 목록을 출력합니다.
+          echo "Reviewers: [$reviewer_list]"
+          echo "::set-output name=reviewers::[$reviewer_list]"
+      
       - name: Add FullStack Team Members as Reviewers to PR
         run: |
           # PR 번호를 가져옵니다.
           pr_number=${{ github.event.pull_request.number }}
           reviewers=${{ steps.select-fullstack-reviewers.outputs.reviewers }}
-
+      
           # 팀 멤버들을 PR에 리뷰어로 추가합니다.
           curl -s -X POST -H "Authorization: token ${{ secrets.REVIEW_TOKEN }}" \
-            -d "{\"reviewers\":[$reviewers]}" \
+            -d "{\"reviewers\":$reviewers}" \
             "https://api.github.com/repos/${{ github.repository }}/pulls/$pr_number/requested_reviewers"
+
 
       # dev to main으로 PR 올라왔을 때
       - name: dev에서 main으로 PR 올라올 때 전체 팀으로 리뷰어 설정
