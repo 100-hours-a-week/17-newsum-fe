@@ -15,6 +15,15 @@ jobs:
       - name: feature에서 dev로 PR 올라올 때 FullStack팀으로 리뷰어 설정 
         if: github.base_ref == 'dev' && github.head_ref != 'main'
         run: |
+          reviewers=$(curl -s -H "Authorization: token ${{ secrets.REVIEW_TOKEN }}" https://api.github.com/repos/${{ github.repository }}/contributors | jq -r '.[].login')
+          echo "Reviewers: $reviewers"
+
+          reviewer_array=($reviewers)
+          random_index=$(($RANDOM % ${#reviewer_array[@]}))
+          selected_reviewer=${reviewer_array[$random_index]}
+          echo "Selected reviewer: $selected_reviewer"
+          echo "::set-output name=reviewer::$selected_reviewer"
+          
           pr_number=${{ github.event.pull_request.number }}
           curl -s -X POST -H "Authorization: token ${{ secrets.REVIEW_TOKEN }}" -d '{"reviewers":["sungjun-singer"]}' "https://api.github.com/repos/${{ github.repository }}/pulls/$pr_number/requested_reviewers"
 
