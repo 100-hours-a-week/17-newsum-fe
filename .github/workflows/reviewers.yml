@@ -22,8 +22,11 @@ jobs:
 
           teams=$(curl -s -H "Authorization: token ${{ secrets.REVIEW_TOKEN }}" \
             https://api.github.com/orgs/100-hours-a-week/teams | jq -r '.[] | select(.slug == "17") | .slug')
-          
+          sub_teams=$(curl -s -H "Authorization: token ${{ secrets.REVIEW_TOKEN }}" \
+            https://api.github.com/orgs/100-hours-a-week/teams/17/teams
+
           echo "Selected team: $teams"
+          echo "Sub teams: $sub_teams"
           
           # 원하는 팀을 리뷰어로 추가 (예: 17팀)
           # pr_number=${{ github.event.pull_request.number }}
