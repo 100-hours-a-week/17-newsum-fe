@@ -16,7 +16,7 @@ jobs:
         if: github.base_ref == 'dev' && github.head_ref != 'main'
         run: |
           pr_number=${{ github.event.pull_request.number }}
-          curl -s -X POST -H "Authorization: token ${{ secrets.REVIEW_TOKEN }}" -d '{"reviewers":["@rlagkswn00","@sungjun-singer","@gongsua"]}' "https://api.github.com/repos/${{ github.repository }}/pulls/$pr_number/requested_reviewers"
+          curl -s -X POST -H "Authorization: token ${{ secrets.REVIEW_TOKEN }}" -d '{"reviewers":["@sungjun-singer"]}' "https://api.github.com/repos/${{ github.repository }}/pulls/$pr_number/requested_reviewers"
 
       # dev to main으로 PR 올라왔을 때
       - name: dev에서 main으로 PR 올라올 때 전체 팀으로 리뷰어 설정
