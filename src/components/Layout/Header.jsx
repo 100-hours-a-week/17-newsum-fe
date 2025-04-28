@@ -2,7 +2,7 @@
 import React from 'react';
 import { AppBar, Toolbar, Button, Box } from '@mui/material';
 import { Link as RouterLink, useLocation } from 'react-router-dom';
-import SearchIcon from '@mui/icons-material/Search';
+import NotificationsNoneIcon from '@mui/icons-material/NotificationsNone';
 import PersonOutlineIcon from '@mui/icons-material/PersonOutline';
 import styled from '@emotion/styled';
 import logo from '../../assets/logo.png';
@@ -79,11 +79,11 @@ function Header() {
         <Box sx={{ display: 'flex', gap: 1 }}>
           <NavButton
             component={RouterLink}
-            to="/search"
-            className={location.pathname === '/search' ? 'selected' : ''}
-            startIcon={<SearchIcon />}
+            to="/notifications"
+            className={location.pathname === '/notifications' ? 'selected' : ''}
+            startIcon={<NotificationsNoneIcon />}
           >
-            검색
+            알림
           </NavButton>
           <NavButton
             component={RouterLink}
