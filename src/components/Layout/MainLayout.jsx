@@ -3,29 +3,53 @@ import React from 'react';
 import { Outlet } from 'react-router-dom';
 import { Box, Toolbar } from '@mui/material';
 import Header from './Header';
-// import Footer from './Footer'; // 필요시 Footer 생성 및 import
-// import BottomNav from './BottomNav'; // 필요시 BottomNav 생성 및 import
+import BottomNav from './BottomNav';
+import styled from '@emotion/styled';
 
-function MainLayout() { // React.FC 타입 제거
+const MainContainer = styled(Box)`
+  max-width: 430px;
+  margin: 0 auto;
+  width: 100%;
+  min-height: 100vh;
+  position: relative;
+  border-radius: 24px;
+  box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+  background-color: white;
+  overflow: hidden;
+
+  @media (min-width: 768px) and (max-width: 1024px) {
+    max-width: 100%;
+    border-radius: 0;
+    box-shadow: none;
+  }
+
+  @media (max-width: 767px) {
+    max-width: 100%;
+    border-radius: 0;
+    box-shadow: none;
+  }
+`;
+
+const ContentBox = styled(Box)`
+  flex-grow: 1;
+  padding: 24px 16px;
+  padding-bottom: 80px;
+  margin-top: 64px;
+
+  @media (min-width: 768px) and (max-width: 1024px) {
+    padding: 24px;
+  }
+`;
+
+function MainLayout() {
   return (
-    <Box sx={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
+    <MainContainer>
       <Header />
-      <Box
-        component="main"
-        sx={{
-          flexGrow: 1,
-          py: 3,
-          px: { xs: 1, sm: 2, md: 3 },
-          pb: { xs: 8, sm: 3 }, // BottomNav 고려한 패딩 (BottomNav 추가 시)
-          mt: '64px' // AppBar 높이만큼 마진 (AppBar position="fixed" 사용 시 필요) -> Toolbar 컴포넌트로 대체 가능
-        }}
-      >
-        {/* <Toolbar /> AppBar 높이만큼 공간 확보 (더 나은 방법) */}
-        <Outlet /> {/* 페이지 콘텐츠 렌더링 */}
-      </Box>
-      {/* <Footer /> */}
-      {/* <BottomNav /> */}
-    </Box>
+      <ContentBox component="main">
+        <Outlet />
+      </ContentBox>
+      <BottomNav />
+    </MainContainer>
   );
 }
 
