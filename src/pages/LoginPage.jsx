@@ -26,8 +26,10 @@ function LoginPage() {
   };
 
   const handleKakaoLogin = () => {
-    // 카카오는 나중에 구현
+    window.location.href = 'http://localhost:8080/oauth2/authorization/kakao';
   };
+  
+  
 
   return (
     <Box
@@ -101,8 +103,7 @@ function LoginPage() {
             alt="카카오 로그인"
             sx={{
               width: 50,
-              cursor: 'pointer',
-              opacity: 0.5,
+              cursor: 'pointer'
             }}
             onClick={handleKakaoLogin}
           />
