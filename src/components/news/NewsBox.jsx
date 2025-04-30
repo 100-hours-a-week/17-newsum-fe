@@ -7,6 +7,7 @@ const Container = styled(Box)`
   border: 1px solid #e0e0e0;
   border-radius: 8px;
   padding: 16px;
+  margin-top: 20px;
   margin-bottom: 20px;
   background-color: white;
   max-width: 1200px;
@@ -69,25 +70,6 @@ const ArticlesContainer = styled.div`
   .article-card {
     flex: 1;
     min-width: 0;
-    height: 100px;
-  }
-
-  @media (min-width: 400px) {
-    .article-card {
-      height: 110px;
-    }
-  }
-
-  @media (min-width: 600px) {
-    .article-card {
-      height: 140px;
-    }
-  }
-
-  @media (min-width: 960px) {
-    .article-card {
-      height: 160px;
-    }
   }
 `;
 

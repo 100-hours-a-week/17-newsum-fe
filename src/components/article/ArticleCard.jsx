@@ -8,11 +8,10 @@ import ColorThief from 'colorthief';
 const StyledCard = styled(Card)`
   position: relative;
   width: 100%;
-  height: 100%;
+  aspect-ratio: 1/1;
   border-radius: 8px;
   overflow: hidden;
   min-width: 60px;
-  aspect-ratio: 1/1;
 `;
 
 const CardImage = styled.img`
