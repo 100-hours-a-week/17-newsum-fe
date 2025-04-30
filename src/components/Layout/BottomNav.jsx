@@ -63,7 +63,7 @@ const StyledBottomNavigation = styled(BottomNavigation)`
 
   .MuiBottomNavigationAction-root {
     min-width: 60px;
-    padding: 6px 12px;
+    padding: 0px 0px;
     color: #666;
     transition: all 0.2s ease-in-out;
 

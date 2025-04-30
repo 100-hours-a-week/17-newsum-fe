@@ -16,7 +16,7 @@ const ITEMS_PER_PAGE = 6;
 const StyledTab = styled(Tab)`
   color: #666;
   border-radius: 8px;
-  padding: 6px 12px;
+  padding: 0px 0px;
   min-width: 60px;
   text-transform: none;
   font-size: 0.875rem;
@@ -82,10 +82,9 @@ function HomePage() {
 
   return (
     <Container maxWidth="lg">
-      <Box sx={{ my: 4 }}>
-
+      <Box sx={{ my: 1 }}>
         {/* 카테고리 탭 */}
-        <Box sx={{ borderBottom: 1, borderColor: 'divider', mb: 3 }}>
+        <Box sx={{ borderBottom: 1, borderColor: 'divider', mb: 1 }}>
           <StyledTabs value={activeTab} onChange={handleTabChange} variant="scrollable" scrollButtons="auto" allowScrollButtonsMobile>
             {categories.map((cat) => (
               <StyledTab key={cat.value} label={cat.label} value={cat.value} />
@@ -93,17 +92,16 @@ function HomePage() {
           </StyledTabs>
         </Box>
 
-        {loading && ( <Box sx={{ display: 'flex', justifyContent: 'center', my: 5 }}><CircularProgress /></Box> )}
-        {error && ( <Alert severity="error" sx={{ my: 2 }}>{error}</Alert> )}
+        {loading && ( <Box sx={{ display: 'flex', justifyContent: 'center', my: 2 }}><CircularProgress /></Box> )}
+        {error && ( <Alert severity="error" sx={{ my: 1 }}>{error}</Alert> )}
         {!loading && !error && articles.length > 0 && (
-          <Box sx={{ mb: 4 }}>
+          <Box sx={{ mb: 2 }}>
             <Carousel 
               items={articles.map(article => (
                 <Box key={article.id} sx={{ width: '100%', height: '100%' }}>
                   <ArticleCard article={article} />
                 </Box>
               ))}
-              slidesPerView={1}
             />
           </Box>
         )}
@@ -125,7 +123,7 @@ function HomePage() {
         />
 
         {!loading && !error && totalPages > 1 && (
-           <Box sx={{ display: 'flex', justifyContent: 'center', py: 4 }}>
+           <Box sx={{ display: 'flex', justifyContent: 'center', py: 2 }}>
              <Pagination count={totalPages} page={page} onChange={handlePageChange} color="primary" size="large" showFirstButton showLastButton />
            </Box>
          )}

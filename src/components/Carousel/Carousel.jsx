@@ -34,7 +34,7 @@ const Slide = styled(Box)({
 const NavigationButton = styled(IconButton)(({ theme }) => ({
   position: 'absolute',
   backgroundColor: 'rgba(255, 255, 255, 0.8)',
-  padding: '12px',
+  padding: '10px',
   '&:hover': {
     backgroundColor: 'rgba(255, 255, 255, 0.9)',
   },

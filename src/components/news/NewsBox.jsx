@@ -4,11 +4,9 @@ import { Box, Grid } from '@mui/material';
 import ArticleCard from '../article/ArticleCard';
 
 const Container = styled(Box)`
-  border: 1px solid #e0e0e0;
-  border-radius: 8px;
-  padding: 16px;
-  margin-top: 20px;
-  margin-bottom: 20px;
+  padding: 0px;
+  margin-top: 16px;
+  margin-bottom: 16px;
   background-color: white;
   max-width: 1200px;
   min-width: 350px;
@@ -18,11 +16,8 @@ const Container = styled(Box)`
 
   @media (max-width: 350px) {
     min-width: 350px;
-    margin-left: -16px;
-    margin-right: -16px;
-    border-radius: 0;
-    border-left: none;
-    border-right: none;
+    margin: 0;
+    padding: 8px 0;
   }
 `;
 
@@ -30,7 +25,8 @@ const Header = styled.div`
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 16px;
+  margin-bottom: 8px;
+  padding: 0 0px;
 `;
 
 const TitleWrapper = styled.div`
@@ -65,11 +61,15 @@ const MoreButton = styled.button`
 
 const ArticlesContainer = styled.div`
   display: flex;
-  gap: 8px;
+  gap: 6px;
   
   .article-card {
     flex: 1;
     min-width: 0;
+  }
+
+  @media (max-width: 350px) {
+    gap: 2px;
   }
 `;
 
