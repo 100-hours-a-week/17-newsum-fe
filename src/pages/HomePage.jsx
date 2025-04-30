@@ -5,6 +5,7 @@ import { fetchArticles } from '../services/articleApi';
 import ArticleCard from '../components/article/ArticleCard';
 import NewsBox from '../components/news/NewsBox';
 import styled from '@emotion/styled';
+import Carousel from '../components/Carousel/Carousel';
 
 const categories = [
   { value: 'all', label: '전체' }, { value: '정치', label: '정치' }, { value: '경제', label: '경제' },
@@ -95,28 +96,17 @@ function HomePage() {
         {loading && ( <Box sx={{ display: 'flex', justifyContent: 'center', my: 5 }}><CircularProgress /></Box> )}
         {error && ( <Alert severity="error" sx={{ my: 2 }}>{error}</Alert> )}
         {!loading && !error && articles.length > 0 && (
-          <Grid item xs={12} sm={6} md={4} key={articles[0].id}>
-            <ArticleCard article={articles[0]} />
-          </Grid>
-        )}
-        {/* {!loading && !error && (
-          <Grid container spacing={3}>
-            {articles.length > 0 ? (
-              articles.map((article) => (
-                <Grid item xs={12} sm={6} md={4} key={article.id}>
+          <Box sx={{ mb: 4 }}>
+            <Carousel 
+              items={articles.map(article => (
+                <Box key={article.id} sx={{ width: '100%', height: '100%' }}>
                   <ArticleCard article={article} />
-                </Grid>
-              )
-            )
-            ) : (
-              <Grid item xs={12}>
-                <Typography sx={{ textAlign: 'center', mt: 5, color: 'text.secondary' }}>
-                  '{categories.find(c => c.value === activeTab)?.label}' 카테고리에 표시할 뉴스가 없습니다.
-                </Typography>
-              </Grid>
-            )}
-          </Grid>
-        )} */}
+                </Box>
+              ))}
+              slidesPerView={1}
+            />
+          </Box>
+        )}
 
         {/* 오늘의 뉴스 박스 */}
         <NewsBox
