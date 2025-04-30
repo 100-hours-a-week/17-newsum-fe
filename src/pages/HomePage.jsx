@@ -94,9 +94,11 @@ function HomePage() {
 
         {loading && ( <Box sx={{ display: 'flex', justifyContent: 'center', my: 5 }}><CircularProgress /></Box> )}
         {error && ( <Alert severity="error" sx={{ my: 2 }}>{error}</Alert> )}
-            <Grid item xs={12} sm={6} md={4} key= {articles[0].id}>
-              <ArticleCard article={articles[0]} />
-            </Grid>
+        {!loading && !error && articles.length > 0 && (
+          <Grid item xs={12} sm={6} md={4} key={articles[0].id}>
+            <ArticleCard article={articles[0]} />
+          </Grid>
+        )}
         {/* {!loading && !error && (
           <Grid container spacing={3}>
             {articles.length > 0 ? (
