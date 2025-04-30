@@ -51,7 +51,7 @@ const StyledToolbar = styled(Toolbar)`
 const NavButton = styled(Button)`
   color: #666;
   border-radius: 8px;
-  padding: 6px 12px;
+  padding: 0px 0px;
   min-width: 60px;
   text-transform: none;
   font-size: 0.875rem;
