@@ -2,20 +2,25 @@
 
 import React from 'react';
 import { Routes, Route } from 'react-router-dom';
-import MainLayout from '../components/Layout/MainLayout';
-import HomePage from '../pages/HomePage';
-import ArticlePage from '../pages/ArticlePage'; // ★ ArticlePage import 확인
+import MainLayout                from '../components/Layout/MainLayout';
+import HomePage                  from '../pages/HomePage';
+import ArticlePage               from '../pages/ArticlePage';
+import LoginPage                 from '../pages/LoginPage';
+import GoogleRedirectHandler     from '../pages/GoogleRedirectHandler';
 
 function Router() {
   return (
     <Routes>
+      {/* 레이아웃 없이 렌더링할 페이지들 */}
+      <Route path="/login" element={<LoginPage />} />
+      <Route path="/oauth/google/redirect" element={<GoogleRedirectHandler />} />
+
+      {/* MainLayout: 헤더/푸터 있는 공통 레이아웃 */}
       <Route element={<MainLayout />}>
-        <Route path="/" element={<HomePage />} />
-        {/* ★★★ 아래 라인이 정확히 있는지 확인하세요 ★★★ */}
+        <Route path="/"                   element={<HomePage />} />
         <Route path="/article/:articleId" element={<ArticlePage />} />
-        {/* 다른 라우트들... */}
+        {/* 필요하면 추가 페이지 */}
       </Route>
-      {/* 다른 레이아웃 라우트... */}
     </Routes>
   );
 }
