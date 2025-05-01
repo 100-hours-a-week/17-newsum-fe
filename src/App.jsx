@@ -8,7 +8,6 @@ function App() {
   return (
     <ThemeProviderWrapper>
       <Router />
-      <BottomNav /> {/* 렌더링 확인 */}
     </ThemeProviderWrapper>
   );
 }
