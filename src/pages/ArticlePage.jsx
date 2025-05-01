@@ -1,12 +1,13 @@
 // src/pages/ArticlePage.jsx
 import React, { useState, useEffect } from 'react';
 import { Box, IconButton, Typography, CircularProgress, Alert } from '@mui/material';
-import { useParams, useNavigate, Link as RouterLink } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import { fetchArticleById } from '../services/articleApi';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import ChatBubbleOutlineIcon from '@mui/icons-material/ChatBubbleOutline';
 import ArticleCard from '../components/article/ArticleCard';
 import NewsBox from '../components/news/NewsBox';
+import AuthorCard from '../components/AuthorCard';
 
 function ArticlePage() {
   const { articleId } = useParams();
@@ -89,14 +90,13 @@ function ArticlePage() {
       </Box>
 
       {/* 작가 프로필 */}
-      <Box sx={{ px: 2, py: 1 }}>
-        <NewsBox
-          title="작가 컴포넌트"
-          date=""
-          articles={[]}
-          onMoreClick={() => {}}
-        />
-      </Box>
+      <AuthorCard 
+        author={{
+          name: article.author || "작성자",
+          image: article.authorImage || "/placeholder-author.jpg"
+        }}
+        viewCount={23}
+      />
 
       {/* 댓글 섹션 */}
       <Box 
@@ -107,8 +107,6 @@ function ArticlePage() {
           display: 'flex',
           alignItems: 'center',
           gap: 1,
-          borderTop: '1px solid rgba(0, 0, 0, 0.12)',
-          borderBottom: '1px solid rgba(0, 0, 0, 0.12)',
           cursor: 'pointer'
         }}
       >

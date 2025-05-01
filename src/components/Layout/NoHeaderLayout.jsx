@@ -33,7 +33,6 @@ const MainContainer = styled(Box)`
 const ContentBox = styled(Box)`
   flex-grow: 1;
   padding: 0px;
-  padding-bottom: 80px;
   margin-top: 10px;
 
   @media (min-width: 768px) and (max-width: 1024px) {
