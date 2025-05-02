@@ -6,8 +6,8 @@ import { fetchArticleById } from '../services/articleApi';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import ChatBubbleOutlineIcon from '@mui/icons-material/ChatBubbleOutline';
 import ArticleCard from '../components/article/ArticleCard';
-import NewsBox from '../components/news/NewsBox';
-import AuthorCard from '../components/AuthorCard';
+import NewsBox from '../components/grid/MainGrid';
+import AuthorCard from '../components/author/AuthorCard';
 
 function ArticlePage() {
   const { articleId } = useParams();
