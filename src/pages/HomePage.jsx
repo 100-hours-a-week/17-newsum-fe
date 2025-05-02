@@ -6,6 +6,7 @@ import ArticleCard from '../components/article/ArticleCard';
 import NewsBox from '../components/news/NewsBox';
 import Carousel from '../components/Carousel/Carousel';
 import CategoryTabs from '../components/common/CategoryTabs';
+import Footer from '../components/Layout/Footer';
 
 const ITEMS_PER_PAGE = 6;
 
@@ -52,50 +53,53 @@ function HomePage() {
   };
 
   return (
-    <Container maxWidth="lg">
-      <Box sx={{ my: 1 }}>
-        {/* 카테고리 탭 */}
-        <CategoryTabs activeTab={activeTab} onTabChange={handleTabChange} />
+    <>
+      <Container maxWidth="lg">
+        <Box sx={{ my: 1 }}>
+          {/* 카테고리 탭 */}
+          <CategoryTabs activeTab={activeTab} onTabChange={handleTabChange} />
 
-        {loading && ( <Box sx={{ display: 'flex', justifyContent: 'center', my: 2 }}><CircularProgress /></Box> )}
-        {error && ( <Alert severity="error" sx={{ my: 1 }}>{error}</Alert> )}
-        {!loading && !error && articles.length > 0 && (
-          <Box sx={{ mb: 2 }}>
-            <Carousel 
-              items={articles.map(article => (
-                <Box key={article.id} sx={{ width: '100%', height: '100%' }}>
-                  <ArticleCard article={article} />
-                </Box>
-              ))}
-            />
-          </Box>
-        )}
+          {loading && ( <Box sx={{ display: 'flex', justifyContent: 'center', my: 2 }}><CircularProgress /></Box> )}
+          {error && ( <Alert severity="error" sx={{ my: 1 }}>{error}</Alert> )}
+          {!loading && !error && articles.length > 0 && (
+            <Box sx={{ mb: 2 }}>
+              <Carousel 
+                items={articles.map(article => (
+                  <Box key={article.id} sx={{ width: '100%', height: '100%' }}>
+                    <ArticleCard article={article} />
+                  </Box>
+                ))}
+              />
+            </Box>
+          )}
 
-        {/* 오늘의 뉴스 박스 */}
-        <NewsBox
-          title="오늘의 뉴스"
-          date="25.04.07 23:00 기준"
-          articles={articles}
-          onMoreClick={() => handleMoreClick('today')}
-          maxItems={3}
-        />
+          {/* 오늘의 뉴스 박스 */}
+          <NewsBox
+            title="오늘의 뉴스"
+            date="25.04.07 23:00 기준"
+            articles={articles}
+            onMoreClick={() => handleMoreClick('today')}
+            maxItems={3}
+          />
 
-        {/* 최근 본 뉴스 박스 */}
-        <NewsBox
-          title="최근 본 뉴스"
-          date="25.04.07 23:00 기준"
-          articles={articles}
-          onMoreClick={() => handleMoreClick('recent')}
-          maxItems={3}
-        />
+          {/* 최근 본 뉴스 박스 */}
+          <NewsBox
+            title="최근 본 뉴스"
+            date="25.04.07 23:00 기준"
+            articles={articles}
+            onMoreClick={() => handleMoreClick('recent')}
+            maxItems={3}
+          />
 
-        {!loading && !error && totalPages > 1 && (
-           <Box sx={{ display: 'flex', justifyContent: 'center', py: 2 }}>
-             <Pagination count={totalPages} page={page} onChange={handlePageChange} color="primary" size="large" showFirstButton showLastButton />
-           </Box>
-         )}
-      </Box>
-    </Container>
+          {!loading && !error && totalPages > 1 && (
+             <Box sx={{ display: 'flex', justifyContent: 'center', py: 2 }}>
+               <Pagination count={totalPages} page={page} onChange={handlePageChange} color="primary" size="large" showFirstButton showLastButton />
+             </Box>
+           )}
+        </Box>
+      </Container>
+      <Footer />
+    </>
   );
 }
 
