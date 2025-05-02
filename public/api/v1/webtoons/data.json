@@ -1,0 +1,42 @@
+{
+    "message": "웹툰 목록 조회에 성공했습니다",
+    "code": 200,
+    "data": {
+      "webtoons": [
+        {
+          "id": 101,
+          "title": "엔비디아 루빈 출시",
+          "thumbnailUrl": "https://cdn.example.com/webtoons/101.jpg"
+        },
+        {
+          "id": 102,
+          "title": "초거대 모델과 미래 예측",
+          "thumbnailUrl": "https://cdn.example.com/webtoons/102.jpg"
+        },
+        {
+          "id": 103,
+          "title": "생성형 AI가 바꾸는 일상",
+          "thumbnailUrl": "https://cdn.example.com/webtoons/103.jpg"
+        },
+        {
+          "id": 104,
+          "title": "오픈AI의 차세대 언어 모델",
+          "thumbnailUrl": "https://cdn.example.com/webtoons/104.jpg"
+        },
+        {
+          "id": 105,
+          "title": "구글 vs 엔비디아: AI 칩 전쟁",
+          "thumbnailUrl": "https://cdn.example.com/webtoons/105.jpg"
+        },
+        {
+          "id": 106,
+          "title": "디지털 휴먼의 부상",
+          "thumbnailUrl": "https://cdn.example.com/webtoons/106.jpg"
+        }
+      ],
+      "pageInfo": {
+        "nextCursor": "2024-04-18T13:00:00Z_106",
+        "hasNext": true
+      }
+    }
+  }

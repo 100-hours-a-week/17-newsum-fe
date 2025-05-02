@@ -1,0 +1,26 @@
+{
+    "code": 200,
+    "message": "최근 본 웹툰 목록 조회에 성공했습니다",
+    "data": {
+      "recentWebtoons": [
+        {
+          "id": 111,
+          "title": "드림 노바",
+          "image_url": "https://cdn.example.com/thumbnails/111.png",
+          "viewed_at": "2025-04-20T15:30:00Z"
+        },
+        {
+          "id": 112,
+          "title": "심해 탐험",
+          "image_url": "https://cdn.example.com/thumbnails/112.png",
+          "viewed_at": "2025-04-20T14:45:00Z"
+        },
+        {
+          "id": 113,
+          "title": "미래 도시",
+          "image_url": "https://cdn.example.com/thumbnails/113.png",
+          "viewed_at": "2025-04-20T14:00:00Z"
+        }
+      ]
+    }
+  }

@@ -1,0 +1,44 @@
+{
+    "message": "웹툰 기본 정보 조회에 성공했습니다.",
+    "code": 200,
+    "data": {
+      "id": 101,
+      "slides": [
+        {
+          "slide_seq": 0,
+          "imageUrl": "https://cdn.example.com/101/0.jpg",
+          "text": "슬라이드 설명1"
+        },
+        {
+          "slide_seq": 1,
+          "imageUrl": "https://cdn.example.com/101/1.jpg",
+          "text": "슬라이드 설명2"
+        },
+        {
+          "slide_seq": 2,
+          "imageUrl": "https://cdn.example.com/101/2.jpg",
+          "text": "슬라이드 설명3"
+        },
+        {
+          "slide_seq": 3,
+          "imageUrl": "https://cdn.example.com/101/3.jpg",
+          "text": "슬라이드 설명4"
+        },
+        {
+          "slide_seq": 4,
+          "imageUrl": "https://cdn.example.com/101/4.jpg",
+          "text": "슬라이드 설명5"
+        }
+      ],
+      "author": {
+        "id": 2,
+        "name": "김작가AI",
+        "profileImageUrl": "https://cdn.example.com/authors/2.jpg"
+      },
+      "isLiked": true,
+      "isBookmarked": true,
+      "likeCount": 305,
+      "viewCount": 1281
+    }
+  }
+  

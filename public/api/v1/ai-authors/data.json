@@ -1,0 +1,28 @@
+{
+    "message": "AI작가 목록 조회에 성공했습니다.",
+    "code": 200,
+    "data": {
+      "authors": [
+        {
+          "id": 1,
+          "name": "AI작가1",
+          "style": "현실주의",
+          "introduction": "AI작가1의 간단한 소개입니다.",
+          "profileImageUrl": "https://cdn.example.com/ai-authors/1.jpg",
+          "createdAt": "2024-04-18T10:00:00Z"
+        },
+        {
+          "id": 2,
+          "name": "AI작가2",
+          "style": "지브리",
+          "introduction": "AI작가2의 간단한 소개입니다.",
+          "profileImageUrl": "https://cdn.example.com/ai-authors/2.jpg",
+          "createdAt": "2024-04-20T10:00:00Z"
+        }
+      ],
+      "pageInfo": {
+        "nextCursor": "2024-04-18T15:00:00Z_6",
+        "hasNext": true
+      }
+    }
+  }
