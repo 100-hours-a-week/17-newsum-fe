@@ -7,9 +7,9 @@ import NewsBox from '../components/grid/MainGrid';
 import Carousel from '../components/Carousel/Carousel';
 import CategoryTabs from '../components/tabs/CategoryTabs';
 import Footer from '../components/Layout/Footer';
+import DefaultAxios from '../api/DefaultAxios';
 
 const ITEMS_PER_PAGE = 6;
-
 function HomePage() {
   const [articles, setArticles] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -38,6 +38,8 @@ function HomePage() {
     loadArticles(activeTab, page);
   }, [activeTab, page, loadArticles]);
 
+  
+
   const handleTabChange = (event, newValue) => {
     setActiveTab(newValue);
     setPage(1);
@@ -51,6 +53,21 @@ function HomePage() {
     console.log(`More clicked for ${section}`);
     // 추후 더보기 기능 구현
   };
+
+  // ❗️❗️ axios 사용한 요청 예시
+  const getWebtoons = async () => {
+    try{
+      // const res = await DefaultAxios.get('/api/v1/webtoons');
+      const res = await DefaultAxios.get('/api/v1/webtoons/data.json');
+      console.log(res.data);
+    } catch (err) {
+      console.log(err);
+    }
+  }
+
+  useEffect(() => {
+    getWebtoons();
+  }, []);
 
   return (
     <>
