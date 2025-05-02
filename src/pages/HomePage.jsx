@@ -3,9 +3,9 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { Typography, Container, Box, Grid, CircularProgress, Alert, Pagination } from '@mui/material';
 import { fetchArticles } from '../services/articleApi';
 import ArticleCard from '../components/article/ArticleCard';
-import NewsBox from '../components/news/NewsBox';
+import NewsBox from '../components/grid/MainGrid';
 import Carousel from '../components/Carousel/Carousel';
-import CategoryTabs from '../components/common/CategoryTabs';
+import CategoryTabs from '../components/tabs/CategoryTabs';
 import Footer from '../components/Layout/Footer';
 
 const ITEMS_PER_PAGE = 6;

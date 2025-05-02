@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { Box } from '@mui/material';
 import { useNavigate, useParams } from 'react-router-dom';
-import CategoryTabs, { categories } from '../components/common/CategoryTabs';
-import CategoryGrid from '../components/category/CategoryGrid';
+import CategoryTabs, { categories } from '../components/tabs/CategoryTabs';
+import CategoryGrid from '../components/grid/CategoryGrid';
 
 // 임시 데이터
 const mockArticles = [
