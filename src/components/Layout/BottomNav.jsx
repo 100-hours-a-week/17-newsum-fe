@@ -108,7 +108,7 @@ function BottomNav() {
       selectedIcon: <BookmarkIcon />
     },
     { 
-      label: '내 정보', 
+      label: 'AI 작가', 
       value: '/my', 
       icon: <PersonOutlineIcon />,
       selectedIcon: <PersonIcon />

@@ -9,6 +9,7 @@ import ArticlePage               from '../pages/ArticlePage';
 import CommentPage               from '../pages/CommentPage';
 import LoginPage                 from '../pages/LoginPage';
 import GoogleRedirectHandler     from '../pages/GoogleRedirectHandler';
+import CategoryPage              from '../pages/CategoryPage';
 
 function Router() {
   return (
@@ -21,11 +22,13 @@ function Router() {
       {/* MainLayout: 헤더/푸터 있는 공통 레이아웃 */}
       <Route element={<MainLayout />}>
         <Route path="/"                   element={<HomePage />} />
+        <Route path="/category/:category_id" element={<CategoryPage />} />
         {/* 필요하면 추가 페이지 */}
       </Route>
 
       <Route element={<NoHeaderLayout />}>
         <Route path="/article/:articleId" element={<ArticlePage />} />
+        
       </Route>
     </Routes>
   );
