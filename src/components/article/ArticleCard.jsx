@@ -1,5 +1,5 @@
 // src/components/article/ArticleCard.jsx
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useMemo } from 'react';
 import { Card, CardActionArea, Typography, Box } from '@mui/material';
 import { Link as RouterLink } from 'react-router-dom';
 import styled from '@emotion/styled';
@@ -56,53 +56,65 @@ const ViewCount = styled(Typography)`
   font-size: 0.7rem;
 `;
 
+// 컬러 추출 결과를 캐시하기 위한 Map
+const colorCache = new Map();
+
 const ArticleCard = ({ article }) => {
   const { id, title, thumbnailUrl, viewCount } = article;
   const imageRef = useRef(null);
   const [gradient, setGradient] = useState(null);
+  const [isImageLoaded, setIsImageLoaded] = useState(false);
+
+  // 이미지 URL에서 캐시된 컬러 가져오기
+  const cachedColor = useMemo(() => colorCache.get(thumbnailUrl), [thumbnailUrl]);
 
   useEffect(() => {
+    if (cachedColor) {
+      setGradient(cachedColor);
+      return;
+    }
+
     const loadGradient = async () => {
       if (imageRef.current && imageRef.current.complete) {
         try {
           const colorThief = new ColorThief();
           const color = colorThief.getColor(imageRef.current);
-          setGradient(
-            `linear-gradient(to bottom, transparent 0%, rgba(${color[0]}, ${color[1]}, ${color[2]}, 0.7) 40%, rgba(${color[0]}, ${color[1]}, ${color[2]}, 0.9) 100%)`
-          );
+          const newGradient = `linear-gradient(to bottom, transparent 0%, rgba(${color[0]}, ${color[1]}, ${color[2]}, 0.7) 40%, rgba(${color[0]}, ${color[1]}, ${color[2]}, 0.9) 100%)`;
+          
+          // 결과를 캐시에 저장
+          colorCache.set(thumbnailUrl, newGradient);
+          setGradient(newGradient);
         } catch (error) {
           console.error('Error getting color:', error);
         }
       }
     };
 
-    if (imageRef.current) {
-      if (imageRef.current.complete) {
-        loadGradient();
-      } else {
-        imageRef.current.addEventListener('load', loadGradient);
-      }
+    if (imageRef.current && isImageLoaded) {
+      loadGradient();
     }
+  }, [thumbnailUrl, isImageLoaded, cachedColor]);
 
-    return () => {
-      if (imageRef.current) {
-        imageRef.current.removeEventListener('load', loadGradient);
-      }
-    };
-  }, [thumbnailUrl]);
+  const handleImageLoad = () => {
+    setIsImageLoaded(true);
+  };
 
   const formatViewCount = (count) => {
     return `${(count / 10000).toFixed(1)}만`;
   };
+
+  const defaultThumbnail = 'https://sinsa-image.s3.ap-northeast-2.amazonaws.com/not_image.png';
 
   return (
     <StyledCard elevation={0}>
       <StyledCardActionArea component={RouterLink} to={`/article/${id}`}>
         <CardImage
           ref={imageRef}
-          src={thumbnailUrl || 'https://sinsa-image.s3.ap-northeast-2.amazonaws.com/not_image.png'}
+          src={thumbnailUrl || defaultThumbnail}
           alt={title}
           crossOrigin="anonymous"
+          loading="lazy"
+          onLoad={handleImageLoad}
         />
         <GradientOverlay gradient={gradient}>
           <Title variant="h6" component="h2">
@@ -117,4 +129,4 @@ const ArticleCard = ({ article }) => {
   );
 };
 
-export default ArticleCard;
+export default React.memo(ArticleCard);
