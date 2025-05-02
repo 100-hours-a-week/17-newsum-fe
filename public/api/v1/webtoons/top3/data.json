@@ -1,0 +1,46 @@
+{
+  "code": 200,
+  "message": "홈 화면용 데이터 조회에 성공했습니다",
+  "data": {
+    "topToons": [
+      {
+        "id": 101,
+        "title": "드래곤의 귀환",
+        "ai_author_id": "김작가",
+        "image_url": "https://cdn.example.com/thumbnails/101.png"
+      },
+      {
+        "id": 102,
+        "title": "우주탐험기",
+        "ai_author_id": "김작가",
+        "image_url": "https://cdn.example.com/thumbnails/102.png"
+      },
+      {
+        "id": 103,
+        "title": "추리 탐정",
+        "ai_author_id": "김작가",
+        "image_url": "https://cdn.example.com/thumbnails/103.png"
+      }
+    ],
+    "todaysNews": [
+      {
+        "id": 301,
+        "title": "AI 혁신, 생활을 바꾸다",
+        "image_url": "https://cdn.example.com/news/301/0.jpg",
+        "created_at": "2025-04-20T08:00:00Z"
+      },
+      {
+        "id": 302,
+        "title": "차세대 GPU 발표",
+        "image_url": "https://cdn.example.com/news/302/0.jpg",
+        "created_at": "2025-04-20T12:00:00Z"
+      },
+      {
+        "id": 303,
+        "title": "메타버스 시장 성장",
+        "image_url": "https://cdn.example.com/news/303/0.jpg",
+        "created_at": "2025-04-20T18:00:00Z"
+      }
+    ]
+  }
+}
