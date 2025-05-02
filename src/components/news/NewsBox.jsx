@@ -1,6 +1,6 @@
 import React from 'react';
 import styled from '@emotion/styled';
-import { Box, Grid } from '@mui/material';
+import { Box } from '@mui/material';
 import ArticleCard from '../article/ArticleCard';
 
 const Container = styled(Box)`
@@ -73,7 +73,7 @@ const ArticlesContainer = styled.div`
   }
 `;
 
-const NewsBox = ({ title, date, articles, onMoreClick }) => {
+const NewsBox = ({ title, date, articles, onMoreClick, maxItems = 3 }) => {
   return (
     <Container>
       <Header>
@@ -84,7 +84,7 @@ const NewsBox = ({ title, date, articles, onMoreClick }) => {
         <MoreButton onClick={onMoreClick}>더보기</MoreButton>
       </Header>
       <ArticlesContainer>
-        {articles.slice(0, 3).map((article) => (
+        {articles.slice(0, maxItems).map((article) => (
           <div className="article-card" key={article.id}>
             <ArticleCard article={article} />
           </div>
