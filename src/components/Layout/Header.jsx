@@ -1,9 +1,9 @@
 // src/components/Layout/Header.jsx
 import React from 'react';
-import { AppBar, Toolbar, Button, Box } from '@mui/material';
+import { AppBar, Toolbar, IconButton, Box } from '@mui/material';
 import { Link as RouterLink, useLocation } from 'react-router-dom';
-import NotificationsNoneIcon from '@mui/icons-material/NotificationsNone';
-import PersonOutlineIcon from '@mui/icons-material/PersonOutline';
+import NotificationsOutlinedIcon from '@mui/icons-material/NotificationsOutlined';
+import PersonOutlineOutlinedIcon from '@mui/icons-material/PersonOutlineOutlined';
 import styled from '@emotion/styled';
 import logo from '../../assets/logo.png';
 
@@ -36,6 +36,7 @@ const StyledToolbar = styled(Toolbar)`
   width: 100%;
   padding: 0 16px;
   min-height: 56px;
+  justify-content: space-between;
 
   @media (min-width: 768px) and (max-width: 1024px) {
     max-width: 100%;
@@ -48,22 +49,48 @@ const StyledToolbar = styled(Toolbar)`
   }
 `;
 
-const NavButton = styled(Button)`
+const LogoLink = styled(RouterLink)`
+  display: flex;
+  align-items: center;
+  text-decoration: none;
+`;
+
+const IconsContainer = styled(Box)`
+  display: flex;
+  gap: 12px;
+  margin-right: -8px;
+`;
+
+const StyledIconButton = styled(IconButton)`
+  width: 40px;
+  height: 40px;
+  padding: 8px;
   color: #666;
-  border-radius: 8px;
-  padding: 0px 0px;
-  min-width: 60px;
-  text-transform: none;
-  font-size: 0.875rem;
+  border-radius: 12px;
   transition: all 0.2s ease-in-out;
 
   &:hover {
-    background-color: rgba(0, 0, 0, 0.04);
+    background-color: rgba(0, 0, 0, 0.06);
+    transform: translateY(-1px);
+  }
+
+  &:active {
+    transform: translateY(0);
+  }
+
+  .MuiSvgIcon-root {
+    font-size: 24px;
+    stroke-width: 0.4px;
+    transition: all 0.2s ease-in-out;
   }
 
   &.selected {
-    color: white;
-    background-color: black;
+    color: #000;
+    background-color: rgba(0, 0, 0, 0.04);
+
+    .MuiSvgIcon-root {
+      transform: scale(1.1);
+    }
   }
 `;
 
@@ -73,27 +100,25 @@ function Header() {
   return (
     <StyledAppBar>
       <StyledToolbar>
-        <RouterLink to="/" style={{ flexGrow: 1, display: 'flex', alignItems: 'center', textDecoration: 'none' }}>
+        <LogoLink to="/">
           <img src={logo} alt="Newsum Logo" style={{ height: 40, margin: '4px 0' }} />
-        </RouterLink>
-        <Box sx={{ display: 'flex', gap: 1 }}>
-          <NavButton
+        </LogoLink>
+        <IconsContainer>
+          <StyledIconButton
             component={RouterLink}
             to="/notifications"
             className={location.pathname === '/notifications' ? 'selected' : ''}
-            startIcon={<NotificationsNoneIcon />}
           >
-            알림
-          </NavButton>
-          <NavButton
+            <NotificationsOutlinedIcon />
+          </StyledIconButton>
+          <StyledIconButton
             component={RouterLink}
             to="/my"
             className={location.pathname === '/my' ? 'selected' : ''}
-            startIcon={<PersonOutlineIcon />}
           >
-            내 정보
-          </NavButton>
-        </Box>
+            <PersonOutlineOutlinedIcon />
+          </StyledIconButton>
+        </IconsContainer>
       </StyledToolbar>
     </StyledAppBar>
   );
