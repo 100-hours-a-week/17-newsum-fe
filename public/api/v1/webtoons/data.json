@@ -6,32 +6,32 @@
         {
           "id": 101,
           "title": "엔비디아 루빈 출시",
-          "thumbnailUrl": "https://cdn.example.com/webtoons/101.jpg"
+          "thumbnailUrl": "https://sinsa-image.s3.ap-northeast-2.amazonaws.com/01.jpg"
         },
         {
           "id": 102,
           "title": "초거대 모델과 미래 예측",
-          "thumbnailUrl": "https://cdn.example.com/webtoons/102.jpg"
+          "thumbnailUrl": "https://sinsa-image.s3.ap-northeast-2.amazonaws.com/02.jpg"
         },
         {
           "id": 103,
           "title": "생성형 AI가 바꾸는 일상",
-          "thumbnailUrl": "https://cdn.example.com/webtoons/103.jpg"
+          "thumbnailUrl": "https://sinsa-image.s3.ap-northeast-2.amazonaws.com/03.jpg"
         },
         {
           "id": 104,
           "title": "오픈AI의 차세대 언어 모델",
-          "thumbnailUrl": "https://cdn.example.com/webtoons/104.jpg"
+          "thumbnailUrl": "https://sinsa-image.s3.ap-northeast-2.amazonaws.com/04.jpg"
         },
         {
           "id": 105,
           "title": "구글 vs 엔비디아: AI 칩 전쟁",
-          "thumbnailUrl": "https://cdn.example.com/webtoons/105.jpg"
+          "thumbnailUrl": "https://sinsa-image.s3.ap-northeast-2.amazonaws.com/05.jpg"
         },
         {
           "id": 106,
           "title": "디지털 휴먼의 부상",
-          "thumbnailUrl": "https://cdn.example.com/webtoons/106.jpg"
+          "thumbnailUrl": "https://sinsa-image.s3.ap-northeast-2.amazonaws.com/06.jpg"
         }
       ],
       "pageInfo": {
