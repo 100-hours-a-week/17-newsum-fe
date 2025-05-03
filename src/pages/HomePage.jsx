@@ -8,15 +8,19 @@ import Carousel from '../components/Carousel/Carousel';
 import CategoryTabs from '../components/tabs/CategoryTabs';
 import Footer from '../components/Layout/Footer';
 import DefaultAxios from '../api/DefaultAxios';
-
+import { useNavigate } from 'react-router-dom';
 const ITEMS_PER_PAGE = 6;
 function HomePage() {
-  const [articles, setArticles] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [activeTab, setActiveTab] = useState('all');
   const [page, setPage] = useState(1);
   const [totalCount, setTotalCount] = useState(0);
+  const [webtoonsData, setWebtoonsData] = useState({});
+  const [top3Data, setTop3Data] = useState({});
+  const [recentData, setRecentData] = useState({});
+
+  const navigate = useNavigate();
 
   const totalPages = Math.ceil(totalCount / ITEMS_PER_PAGE);
 
@@ -25,7 +29,6 @@ function HomePage() {
       setLoading(true);
       setError(null);
       const response = await fetchArticles(currentPage, ITEMS_PER_PAGE, category);
-      setArticles(response.articles);
       setTotalCount(response.totalCount);
     } catch (err) {
       setError(err.message || 'An unknown error occurred');
@@ -51,22 +54,42 @@ function HomePage() {
 
   const handleMoreClick = (section) => {
     console.log(`More clicked for ${section}`);
+    navigate(section);
     // 추후 더보기 기능 구현
   };
 
   // ❗️❗️ axios 사용한 요청 예시
   const getWebtoons = async () => {
-    try{
-      // const res = await DefaultAxios.get('/api/v1/webtoons');
-      const res = await DefaultAxios.get('/api/v1/webtoons/data.json');
-      console.log(res.data);
+    try {
+      const res = await DefaultAxios.get('/api/v1/webtoons/main/data.json');
+      setWebtoonsData(res.data?.data?.webtoonsByCategory || {});
     } catch (err) {
       console.log(err);
     }
-  }
+  };
+  
+  const getTop3Data = async () => {
+    try {
+      const res = await DefaultAxios.get('/api/v1/webtoons/top3/data.json');
+      setTop3Data(res.data?.data || {});
+    } catch (err) {
+      console.log(err);
+    }
+  };
+
+  const getRecentData = async () => {
+    try {
+      const res = await DefaultAxios.get('/api/v1/webtoons/recent/data.json');
+      setRecentData(res.data?.data || {});
+    } catch (err) {
+      console.log(err);
+    }
+  };
 
   useEffect(() => {
     getWebtoons();
+    getTop3Data();
+    getRecentData();
   }, []);
 
   return (
@@ -78,12 +101,17 @@ function HomePage() {
 
           {loading && ( <Box sx={{ display: 'flex', justifyContent: 'center', my: 2 }}><CircularProgress /></Box> )}
           {error && ( <Alert severity="error" sx={{ my: 1 }}>{error}</Alert> )}
-          {!loading && !error && articles.length > 0 && (
+          {!loading && !error && top3Data.topToons && top3Data.topToons.length > 0 && (
             <Box sx={{ mb: 2 }}>
               <Carousel 
-                items={articles.map(article => (
+                items={top3Data.topToons.map(article => (
                   <Box key={article.id} sx={{ width: '100%', height: '100%' }}>
-                    <ArticleCard article={article} />
+                    <ArticleCard article={{
+                      id: article.id,
+                      title: article.title,
+                      thumbnailUrl: article.image_url,
+                      viewCount: 0,
+                    }} />
                   </Box>
                 ))}
               />
@@ -91,22 +119,53 @@ function HomePage() {
           )}
 
           {/* 오늘의 뉴스 박스 */}
-          <NewsBox
-            title="오늘의 뉴스"
-            date="25.04.07 23:00 기준"
-            articles={articles}
-            onMoreClick={() => handleMoreClick('today')}
-            maxItems={3}
-          />
+          {top3Data.todaysNews && top3Data.todaysNews.length > 0 && (
+            <NewsBox
+              title="오늘의 뉴스"
+              date={top3Data.todaysNews[0]?.created_at ? new Date(top3Data.todaysNews[0].created_at).toLocaleString('ko-KR', { dateStyle: 'short', timeStyle: 'short' }) + " 기준" : ''}
+              articles={top3Data.todaysNews.map(article => ({
+                id: article.id,
+                title: article.title,
+                thumbnailUrl: article.image_url,
+                viewCount: 0,
+              }))}
+              onMoreClick={() => handleMoreClick(`/today`)}
+              maxItems={3}
+            />
+          )}
 
           {/* 최근 본 뉴스 박스 */}
-          <NewsBox
-            title="최근 본 뉴스"
-            date="25.04.07 23:00 기준"
-            articles={articles}
-            onMoreClick={() => handleMoreClick('recent')}
-            maxItems={3}
-          />
+          {recentData.recentWebtoons && recentData.recentWebtoons.length > 0 && (
+            <NewsBox
+              title="최근 본 뉴스"
+              date={recentData.recentWebtoons[0]?.viewed_at ? new Date(recentData.recentWebtoons[0].viewed_at).toLocaleString('ko-KR', { dateStyle: 'short', timeStyle: 'short' }) + " 기준" : ''}
+              articles={recentData.recentWebtoons.map(article => ({
+                id: article.id,
+                title: article.title,
+                thumbnailUrl: article.image_url,
+                viewCount: 0,
+              }))}
+              onMoreClick={() => handleMoreClick(`/recent`)}
+              maxItems={3}
+            />
+          )}
+
+          {/* 카테고리별 웹툰 박스 */}
+          {Object.entries(webtoonsData).map(([category, articles]) => (
+            <NewsBox
+              key={category}
+              title={category}
+              date={articles[0]?.created_at ? new Date(articles[0].created_at).toLocaleString('ko-KR', { dateStyle: 'short', timeStyle: 'short' }) + " 기준" : ''}
+              articles={articles.map(article => ({
+                id: article.id,
+                title: article.title,
+                thumbnailUrl: article.image_url,
+                viewCount: 0,
+              }))}
+              onMoreClick={() => handleMoreClick(`category/${category}`)}
+              maxItems={3}
+            />
+          ))}
 
           {!loading && !error && totalPages > 1 && (
              <Box sx={{ display: 'flex', justifyContent: 'center', py: 2 }}>

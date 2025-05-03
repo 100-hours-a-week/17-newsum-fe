@@ -7,9 +7,13 @@ import NEWSUM_LOGO from '../../assets/logo.png';
 
 
 const FooterContainer = styled(Box)`
-  padding: 32px 0;  
+  padding: 32px 0;
   background-color: white;
   border-top: 1px solid #eee;
+
+  @media (min-width: 768px) and (max-width: 1024px) {
+    padding-bottom: 80px;
+  }
 `;
 
 const FooterContent = styled.div`
