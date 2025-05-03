@@ -18,7 +18,7 @@ function GoogleRedirectHandler() {
         }
 
         // 서버에 인증 코드 전송
-        const response = await fetch('http://localhost:8080/api/v1/oauth2/google/callback', {
+        const response = await fetch(`${import.meta.env.VITE_GOOGLE_CALLBACK_API_URL}`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
