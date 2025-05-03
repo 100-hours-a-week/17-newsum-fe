@@ -1,53 +1,57 @@
 // src/pages/GoogleRedirectHandler.jsx
 import React, { useEffect } from 'react';
-import { useNavigate, useLocation } from 'react-router-dom';
-import { Box, CircularProgress } from '@mui/material';
+import { useNavigate } from 'react-router-dom';
+import { useAuth } from '../contexts/AuthContext';
 
 function GoogleRedirectHandler() {
   const navigate = useNavigate();
-  const { search } = useLocation();
+  const { login } = useAuth();
 
   useEffect(() => {
-    // 1) URL에서 code 파라미터 추출
-    const params = new URLSearchParams(search);
-    const code = params.get('code');
+    const handleGoogleCallback = async () => {
+      try {
+        const urlParams = new URLSearchParams(window.location.search);
+        const code = urlParams.get('code');
 
-    console.log('Google OAuth 인가코드:', code);
+        if (!code) {
+          throw new Error('인증 코드를 받지 못했습니다.');
+        }
 
-    if (!code) {
-      // code가 없으면 로그인으로 돌려보냄
-      navigate('/login');
-      return;
-    }
+        // 서버에 인증 코드 전송
+        const response = await fetch('http://localhost:8080/api/v1/oauth2/google/callback', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ code }),
+        });
 
-    // 2) 백엔드로 code 전달 (POST 예시)
-    fetch(`${import.meta.env.VITE_API_BASE_URL}/api/v1/oauth2/authorization/google`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ code }),
-    })
-      .then((res) => res.json())
-      .then((data) => {
-        // 3) 받은 JWT 토큰 저장 (예시: localStorage)
-        localStorage.setItem('accessToken', data.data.accessToken);
-        localStorage.setItem('refreshToken', data.data.refreshToken);
-        // 4) 로그인 완료 후 메인페이지로 이동
+        if (!response.ok) {
+          throw new Error('로그인에 실패했습니다.');
+        }
+
+        const data = await response.json();
+
+        // 사용자 정보를 세션 스토리지에 저장
+        sessionStorage.setItem('userInfo', JSON.stringify(data.userInfo));
+        sessionStorage.setItem('accessToken', data.accessToken);
+        sessionStorage.setItem('refreshToken', data.refreshToken);
+
+        // AuthContext에 사용자 정보 저장
+        login(data.userInfo);
+
+        // 홈페이지로 리다이렉트
         navigate('/');
-      })
-      .catch((err) => {
-        console.error('OAuth 처리 중 에러:', err);
+      } catch (error) {
+        console.error('구글 로그인 처리 중 오류 발생:', error);
         navigate('/login');
-      });
-  }, [search, navigate]);
+      }
+    };
 
-  // 로딩 스피너 표시
-  return (
-    <Box 
-      sx={{ display: 'flex', height: '100vh', alignItems: 'center', justifyContent: 'center' }}
-    >
-      <CircularProgress />
-    </Box>
-  );
+    handleGoogleCallback();
+  }, [navigate, login]);
+
+  return null;
 }
 
 export default GoogleRedirectHandler;

@@ -4,12 +4,21 @@ const AuthContext = createContext(null);
 
 export function AuthProvider({ children }) {
   const [user, setUser] = useState(() => {
-    // localStorage에서 사용자 정보 불러오기
-    const savedUser = localStorage.getItem('user');
-    return savedUser ? JSON.parse(savedUser) : null;
+    try {
+      const savedUser = localStorage.getItem('user');
+      return savedUser ? JSON.parse(savedUser) : null;
+    } catch (e) {
+      console.error("유저 정보 파싱 실패:", e);
+      localStorage.removeItem('user');
+      return null;
+    }
   });
 
   const login = useCallback((userData) => {
+    if (!userData) {
+      console.warn('login에 전달된 userData가 없습니다.');
+      return;
+    }
     setUser(userData);
     localStorage.setItem('user', JSON.stringify(userData));
   }, []);
@@ -32,4 +41,4 @@ export function useAuth() {
     throw new Error('useAuth must be used within an AuthProvider');
   }
   return context;
-} 
+}
