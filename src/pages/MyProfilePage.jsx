@@ -1,12 +1,14 @@
 import React, { useEffect, useState, useRef } from 'react';
-import { Box, Typography, Button, Avatar, IconButton } from '@mui/material';
+import { Box, Typography, Button, Avatar, IconButton, Modal } from '@mui/material';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import { useNavigate } from 'react-router-dom';
+import logoutLogo from '../assets/logout_logo.jpeg';
 
 function MyProfilePage() {
   const navigate = useNavigate();
   const [user, setUser] = useState(null);
   const [profileImg, setProfileImg] = useState('');
+  const [open, setOpen] = useState(false);
   const fileInputRef = useRef();
 
   useEffect(() => {
@@ -19,11 +21,6 @@ function MyProfilePage() {
     const localImg = localStorage.getItem('profileImage');
     if (localImg) setProfileImg(localImg);
   }, []);
-
-  const handleLogout = () => {
-    sessionStorage.clear();
-    navigate('/login');
-  };
 
   const handleEdit = () => {
     // 회원정보 수정 페이지로 이동 (추후 구현)
@@ -46,6 +43,19 @@ function MyProfilePage() {
     };
     reader.readAsDataURL(file);
   };
+
+  // 로그아웃 버튼 클릭 시 팝업 오픈
+  const handleLogoutClick = () => setOpen(true);
+
+  // 팝업에서 진짜 로그아웃
+  const handleLogout = () => {
+    setOpen(false);
+    sessionStorage.clear();
+    navigate('/login');
+  };
+
+  // 팝업 취소
+  const handleCancel = () => setOpen(false);
 
   return (
     <Box
@@ -144,11 +154,11 @@ function MyProfilePage() {
         <Button
           fullWidth
           variant="outlined"
-          onClick={handleLogout}
+          onClick={handleLogoutClick}
           sx={{
             bgcolor: '#fff',
-            color: '#d32f2f',
-            borderColor: '#d32f2f',
+            color: '#111',
+            borderColor: '#111',
             fontWeight: 500,
             borderRadius: 2,
             '&:hover': {
@@ -161,6 +171,83 @@ function MyProfilePage() {
           로그아웃
         </Button>
       </Box>
+
+      {/* 로그아웃 확인 모달 */}
+      <Modal open={open} onClose={handleCancel}>
+        <Box
+          sx={{
+            position: 'absolute',
+            top: '50%',
+            left: '50%',
+            transform: 'translate(-50%, -50%)',
+            bgcolor: '#fff',
+            borderRadius: 3,
+            boxShadow: 24,
+            p: 4,
+            width: 320,
+            minHeight: 320,
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            outline: 'none',
+          }}
+        >
+          {/* 위에 이미지 */}
+          <Box
+            component="img"
+            src={logoutLogo}
+            alt="Logout Logo"
+            sx={{
+              width: 90,
+              height: 90,
+              borderRadius: '50%',
+              objectFit: 'cover',
+              mb: 2,
+            }}
+          />
+          {/* 대사 */}
+          <Typography sx={{ fontWeight: 600, fontSize: 18, mb: 4, mt: 1 }}>
+            로그아웃할거야 멍?
+          </Typography>
+          {/* 버튼들 */}
+          <Button
+            fullWidth
+            variant="contained"
+            onClick={handleLogout}
+            sx={{
+              bgcolor: '#111',
+              color: '#fff',
+              fontWeight: 600,
+              borderRadius: 2,
+              mb: 1.5,
+              '&:hover': {
+                bgcolor: '#d32f2f',
+                color: '#fff',
+              },
+            }}
+          >
+            로그아웃
+          </Button>
+          <Button
+            fullWidth
+            variant="outlined"
+            onClick={handleCancel}
+            sx={{
+              bgcolor: '#fff',
+              color: '#111',
+              borderColor: '#111',
+              fontWeight: 600,
+              borderRadius: 2,
+              '&:hover': {
+                bgcolor: '#f5f5f5',
+                borderColor: '#111',
+              },
+            }}
+          >
+            취소
+          </Button>
+        </Box>
+      </Modal>
     </Box>
   );
 }
