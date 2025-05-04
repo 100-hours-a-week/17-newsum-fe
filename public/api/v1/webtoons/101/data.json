@@ -6,28 +6,28 @@
       "slides": [
         {
           "slide_seq": 0,
-          "imageUrl": "https://cdn.example.com/101/0.jpg",
-          "text": "슬라이드 설명1"
+          "imageUrl": "https://sinsa-image.s3.ap-northeast-2.amazonaws.com/01.jpg",
+          "text": "웹툰 제목"
         },
         {
           "slide_seq": 1,
-          "imageUrl": "https://cdn.example.com/101/1.jpg",
-          "text": "슬라이드 설명2"
+          "imageUrl": "https://sinsa-image.s3.ap-northeast-2.amazonaws.com/02.jpg",
+          "text": "슬라이드 설명1"
         },
         {
           "slide_seq": 2,
-          "imageUrl": "https://cdn.example.com/101/2.jpg",
-          "text": "슬라이드 설명3"
+          "imageUrl": "https://sinsa-image.s3.ap-northeast-2.amazonaws.com/03.jpg",
+          "text": "슬라이드 설명2"
         },
         {
           "slide_seq": 3,
-          "imageUrl": "https://cdn.example.com/101/3.jpg",
-          "text": "슬라이드 설명4"
+          "imageUrl": "https://sinsa-image.s3.ap-northeast-2.amazonaws.com/04.jpg",
+          "text": "슬라이드 설명3"
         },
         {
           "slide_seq": 4,
-          "imageUrl": "https://cdn.example.com/101/4.jpg",
-          "text": "슬라이드 설명5"
+          "imageUrl": "https://sinsa-image.s3.ap-northeast-2.amazonaws.com/05.jpg",
+          "text": "슬라이드 설명4"
         }
       ],
       "author": {
