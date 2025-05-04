@@ -99,8 +99,11 @@ function HomePage() {
           {/* 카테고리 탭 */}
           <CategoryTabs activeTab={activeTab} onTabChange={handleTabChange} />
 
+          {/* 로딩 중일 때 로딩 스피너 표시 */}
           {loading && ( <Box sx={{ display: 'flex', justifyContent: 'center', my: 2 }}><CircularProgress /></Box> )}
           {error && ( <Alert severity="error" sx={{ my: 1 }}>{error}</Alert> )}
+          
+          {/* 최상위 3개 웹툰 캐러셀 표시 */}
           {!loading && !error && top3Data.topToons && top3Data.topToons.length > 0 && (
             <Box sx={{ mb: 2 }}>
               <Carousel 
@@ -167,6 +170,7 @@ function HomePage() {
             />
           ))}
 
+          {/* 페이지네이션 표시 */} 
           {!loading && !error && totalPages > 1 && (
              <Box sx={{ display: 'flex', justifyContent: 'center', py: 2 }}>
                <Pagination count={totalPages} page={page} onChange={handlePageChange} color="primary" size="large" showFirstButton showLastButton />
