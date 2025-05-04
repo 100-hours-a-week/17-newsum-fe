@@ -26,13 +26,8 @@ function LoginPage() {
   };
 
   const handleKakaoLogin = () => {
-    const log = {
-      timestamp: new Date().toISOString(),
-      event: '카카오 로그인 버튼 클릭',
-      url: window.location.href
-    };
-    localStorage.setItem('login_debug_log', JSON.stringify(log));
-    window.location.href = 'http://localhost:8080/oauth2/authorization/kakao';
+    const KAKAO_AUTH_URL = `https://kauth.kakao.com/oauth/authorize?client_id=${import.meta.env.VITE_KAKAO_REST_API_KEY}&redirect_uri=${import.meta.env.VITE_KAKAO_REDIRECT_URI}&response_type=code`;
+    window.location.href = KAKAO_AUTH_URL;
   };
 
   // 서버에서 받은 토큰을 처리하는 함수

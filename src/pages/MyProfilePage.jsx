@@ -16,11 +16,14 @@ function MyProfilePage() {
     const userInfo = sessionStorage.getItem('userInfo');
     if (userInfo) {
       setUser(JSON.parse(userInfo));
+    } else {
+      // 사용자 정보가 없으면 로그인 페이지로 이동
+      navigate('/login', { replace: true });
     }
     // 로컬스토리지에서 이미지 불러오기
     const localImg = localStorage.getItem('profileImage');
     if (localImg) setProfileImg(localImg);
-  }, []);
+  }, [navigate]);
 
   const handleEdit = () => {
     // 회원정보 수정 페이지로 이동 (추후 구현)
@@ -51,7 +54,9 @@ function MyProfilePage() {
   const handleLogout = () => {
     setOpen(false);
     sessionStorage.clear();
-    navigate('/login');
+    localStorage.removeItem('profileImage');
+    localStorage.removeItem('user');
+    navigate('/');
   };
 
   // 팝업 취소
