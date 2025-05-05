@@ -1,0 +1,8 @@
+{
+    "code": 200,
+    "message": "로그인에 성공했습니다",
+    "data": {
+      "accessToken": "{your_jwt_here}",
+      "refreshToken": "{your_refresh_token_here}"
+    }
+}

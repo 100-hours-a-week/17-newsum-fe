@@ -1,0 +1,12 @@
+{
+    "code": 200,
+    "message": "유저 프로필 조회에 성공했습니다",
+    "data": {
+      "nickname": "수아",
+      "email": "hong@example.com",
+      "profileImageUrl": "https://cdn.example.com/profiles/123.png",
+      "createdAt": "2025-01-01T12:00:00Z",
+      "updatedAt": "2025-03-15T09:30:00Z"
+    }
+  }
+  

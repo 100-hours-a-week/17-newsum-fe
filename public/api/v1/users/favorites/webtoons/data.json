@@ -1,0 +1,27 @@
+{
+    "message": "웹툰 즐겨찾기 목록 조회에 성공했습니다.",
+    "code": 200,
+    "data": {
+      "webtoons": [
+        {
+          "id": 101,
+          "title": "AI 혁명의 시대",
+          "thumbnailUrl": "https://cdn.example.com/webtoons/101.jpg"
+        },
+        {
+          "id": 102,
+          "title": "로봇은 철학을 할 수 있을까?",
+          "thumbnailUrl": "https://cdn.example.com/webtoons/102.jpg"
+        },
+        {
+          "id": 103,
+          "title": "초거대 모델의 비밀",
+          "thumbnailUrl": "https://cdn.example.com/webtoons/103.jpg"
+        }
+      ],
+      "pageInfo": {
+        "nextCursor": "2024-04-21T10:30:00Z_103",
+        "hasNext": true
+      }
+    }
+  }

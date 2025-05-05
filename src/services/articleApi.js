@@ -4,7 +4,7 @@
 // JavaScript에서는 타입을 명시하지 않습니다.
 const mockArticles = [
   {
-    id: 'news001',
+    id: '1',
     title: '우리가 사랑한 영웅, 이순신',
     summary: '인공지능 기술이 뉴스 소비 패턴을 어떻게 바꾸고 있는지...',
     thumbnailUrl: 'https://sinsa-image.s3.ap-northeast-2.amazonaws.com/01.jpg',
@@ -15,7 +15,7 @@ const mockArticles = [
     content: '<h3>AI 기반 뉴스 소비의 변화</h3><p>최근 몇 년간 인공지능(AI) 기술은 미디어 산업... (이하 생략, 이전 내용 참고)'
   },
   {
-    id: 'news002',
+    id: '2',
     title: '걸어서 템플로',
     summary: '세계 경제가 직면한 주요 이슈와 다가올 분기의 경제 성장률...',
     thumbnailUrl: 'https://sinsa-image.s3.ap-northeast-2.amazonaws.com/02.jpg',
@@ -26,7 +26,7 @@ const mockArticles = [
     content: '<h4>주요 경제 지표 분석</h4><p>최근 발표된 주요 경제 지표들은 혼조세를... (이하 생략, 이전 내용 참고)'
   },
   {
-    id: 'news003',
+    id: '3',
     title: '워킹데드 오상이',
     summary: '따뜻한 봄날, 가족 또는 연인과 함께 떠나기 좋은 국내 숨겨진 명소...',
     thumbnailUrl: 'https://sinsa-image.s3.ap-northeast-2.amazonaws.com/03.jpg',
@@ -37,7 +37,7 @@ const mockArticles = [
     content: '<p>봄의 정취를 만끽할 수 있는... (이하 생략)'
   },
   {
-    id: 'news004',
+    id: '4',
     title: '우주패스를 구독했더니',
     summary: '지구를 지키는 일상 속 작은 습관들. 누구나 쉽게 따라 할 수 있는...',
     thumbnailUrl: 'https://sinsa-image.s3.ap-northeast-2.amazonaws.com/04.jpg',
@@ -48,7 +48,7 @@ const mockArticles = [
     content: '<p>일상에서 쉽게 실천할 수 있는... (이하 생략)'
   },
   {
-    id: 'news005',
+    id: '5',
     title: '에버소울: 영혼의 시작점',
     summary: '시장 안정화를 위한 새로운 부동산 정책이 발표되었습니다...',
     thumbnailUrl: 'https://sinsa-image.s3.ap-northeast-2.amazonaws.com/05.jpg',
@@ -59,7 +59,7 @@ const mockArticles = [
     content: '<p>정부는 오늘 새로운 부동산 안정화... (이하 생략)'
   },
   {
-    id: 'news006',
+    id: '6',
     title: '아가일 스페셜 웹툰',
     summary: '폴더블부터 롤러블까지, 최신 스마트폰 기술 동향을 살펴봅니다...',
     thumbnailUrl: '',

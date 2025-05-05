@@ -1,0 +1,24 @@
+ 
+ 	
+{
+    "message": "AI 작가 즐겨찾기 목록 조회에 성공했습니다.",
+    "code": 200,
+    "data": {
+      "aiAuthors": [
+        {
+          "id": 1,
+          "name": "김작가AI",
+          "profileImageUrl": "https://cdn.example.com/authors/1.jpg"
+        },
+        {
+          "id": 2,
+          "name": "이작가AI",
+          "profileImageUrl": "https://cdn.example.com/authors/2.jpg"
+        }
+      ],
+      "pageInfo": {
+        "nextCursor": "2024-04-21T09:50:00Z_2",
+        "hasNext": false
+      }
+    }
+  }

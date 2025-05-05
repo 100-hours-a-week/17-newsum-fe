@@ -3,91 +3,68 @@ import { Box } from '@mui/material';
 import { useNavigate, useParams } from 'react-router-dom';
 import CategoryTabs, { categories } from '../components/tabs/CategoryTabs';
 import CategoryGrid from '../components/grid/CategoryGrid';
-
-// 임시 데이터
-const mockArticles = [
-  {
-    id: 1,
-    title: "AMD, 새로운 그래픽 카드 라인업 공개",
-    content: "AMD가 새로운 GPU를 발표했습니다...",
-    thumbnail: "/placeholder.jpg",
-    source: "테크뉴스",
-    publishedAt: "2024-03-20"
-  },
-  {
-    id: 2,
-    title: "GPU 수급난 해결될까",
-    content: "반도체 업계의 새로운 전략...",
-    thumbnail: "/placeholder.jpg",
-    source: "IT저널",
-    publishedAt: "2024-03-19"
-  },
-  {
-    id: 3,
-    title: "인공지능 시대의 GPU 수요",
-    content: "AI 붐으로 인한 GPU 수요 증가...",
-    thumbnail: "/placeholder.jpg",
-    source: "경제일보",
-    publishedAt: "2024-03-18"
-  },
-  {
-    id: 4,
-    title: "새로운 반도체 기술 발표",
-    content: "차세대 반도체 기술 소개...",
-    thumbnail: "/placeholder.jpg",
-    source: "과학뉴스",
-    publishedAt: "2024-03-17"
-  }
-];
+import DefaultAxios from '../api/DefaultAxios';
 
 function CategoryPage() {
   const navigate = useNavigate();
   const { category_id } = useParams();
-  
-  // URL의 category_id에 해당하는 탭을 찾아 초기값으로 설정
-  const [activeTab, setActiveTab] = useState(() => {
-    return category_id || 'all';
-  });
 
-  // URL이 변경될 때 activeTab 업데이트
+  const [activeTab, setActiveTab] = useState(() => category_id || 'all');
+  const [articles, setArticles] = useState([]);
+  const [pageInfo, setPageInfo] = useState(null);
+
+  // 카테고리별 기사 가져오는 API ()
+  const getArticleByCategory = async () => {
+    try {
+      // 추후 ?category={category_id} 형식으로 변경
+      const res = await DefaultAxios.get('/api/v1/webtoons/data.json');
+      setArticles(res.data?.data?.webtoons || []);
+      setPageInfo(res.data?.data?.pageInfo || null);
+    } catch {
+      setArticles([]);
+      setPageInfo(null);
+    }
+  };
+
+  // tab 클릭할 때 이동시키는 함수
+  const handleTabChange = (event, newValue) => {
+    setActiveTab(newValue);
+    navigate(`/category/${newValue}`);
+  };
+
+  // 카테고리 이름 가져오는 함수
+  const getCategoryName = () => {
+    const category = categories.find(cat => cat.value === activeTab);
+    return category ? category.label : activeTab;
+  };
+
+  // 시간 포맷팅 하는 함수
+  const getTimeString = () => {
+    if (!pageInfo || !pageInfo.nextCursor) return '';
+    const [dateStr] = pageInfo.nextCursor.split('_');
+    const date = new Date(dateStr);
+    return date.toLocaleString('ko-KR', { dateStyle: 'short', timeStyle: 'short' }) + ' 기준';
+  };
+
+  // 탭 클릭시 카테고리 ID 설정
   useEffect(() => {
     if (category_id) {
       setActiveTab(category_id);
     }
   }, [category_id]);
 
-  const handleTabChange = (event, newValue) => {
-    setActiveTab(newValue);
-    navigate(`/category/${newValue}`);
-  };
-
-  // 현재 시간을 포맷팅하는 함수
-  const getCurrentTime = () => {
-    const now = new Date();
-    const year = now.getFullYear().toString().slice(-2);
-    const month = String(now.getMonth() + 1).padStart(2, '0');
-    const day = String(now.getDate()).padStart(2, '0');
-    const hours = String(now.getHours()).padStart(2, '0');
-    const minutes = String(now.getMinutes()).padStart(2, '0');
-    return `${year}.${month}.${day} ${hours}:${minutes} 기준`;
-  };
-
-  // 카테고리 이름을 가져오는 함수
-  const getCategoryName = () => {
-    const category = categories.find(cat => cat.value === activeTab);
-    return category ? category.label : '전체';
-  };
+  // 탭 클릭할 때 기사 가져오는 함수 실행
+  useEffect(() => {
+    getArticleByCategory();
+  }, [activeTab]);
 
   return (
     <Box sx={{ p: 2 }}>
-      {/* 카테고리 탭 */}
       <CategoryTabs activeTab={activeTab} onTabChange={handleTabChange} />
-
-      {/* 카테고리 그리드 */}
       <CategoryGrid
         title={getCategoryName()}
-        time={getCurrentTime()}
-        articles={mockArticles}
+        time={getTimeString()}
+        articles={articles}
       />
     </Box>
   );
