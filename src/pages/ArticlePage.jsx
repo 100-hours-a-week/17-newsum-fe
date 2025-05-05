@@ -146,7 +146,7 @@ function ArticlePage() {
         </Box>
         {/* 오른쪽: 액션 버튼 (공유, 하트, 북마크 한 줄, 그 아래 좋아요 수) */}
         <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 0.5, mt: 0.5 }}>
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.2 }}>
             <IconButton><ShareIcon /></IconButton>
             <IconButton onClick={handleLike} color={isLiked ? 'error' : 'default'} sx={{ p: 0.5 }}>
               {isLiked ? <FavoriteIcon /> : <FavoriteBorderIcon />}
