@@ -15,13 +15,43 @@
           "subComments" : [
               {
                     "id": 1,
-                    "content": "댓글 내용 1",
+                    "content": "답글 내용 1",
                     "author": "user1",
                     "authorProfileImageUrl": "https://cdn.example.com/users/1.jpg",
-                    "createdAt": "2024-04-18T01:00:00Z",
+                    "createdAt": "2024-04-18T01:10:00Z",
                     "likeCount": 1,
                     "isLiked": false,
                     "isOwner": false
+              },
+              {
+                "id": 2,
+                "content": "답글 내용 2",
+                "author": "user2",
+                "authorProfileImageUrl": "https://cdn.example.com/users/1.jpg",
+                "createdAt": "2024-04-18T01:20:00Z",
+                "likeCount": 1,
+                "isLiked": false,
+                "isOwner": false
+              },
+              {
+                "id": 3,
+                "content": "답글 내용 3",
+                "author": "user3",
+                "authorProfileImageUrl": "https://cdn.example.com/users/1.jpg",
+                "createdAt": "2024-04-18T01:30:00Z",
+                "likeCount": 1,
+                "isLiked": false,
+                "isOwner": false
+              },
+              {
+                "id": 4,
+                "content": "답글 내용 4",
+                "author": "user4",
+                "authorProfileImageUrl": "https://cdn.example.com/users/1.jpg",
+                "createdAt": "2024-04-18T01:40:00Z",
+                "likeCount": 1,
+                "isLiked": false,
+                "isOwner": false
               }
           ]
         },
