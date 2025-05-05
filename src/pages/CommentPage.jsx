@@ -4,15 +4,7 @@ import { useParams, useNavigate, Link as RouterLink } from 'react-router-dom';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import { useAuth } from '../contexts/AuthContext';
 import CommentItem from '../components/comments/CommentItem';
-
-// 목업 댓글 데이터
-const initialMockComments = (articleId) => [
-  { id: 'cmt001', articleId: articleId, author: '댓글러1', content: '정말 유익한 기사네요!', createdAt: '2025-04-15T11:00:00Z', parentId: null },
-  { id: 'cmt002', articleId: articleId, author: '궁금해요', content: '이 부분은 조금 더 설명이 필요할 것 같아요.\n다른 의견 있으신 분?', createdAt: '2025-04-15T11:30:00Z', parentId: null },
-  { id: 'cmt003', articleId: articleId, author: '개발자A', content: 'cmt001님 의견 감사합니다. 저도 그렇게 생각해요.', createdAt: '2025-04-15T11:35:00Z', parentId: 'cmt001' },
-  { id: 'cmt004', articleId: articleId, author: '지나가던B', content: '저는 cmt002님 의견에 동의합니다.', createdAt: '2025-04-15T11:40:00Z', parentId: 'cmt002' },
-  { id: 'cmt005', articleId: articleId, author: '댓글러1', content: '개발자A님 답글 감사합니다!', createdAt: '2025-04-15T11:45:00Z', parentId: 'cmt003' },
-];
+import DefaultAxios from '../api/DefaultAxios';
 
 function CommentPage() {
   const { articleId } = useParams();
@@ -22,10 +14,23 @@ function CommentPage() {
   const [selectedCommentId, setSelectedCommentId] = useState(null);
   const [showReplies, setShowReplies] = useState(false);
   const [commentText, setCommentText] = useState('');
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
   useEffect(() => {
-    // 목업 댓글 데이터 로드
-    setComments(initialMockComments(articleId));
+    const fetchComments = async () => {
+      setLoading(true);
+      setError(null);
+      try {
+        const res = await DefaultAxios.get(`/api/v1/webtoons/${articleId}/comments/data.json`);
+        setComments(res.data?.data?.comments || []);
+      } catch {
+        setError('댓글을 불러오지 못했습니다.');
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchComments();
   }, [articleId]);
 
   const handleBack = () => {
@@ -64,8 +69,8 @@ function CommentPage() {
   }, []);
 
   const selectedComment = selectedCommentId ? comments.find(c => c.id === selectedCommentId) : null;
-  const replies = selectedCommentId ? comments.filter(c => c.parentId === selectedCommentId) : [];
-  const topLevelComments = comments.filter(comment => comment.parentId === null);
+  const replies = selectedCommentId ? (selectedComment?.subComments || []) : [];
+  const topLevelComments = comments;
 
   return (
     <Box 
@@ -109,7 +114,13 @@ function CommentPage() {
 
       {/* 댓글 목록 */}
       <Box sx={{ flex: 1, overflow: 'auto', pb: user ? 7 : 0 }}>
-        {!showReplies ? (
+        {loading ? (
+          <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: 200 }}>
+            <CircularProgress />
+          </Box>
+        ) : error ? (
+          <Alert severity="error">{error}</Alert>
+        ) : !showReplies ? (
           topLevelComments.map(comment => (
             <Box key={comment.id} sx={{ px: 2 }}>
               <CommentItem
@@ -118,34 +129,37 @@ function CommentPage() {
                 onDelete={handleCommentDelete}
                 level={0}
                 isAuthor={user && comment.author === user.name}
+                replyCount={comment.subComments?.length || 0}
+                likeCount={comment.likeCount || 0}
               />
             </Box>
           ))
         ) : (
-          <>
-            {selectedComment && (
-              <>
-                <Box sx={{ px: 2 }}>
+          selectedComment && (
+            <>
+              <Box sx={{ px: 2 }}>
+                <CommentItem
+                  comment={selectedComment}
+                  level={0}
+                  isAuthor={user && selectedComment.author === user.name}
+                  onDelete={handleCommentDelete}
+                  replyCount={selectedComment.subComments?.length || 0}
+                  likeCount={selectedComment.likeCount || 0}
+                />
+              </Box>
+              {replies.map(reply => (
+                <Box key={reply.id} sx={{ pl: 4, pr: 2 }}>
                   <CommentItem
-                    comment={selectedComment}
-                    level={0}
-                    isAuthor={user && selectedComment.author === user.name}
+                    comment={reply}
+                    level={1}
+                    isAuthor={user && reply.author === user.name}
                     onDelete={handleCommentDelete}
+                    likeCount={reply.likeCount || 0}
                   />
                 </Box>
-                {replies.map(reply => (
-                  <Box key={reply.id} sx={{ pl: 4, pr: 2 }}>
-                    <CommentItem
-                      comment={reply}
-                      level={1}
-                      isAuthor={user && reply.author === user.name}
-                      onDelete={handleCommentDelete}
-                    />
-                  </Box>
-                ))}
-              </>
-            )}
-          </>
+              ))}
+            </>
+          )
         )}
       </Box>
 
