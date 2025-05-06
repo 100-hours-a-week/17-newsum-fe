@@ -1,6 +1,6 @@
 // src/components/Layout/Header.jsx
 import React from 'react';
-import { AppBar, Toolbar, IconButton, Box } from '@mui/material';
+import { AppBar, Toolbar, IconButton, Box, Avatar } from '@mui/material';
 import { Link as RouterLink, useLocation, useNavigate } from 'react-router-dom';
 import NotificationsOutlinedIcon from '@mui/icons-material/NotificationsOutlined';
 import PersonOutlineOutlinedIcon from '@mui/icons-material/PersonOutlineOutlined';
@@ -100,6 +100,18 @@ function Header() {
   const navigate = useNavigate();
   const { user } = useAuth();
 
+  // 프로필 이미지(1순위: localStorage, 2순위: user.picture, 3순위: user.profileImage)
+  let profileImg = '';
+  try {
+    profileImg =
+      localStorage.getItem('profileImage') ||
+      user?.picture ||
+      user?.profileImage ||
+      '';
+  } catch (e) {
+    profileImg = user?.picture || user?.profileImage || '';
+  }
+
   const handleUserIconClick = () => {
     if (user) {
       navigate('/users/profile');
@@ -125,8 +137,22 @@ function Header() {
           <StyledIconButton
             onClick={handleUserIconClick}
             className={location.pathname === '/users/profile' ? 'selected' : ''}
+            sx={{ p: 0, width: 40, height: 40 }}
           >
-            <PersonOutlineOutlinedIcon />
+            {user && profileImg ? (
+              <Avatar
+                src={profileImg}
+                alt={user?.name || '프로필'}
+                sx={{
+                  width: 32,
+                  height: 32,
+                  border: '2px solid #eee',
+                  bgcolor: '#fff',
+                }}
+              />
+            ) : (
+              <PersonOutlineOutlinedIcon sx={{ fontSize: 32 }} />
+            )}
           </StyledIconButton>
         </IconsContainer>
       </StyledToolbar>
