@@ -6,7 +6,7 @@ import ChatBubbleOutlineIcon from '@mui/icons-material/ChatBubbleOutline';
 import FavoriteBorderIcon from '@mui/icons-material/FavoriteBorder';
 import FavoriteIcon from '@mui/icons-material/Favorite';
 
-function CommentItem({ comment, onDelete, onReply, level, isAuthor = false }) {
+function CommentItem({ comment, onDelete, onReply, level, isAuthor = false, likeCount = 0, replyCount = 0 }) {
   const [anchorEl, setAnchorEl] = useState(null);
   const [isLiked, setIsLiked] = useState(false);
   const open = Boolean(anchorEl);
@@ -102,7 +102,7 @@ function CommentItem({ comment, onDelete, onReply, level, isAuthor = false }) {
                   <FavoriteBorderIcon sx={{ fontSize: '1rem' }} />
                 )}
                 <Typography variant="caption" color="text.secondary">
-                  {10}
+                  {likeCount}
                 </Typography>
               </Box>
               {!level && (
@@ -123,7 +123,7 @@ function CommentItem({ comment, onDelete, onReply, level, isAuthor = false }) {
                 >
                   <ChatBubbleOutlineIcon sx={{ fontSize: '1rem' }} />
                   <Typography variant="caption" color="text.secondary">
-                    {4}
+                    {replyCount}
                   </Typography>
                 </Box>
               )}
