@@ -5,6 +5,7 @@ import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import { useAuth } from '../contexts/AuthContext';
 import CommentItem from '../components/comments/CommentItem';
 import DefaultAxios from '../api/DefaultAxios';
+import TokenAxios from '../api/TokenAxios';
 
 function CommentPage() {
   const { articleId } = useParams();
@@ -17,19 +18,23 @@ function CommentPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
+
+  const fetchComments = async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      const res = await DefaultAxios.get(`/api/v1/webtoons/${articleId}/comments`);
+      console.log(res.data)
+      setComments(res.data?.data?.comments || []);
+    } catch {
+      setError('댓글을 불러오지 못했습니다.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
   useEffect(() => {
-    const fetchComments = async () => {
-      setLoading(true);
-      setError(null);
-      try {
-        const res = await DefaultAxios.get(`/api/v1/webtoons/${articleId}/comments`);
-        setComments(res.data?.data?.comments || []);
-      } catch {
-        setError('댓글을 불러오지 못했습니다.');
-      } finally {
-        setLoading(false);
-      }
-    };
+    
     fetchComments();
   }, [articleId]);
 
@@ -42,21 +47,25 @@ function CommentPage() {
     }
   };
 
-  const handleCommentSubmit = useCallback(async () => {
-    if (!articleId || !user || !commentText.trim()) return;
-    
-    const newCommentObject = {
-      id: `cmt${Date.now()}`,
-      articleId: articleId,
-      author: user.name,
-      content: commentText.trim(),
-      createdAt: new Date().toISOString(),
-      parentId: selectedCommentId
-    };
-    
-    setComments(prevComments => [newCommentObject, ...prevComments]);
-    setCommentText('');
-  }, [articleId, user, commentText, selectedCommentId]);
+  const handleCommentSubmit = async (e) => {
+    e.preventDefault();
+    if (!commentText.trim()) return;
+
+    try {
+      const parentId = showReplies && selectedCommentId ? selectedCommentId : 0;
+      await TokenAxios.post(`/api/v1/webtoons/${articleId}/comments`, {
+        content: commentText,
+        parentId: parentId
+      });
+      setCommentText('');
+      fetchComments();
+      if (showReplies && selectedCommentId) {
+        handleViewReplies(selectedCommentId);
+      }
+    } catch {
+      setError('댓글 작성에 실패했습니다.');
+    }
+  };
 
   const handleCommentDelete = useCallback((commentId) => {
     console.log('Deleting comment:', commentId);
@@ -191,16 +200,23 @@ function CommentPage() {
             }}
           />
           <Button
+            type="submit"
             variant="contained"
-            onClick={handleCommentSubmit}
-            disabled={!commentText.trim()}
             sx={{
-              minWidth: 'auto',
-              px: 2,
-              borderRadius: '20px'
+              bgcolor: 'black',
+              color: 'white',
+              borderRadius: '20px',
+              minWidth: 80,
+              height: 40,
+              px: 3,
+              boxShadow: 'none',
+              whiteSpace: 'nowrap',
+              '&:hover': { bgcolor: '#222' }
             }}
+            disabled={!commentText.trim()}
+            onClick={handleCommentSubmit}
           >
-            등록
+            {showReplies ? "답글" : "댓글"}
           </Button>
         </Box>
       ) : (

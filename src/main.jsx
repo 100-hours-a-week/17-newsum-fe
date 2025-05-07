@@ -10,7 +10,7 @@ ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>
     <BrowserRouter> {/* BrowserRouter 적용 */}
       <AuthProvider>
-        <App />
+      <App />
       </AuthProvider>
     </BrowserRouter>
   </React.StrictMode>,

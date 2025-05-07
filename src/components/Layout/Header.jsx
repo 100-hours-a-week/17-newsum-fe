@@ -7,6 +7,7 @@ import PersonOutlineOutlinedIcon from '@mui/icons-material/PersonOutlineOutlined
 import styled from '@emotion/styled';
 import logo from '../../assets/logo.png';
 import { useAuth } from '../../contexts/AuthContext';
+import Swal from 'sweetalert2';
 
 const StyledAppBar = styled(AppBar)`
   max-width: 430px;
@@ -120,6 +121,16 @@ function Header() {
     }
   };
 
+  const handleNotificationClick = (e) => {
+    e.preventDefault();
+    Swal.fire({
+      icon: 'info',
+      title: '해당기능은 준비중입니다!',
+      confirmButtonColor: '#222',
+      confirmButtonText: '확인'
+    });
+  };
+
   return (
     <StyledAppBar>
       <StyledToolbar>
@@ -128,8 +139,7 @@ function Header() {
         </LogoLink>
         <IconsContainer>
           <StyledIconButton
-            component={RouterLink}
-            to="/notifications"
+            onClick={handleNotificationClick}
             className={location.pathname === '/notifications' ? 'selected' : ''}
           >
             <NotificationsOutlinedIcon />
