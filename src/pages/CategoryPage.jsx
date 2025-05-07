@@ -17,7 +17,7 @@ function CategoryPage() {
   const getArticleByCategory = async () => {
     try {
       // 추후 ?category={category_id} 형식으로 변경
-      const res = await DefaultAxios.get('/api/v1/webtoons/data.json');
+      const res = await DefaultAxios.get('/api/v1/webtoons');
       setArticles(res.data?.data?.webtoons || []);
       setPageInfo(res.data?.data?.pageInfo || null);
     } catch {
