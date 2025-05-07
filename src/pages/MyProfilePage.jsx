@@ -12,7 +12,7 @@ function MyProfilePage() {
   const fileInputRef = useRef();
 
   useEffect(() => {
-    const userInfo = sessionStorage.getItem('userInfo');
+    const userInfo = localStorage.getItem('userInfo');
     if (userInfo) {
       setUser(JSON.parse(userInfo));
     } else {
@@ -50,7 +50,7 @@ function MyProfilePage() {
 
   const handleLogout = () => {
     setOpen(false);
-    sessionStorage.clear();
+    localStorage.clear();
     localStorage.removeItem('profileImage');
     localStorage.removeItem('user');
     navigate('/');
