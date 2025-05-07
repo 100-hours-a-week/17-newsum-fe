@@ -5,12 +5,7 @@ import { useNavigate } from 'react-router-dom';
 
 export const categories = [
   { value: 'all', label: '전체' }, 
-  { value: '정치', label: '정치' }, 
-  { value: '경제', label: '경제' },
-  { value: '사회', label: '사회' }, 
-  { value: 'IT', label: 'IT' },
-  { value: '과학', label: '과학' }, 
-  { value: '라이프', label: '라이프' },
+  { value: 'IT', label: 'IT' }, 
 ];
 
 const StyledTab = styled(Tab)`

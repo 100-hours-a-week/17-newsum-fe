@@ -16,8 +16,8 @@ function CategoryPage() {
   // 카테고리별 기사 가져오는 API ()
   const getArticleByCategory = async () => {
     try {
-      // 추후 ?category={category_id} 형식으로 변경
-      const res = await DefaultAxios.get('/api/v1/webtoons');
+      const res = await DefaultAxios.get(`/api/v1/webtoons?category=${activeTab}`);
+      console.log(res.data)
       setArticles(res.data?.data?.webtoons || []);
       setPageInfo(res.data?.data?.pageInfo || null);
     } catch {
