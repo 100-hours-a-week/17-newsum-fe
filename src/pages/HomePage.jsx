@@ -70,7 +70,8 @@ function HomePage() {
   
   const getTop3Data = async () => {
     try {
-      const res = await DefaultAxios.get('/api/v1/webtoons/top3');
+      const res = await DefaultAxios.get('/api/v1/webtoons/top');
+      console.log(res.data)
       setTop3Data(res.data?.data || {});
     } catch (err) {
       console.log(err);
@@ -112,7 +113,7 @@ function HomePage() {
                     <ArticleCard article={{
                       id: article.id,
                       title: article.title,
-                      thumbnailUrl: article.image_url,
+                      thumbnailUrl: article.thumbnailUrl, // ✅ 수정
                       viewCount: 0,
                     }} />
                   </Box>
@@ -129,7 +130,7 @@ function HomePage() {
               articles={top3Data.todaysNews.map(article => ({
                 id: article.id,
                 title: article.title,
-                thumbnailUrl: article.image_url,
+                thumbnailUrl: article.thumbnailUrl,
                 viewCount: 0,
               }))}
               onMoreClick={() => handleMoreClick(`/today`)}
