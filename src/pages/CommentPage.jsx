@@ -17,15 +17,31 @@ function CommentPage() {
   const [commentText, setCommentText] = useState('');
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [pageInfo, setPageInfo] = useState(null);
 
-
-  const fetchComments = async () => {
-    setLoading(true);
-    setError(null);
+  const fetchComments = async (cursor = null) => {
     try {
-      const res = await DefaultAxios.get(`/api/v1/webtoons/${articleId}/comments`);
-      console.log(res.data)
-      setComments(res.data?.data?.comments || []);
+      setLoading(true);
+      setError(null);
+      const params = {
+        size: 10
+      };
+      if (cursor) {
+        params.cursor = cursor;
+      }
+
+      const res = await DefaultAxios.get(`/api/v1/webtoons/${articleId}/comments`, { params });
+      const newComments = res.data?.data?.comments || [];
+      const newPageInfo = res.data?.data?.pageInfo || null;
+
+      if (cursor) {
+        // 추가 로딩인 경우 기존 데이터에 추가
+        setComments(prev => [...prev, ...newComments]);
+      } else {
+        // 초기 로딩인 경우 데이터 교체
+        setComments(newComments);
+      }
+      setPageInfo(newPageInfo);
     } catch {
       setError('댓글을 불러오지 못했습니다.');
     } finally {
@@ -33,8 +49,27 @@ function CommentPage() {
     }
   };
 
+  // 스크롤 이벤트 핸들러
+  const handleScroll = useCallback(() => {
+    if (loading || !pageInfo?.hasNext || showReplies) return;
+
+    const scrollHeight = document.documentElement.scrollHeight;
+    const scrollTop = window.scrollY;
+    const clientHeight = document.documentElement.clientHeight;
+
+    // 스크롤이 하단에서 100px 이내로 왔을 때 추가 로딩
+    if (scrollHeight - scrollTop - clientHeight < 100) {
+      fetchComments(pageInfo.nextCursor);
+    }
+  }, [loading, pageInfo, showReplies]);
+
+  // 스크롤 이벤트 리스너 등록
   useEffect(() => {
-    
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, [handleScroll]);
+
+  useEffect(() => {
     fetchComments();
   }, [articleId]);
 
@@ -58,7 +93,7 @@ function CommentPage() {
         parentId: parentId
       });
       setCommentText('');
-      fetchComments();
+      fetchComments(); // 댓글 작성 후 목록 새로고침
       if (showReplies && selectedCommentId) {
         handleViewReplies(selectedCommentId);
       }
@@ -68,7 +103,6 @@ function CommentPage() {
   };
 
   const handleCommentDelete = useCallback((commentId) => {
-    console.log('Deleting comment:', commentId);
     setComments(prev => prev.filter(comment => comment.id !== commentId));
   }, []);
 
@@ -123,26 +157,33 @@ function CommentPage() {
 
       {/* 댓글 목록 */}
       <Box sx={{ flex: 1, overflow: 'auto', pb: user ? 7 : 0 }}>
-        {loading ? (
+        {loading && !comments.length ? (
           <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: 200 }}>
             <CircularProgress />
           </Box>
         ) : error ? (
           <Alert severity="error">{error}</Alert>
         ) : !showReplies ? (
-          topLevelComments.map(comment => (
-            <Box key={comment.id} sx={{ px: 2 }}>
-              <CommentItem
-                comment={comment}
-                onReply={() => handleViewReplies(comment.id)}
-                onDelete={handleCommentDelete}
-                level={0}
-                isAuthor={user && comment.author === user.name}
-                replyCount={comment.subComments?.length || 0}
-                likeCount={comment.likeCount || 0}
-              />
-            </Box>
-          ))
+          <>
+            {topLevelComments.map(comment => (
+              <Box key={comment.id} sx={{ px: 2 }}>
+                <CommentItem
+                  comment={comment}
+                  onReply={() => handleViewReplies(comment.id)}
+                  onDelete={handleCommentDelete}
+                  level={0}
+                  isAuthor={user && comment.author === user.name}
+                  replyCount={comment.subComments?.length || 0}
+                  likeCount={comment.likeCount || 0}
+                />
+              </Box>
+            ))}
+            {loading && (
+              <Box sx={{ display: 'flex', justifyContent: 'center', py: 2 }}>
+                <CircularProgress size={24} />
+              </Box>
+            )}
+          </>
         ) : (
           selectedComment && (
             <>
