@@ -2,6 +2,7 @@
 import React from 'react';
 import { Routes, Route } from 'react-router-dom';
 import MainLayout from '../components/Layout/MainLayout';
+import NoHeaderLayout from '../components/Layout/NoHeaderLayout';
 import HomePage from '../pages/HomePage';
 import ArticlePage from '../pages/ArticlePage';
 import LoginPage from '../pages/LoginPage';
@@ -33,7 +34,7 @@ function Router() {
 
 
       <Route element={<NoHeaderLayout />}>
-        <Route path='/article/:articleID' element={<ArticlePage />}/>
+        <Route path='/article/:articleId' element={<ArticlePage />}/>
       
       </Route>
     </Routes>

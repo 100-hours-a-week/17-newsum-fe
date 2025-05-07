@@ -22,7 +22,7 @@ function CommentPage() {
       setLoading(true);
       setError(null);
       try {
-        const res = await DefaultAxios.get(`/api/v1/webtoons/${articleId}/comments/data.json`);
+        const res = await DefaultAxios.get(`/api/v1/webtoons/${articleId}/comments`);
         setComments(res.data?.data?.comments || []);
       } catch {
         setError('댓글을 불러오지 못했습니다.');
