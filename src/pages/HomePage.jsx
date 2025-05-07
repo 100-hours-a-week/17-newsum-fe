@@ -112,7 +112,7 @@ function HomePage() {
                     <ArticleCard article={{
                       id: article.id,
                       title: article.title,
-                      thumbnailUrl: article.image_url,
+                      thumbnailUrl: article.thumbnailUrl, // ✅ 수정
                       viewCount: 0,
                     }} />
                   </Box>
@@ -129,7 +129,7 @@ function HomePage() {
               articles={top3Data.todaysNews.map(article => ({
                 id: article.id,
                 title: article.title,
-                thumbnailUrl: article.image_url,
+                thumbnailUrl: article.thumbnailUrl,
                 viewCount: 0,
               }))}
               onMoreClick={() => handleMoreClick(`/today`)}
