@@ -70,7 +70,8 @@ function HomePage() {
   
   const getTop3Data = async () => {
     try {
-      const res = await DefaultAxios.get('/api/v1/webtoons/top3');
+      const res = await DefaultAxios.get('/api/v1/webtoons/top');
+      console.log(res.data)
       setTop3Data(res.data?.data || {});
     } catch (err) {
       console.log(err);
