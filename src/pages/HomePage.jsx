@@ -61,7 +61,7 @@ function HomePage() {
   // ❗️❗️ axios 사용한 요청 예시
   const getWebtoons = async () => {
     try {
-      const res = await DefaultAxios.get('/api/v1/webtoons/main/data.json');
+      const res = await DefaultAxios.get('/api/v1/webtoons/main');
       setWebtoonsData(res.data?.data?.webtoonsByCategory || {});
     } catch (err) {
       console.log(err);
@@ -70,7 +70,7 @@ function HomePage() {
   
   const getTop3Data = async () => {
     try {
-      const res = await DefaultAxios.get('/api/v1/webtoons/top3/data.json');
+      const res = await DefaultAxios.get('/api/v1/webtoons/top3');
       setTop3Data(res.data?.data || {});
     } catch (err) {
       console.log(err);
@@ -79,7 +79,7 @@ function HomePage() {
 
   const getRecentData = async () => {
     try {
-      const res = await DefaultAxios.get('/api/v1/webtoons/recent/data.json');
+      const res = await DefaultAxios.get('/api/v1/webtoons/recent');
       setRecentData(res.data?.data || {});
     } catch (err) {
       console.log(err);

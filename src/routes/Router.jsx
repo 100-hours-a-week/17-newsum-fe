@@ -34,7 +34,7 @@ function Router() {
 
 
       <Route element={<NoHeaderLayout />}>
-        <Route path='/article/:articleID' element={<ArticlePage />}/>
+        <Route path='/article/:articleId' element={<ArticlePage />}/>
       
       </Route>
     </Routes>
