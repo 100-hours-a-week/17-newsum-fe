@@ -50,7 +50,7 @@ const ArticlesGrid = styled.div`
   gap: 24px;
   
   @media (max-width: 600px) {
-    grid-template-columns: 1fr;
+    grid-template-columns: repeat(2, 1fr);
   }
 `;
 
