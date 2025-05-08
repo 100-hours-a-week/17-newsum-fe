@@ -127,11 +127,11 @@ function ArticlePage() {
               <Typography
                 key={idx}
                 component="a"
-                href={news.url}
+                href={news.link}
                 target="_blank"
                 rel="noopener noreferrer"
                 sx={{ color: 'primary.main', textDecoration: 'none', display: 'block', fontSize: '1rem', '&:hover': { textDecoration: 'underline' } }}>
-                {news.headline}
+                {news.title}
               </Typography>
             ))}
           </Box>
