@@ -3,20 +3,20 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import DefaultAxios from '../api/DefaultAxios';
 
-function GoogleRedirectHandler() {
+function KakaoRedirectHandler() {
   const navigate = useNavigate();
   const { login } = useAuth();
 
   useEffect(() => {
-    const handleGoogleCallback = async () => {
+    const handleKakaoCallback = async () => {
       try {
         const urlParams = new URLSearchParams(window.location.search);
         const code = urlParams.get('code');
 
-        if (!code) throw new Error('인증 코드를 받지 못했습니다.');
+        if (!code) throw new Error('카카오 인증 코드를 받지 못했습니다.');
 
         const response = await DefaultAxios.post(
-          import.meta.env.VITE_GOOGLE_CALLBACK_API_URL,
+          import.meta.env.VITE_KAKAO_CALLBACK_API_URL,
           { code }
         );
 
@@ -29,15 +29,15 @@ function GoogleRedirectHandler() {
         login(data.userInfo);
         navigate('/');
       } catch (error) {
-        console.error('구글 로그인 처리 중 오류:', error);
+        console.error('카카오 로그인 처리 중 오류:', error);
         navigate('/login');
       }
     };
 
-    handleGoogleCallback();
+    handleKakaoCallback();
   }, [navigate, login]);
 
   return null;
 }
 
-export default GoogleRedirectHandler;
+export default KakaoRedirectHandler;

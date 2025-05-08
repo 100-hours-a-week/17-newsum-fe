@@ -4,15 +4,9 @@ import { useParams, useNavigate, Link as RouterLink } from 'react-router-dom';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import { useAuth } from '../contexts/AuthContext';
 import CommentItem from '../components/comments/CommentItem';
-
-// 목업 댓글 데이터
-const initialMockComments = (articleId) => [
-  { id: 'cmt001', articleId: articleId, author: '댓글러1', content: '정말 유익한 기사네요!', createdAt: '2025-04-15T11:00:00Z', parentId: null },
-  { id: 'cmt002', articleId: articleId, author: '궁금해요', content: '이 부분은 조금 더 설명이 필요할 것 같아요.\n다른 의견 있으신 분?', createdAt: '2025-04-15T11:30:00Z', parentId: null },
-  { id: 'cmt003', articleId: articleId, author: '개발자A', content: 'cmt001님 의견 감사합니다. 저도 그렇게 생각해요.', createdAt: '2025-04-15T11:35:00Z', parentId: 'cmt001' },
-  { id: 'cmt004', articleId: articleId, author: '지나가던B', content: '저는 cmt002님 의견에 동의합니다.', createdAt: '2025-04-15T11:40:00Z', parentId: 'cmt002' },
-  { id: 'cmt005', articleId: articleId, author: '댓글러1', content: '개발자A님 답글 감사합니다!', createdAt: '2025-04-15T11:45:00Z', parentId: 'cmt003' },
-];
+import DefaultAxios from '../api/DefaultAxios';
+import TokenAxios from '../api/TokenAxios';
+import Swal from 'sweetalert2';
 
 function CommentPage() {
   const { articleId } = useParams();
@@ -22,10 +16,62 @@ function CommentPage() {
   const [selectedCommentId, setSelectedCommentId] = useState(null);
   const [showReplies, setShowReplies] = useState(false);
   const [commentText, setCommentText] = useState('');
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [pageInfo, setPageInfo] = useState(null);
+
+  const fetchComments = async (cursor = null) => {
+    try {
+      setLoading(true);
+      setError(null);
+      const params = {
+        size: 10
+      };
+      if (cursor) {
+        params.cursor = cursor;
+      }
+
+      const res = await DefaultAxios.get(`/api/v1/webtoons/${articleId}/comments`, { params });
+      const newComments = res.data?.data?.comments || [];
+      const newPageInfo = res.data?.data?.pageInfo || null;
+
+      if (cursor) {
+        // 추가 로딩인 경우 기존 데이터에 추가
+        setComments(prev => [...prev, ...newComments]);
+      } else {
+        // 초기 로딩인 경우 데이터 교체
+        setComments(newComments);
+      }
+      setPageInfo(newPageInfo);
+    } catch {
+      setError('댓글을 불러오지 못했습니다.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // 스크롤 이벤트 핸들러
+  const handleScroll = useCallback(() => {
+    if (loading || !pageInfo?.hasNext || showReplies) return;
+
+    const scrollHeight = document.documentElement.scrollHeight;
+    const scrollTop = window.scrollY;
+    const clientHeight = document.documentElement.clientHeight;
+
+    // 스크롤이 하단에서 100px 이내로 왔을 때 추가 로딩
+    if (scrollHeight - scrollTop - clientHeight < 100) {
+      fetchComments(pageInfo.nextCursor);
+    }
+  }, [loading, pageInfo, showReplies]);
+
+  // 스크롤 이벤트 리스너 등록
+  useEffect(() => {
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, [handleScroll]);
 
   useEffect(() => {
-    // 목업 댓글 데이터 로드
-    setComments(initialMockComments(articleId));
+    fetchComments();
   }, [articleId]);
 
   const handleBack = () => {
@@ -37,26 +83,51 @@ function CommentPage() {
     }
   };
 
-  const handleCommentSubmit = useCallback(async () => {
-    if (!articleId || !user || !commentText.trim()) return;
-    
-    const newCommentObject = {
-      id: `cmt${Date.now()}`,
-      articleId: articleId,
-      author: user.name,
-      content: commentText.trim(),
-      createdAt: new Date().toISOString(),
-      parentId: selectedCommentId
-    };
-    
-    setComments(prevComments => [newCommentObject, ...prevComments]);
-    setCommentText('');
-  }, [articleId, user, commentText, selectedCommentId]);
+  const handleCommentSubmit = async (e) => {
+    e.preventDefault();
+    if (!commentText.trim()) return;
 
-  const handleCommentDelete = useCallback((commentId) => {
-    console.log('Deleting comment:', commentId);
-    setComments(prev => prev.filter(comment => comment.id !== commentId));
-  }, []);
+    try {
+      const parentId = showReplies && selectedCommentId ? selectedCommentId : 0;
+      await TokenAxios.post(`/api/v1/webtoons/${articleId}/comments`, {
+        content: commentText,
+        parentId: parentId
+      });
+      setCommentText('');
+      fetchComments(); // 댓글 작성 후 목록 새로고침
+      if (showReplies && selectedCommentId) {
+        handleViewReplies(selectedCommentId);
+      }
+    } catch {
+      setError('댓글 작성에 실패했습니다.');
+    }
+  };
+
+  const handleCommentDelete = useCallback(async (commentId) => {
+    try {
+      await TokenAxios.delete(`/api/v1/webtoons/${articleId}/comments/${commentId}`);
+      setComments(prev => prev.filter(comment => comment.id !== commentId));
+      Swal.fire('삭제 완료', '댓글이 삭제되었습니다.', 'success');
+    } catch {
+      Swal.fire('오류', '댓글 삭제에 실패했습니다.', 'error');
+    }
+  }, [articleId]);
+
+  const handleCommentEdit = async (commentId, newContent) => {
+    try {
+      await TokenAxios.patch(`/api/v1/webtoons/${articleId}/comments/${commentId}`, {
+        content: newContent
+      });
+      setComments(prev =>
+        prev.map(comment =>
+          comment.id === commentId ? { ...comment, content: newContent } : comment
+        )
+      );
+      Swal.fire('수정 완료', '댓글이 수정되었습니다.', 'success');
+    } catch {
+      Swal.fire('오류', '댓글 수정에 실패했습니다.', 'error');
+    }
+  };
 
   const handleViewReplies = useCallback((commentId) => {
     setSelectedCommentId(commentId);
@@ -64,8 +135,8 @@ function CommentPage() {
   }, []);
 
   const selectedComment = selectedCommentId ? comments.find(c => c.id === selectedCommentId) : null;
-  const replies = selectedCommentId ? comments.filter(c => c.parentId === selectedCommentId) : [];
-  const topLevelComments = comments.filter(comment => comment.parentId === null);
+  const replies = selectedCommentId ? (selectedComment?.subComments || []) : [];
+  const topLevelComments = comments;
 
   return (
     <Box 
@@ -109,43 +180,62 @@ function CommentPage() {
 
       {/* 댓글 목록 */}
       <Box sx={{ flex: 1, overflow: 'auto', pb: user ? 7 : 0 }}>
-        {!showReplies ? (
-          topLevelComments.map(comment => (
-            <Box key={comment.id} sx={{ px: 2 }}>
-              <CommentItem
-                comment={comment}
-                onReply={() => handleViewReplies(comment.id)}
-                onDelete={handleCommentDelete}
-                level={0}
-                isAuthor={user && comment.author === user.name}
-              />
-            </Box>
-          ))
-        ) : (
+        {loading && !comments.length ? (
+          <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: 200 }}>
+            <CircularProgress />
+          </Box>
+        ) : error ? (
+          <Alert severity="error">{error}</Alert>
+        ) : !showReplies ? (
           <>
-            {selectedComment && (
-              <>
-                <Box sx={{ px: 2 }}>
-                  <CommentItem
-                    comment={selectedComment}
-                    level={0}
-                    isAuthor={user && selectedComment.author === user.name}
-                    onDelete={handleCommentDelete}
-                  />
-                </Box>
-                {replies.map(reply => (
-                  <Box key={reply.id} sx={{ pl: 4, pr: 2 }}>
-                    <CommentItem
-                      comment={reply}
-                      level={1}
-                      isAuthor={user && reply.author === user.name}
-                      onDelete={handleCommentDelete}
-                    />
-                  </Box>
-                ))}
-              </>
+            {topLevelComments.map(comment => (
+              <Box key={comment.id} sx={{ px: 2 }}>
+                <CommentItem
+                  comment={comment}
+                  onReply={() => handleViewReplies(comment.id)}
+                  onDelete={handleCommentDelete}
+                  onEdit={handleCommentEdit}
+                  level={0}
+                  isAuthor={user && comment.author === user.name}
+                  replyCount={comment.subComments?.length || 0}
+                  likeCount={comment.likeCount || 0}
+                />
+              </Box>
+            ))}
+            {loading && (
+              <Box sx={{ display: 'flex', justifyContent: 'center', py: 2 }}>
+                <CircularProgress size={24} />
+              </Box>
             )}
           </>
+        ) : (
+          selectedComment && (
+            <>
+              <Box sx={{ px: 2 }}>
+                <CommentItem
+                  comment={selectedComment}
+                  level={0}
+                  isAuthor={user && selectedComment.author === user.name}
+                  onDelete={handleCommentDelete}
+                  onEdit={handleCommentEdit}
+                  replyCount={selectedComment.subComments?.length || 0}
+                  likeCount={selectedComment.likeCount || 0}
+                />
+              </Box>
+              {replies.map(reply => (
+                <Box key={reply.id} sx={{ pl: 4, pr: 2 }}>
+                  <CommentItem
+                    comment={reply}
+                    level={1}
+                    isAuthor={user && reply.author === user.name}
+                    onDelete={handleCommentDelete}
+                    onEdit={handleCommentEdit}
+                    likeCount={reply.likeCount || 0}
+                  />
+                </Box>
+              ))}
+            </>
+          )
         )}
       </Box>
 
@@ -173,20 +263,41 @@ function CommentPage() {
             sx={{
               '& .MuiOutlinedInput-root': {
                 borderRadius: '20px',
-              }
+                background: 'white',
+                color: 'black',
+                '& fieldset': {
+                  borderColor: 'black',
+                },
+                '&:hover fieldset': {
+                  borderColor: 'black',
+                },
+                '&.Mui-focused fieldset': {
+                  borderColor: 'black',
+                },
+              },
+              input: {
+                color: 'black',
+              },
             }}
           />
           <Button
+            type="submit"
             variant="contained"
-            onClick={handleCommentSubmit}
-            disabled={!commentText.trim()}
             sx={{
-              minWidth: 'auto',
-              px: 2,
-              borderRadius: '20px'
+              bgcolor: 'black',
+              color: 'white',
+              borderRadius: '20px',
+              minWidth: 80,
+              height: 40,
+              px: 3,
+              boxShadow: 'none',
+              whiteSpace: 'nowrap',
+              '&:hover': { bgcolor: '#222' }
             }}
+            disabled={!commentText.trim()}
+            onClick={handleCommentSubmit}
           >
-            등록
+            {showReplies ? "답글" : "댓글"}
           </Button>
         </Box>
       ) : (

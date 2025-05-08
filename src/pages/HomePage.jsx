@@ -8,6 +8,7 @@ import Carousel from '../components/Carousel/Carousel';
 import CategoryTabs from '../components/tabs/CategoryTabs';
 import Footer from '../components/Layout/Footer';
 import DefaultAxios from '../api/DefaultAxios';
+import TokenAxios from '../api/TokenAxios';
 import { useNavigate } from 'react-router-dom';
 const ITEMS_PER_PAGE = 6;
 function HomePage() {
@@ -61,8 +62,9 @@ function HomePage() {
   // ❗️❗️ axios 사용한 요청 예시
   const getWebtoons = async () => {
     try {
-      const res = await DefaultAxios.get('/api/v1/webtoons/main/data.json');
-      setWebtoonsData(res.data?.data?.webtoonsByCategory || {});
+      const res = await DefaultAxios.get('/api/v1/webtoons/main');
+      console.log(res.data?.data)
+      setWebtoonsData(res.data?.data || {});
     } catch (err) {
       console.log(err);
     }
@@ -70,7 +72,8 @@ function HomePage() {
   
   const getTop3Data = async () => {
     try {
-      const res = await DefaultAxios.get('/api/v1/webtoons/top3/data.json');
+      const res = await DefaultAxios.get('/api/v1/webtoons/top');
+      console.log(res.data)
       setTop3Data(res.data?.data || {});
     } catch (err) {
       console.log(err);
@@ -79,7 +82,7 @@ function HomePage() {
 
   const getRecentData = async () => {
     try {
-      const res = await DefaultAxios.get('/api/v1/webtoons/recent/data.json');
+      const res = await TokenAxios.get('/api/v1/webtoons/recent');
       setRecentData(res.data?.data || {});
     } catch (err) {
       console.log(err);
@@ -112,7 +115,7 @@ function HomePage() {
                     <ArticleCard article={{
                       id: article.id,
                       title: article.title,
-                      thumbnailUrl: article.image_url,
+                      thumbnailUrl: article.thumbnailUrl, // ✅ 수정
                       viewCount: 0,
                     }} />
                   </Box>
@@ -129,7 +132,7 @@ function HomePage() {
               articles={top3Data.todaysNews.map(article => ({
                 id: article.id,
                 title: article.title,
-                thumbnailUrl: article.image_url,
+                thumbnailUrl: article.thumbnailUrl,
                 viewCount: 0,
               }))}
               onMoreClick={() => handleMoreClick(`/today`)}
