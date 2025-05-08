@@ -6,6 +6,7 @@ import { useAuth } from '../contexts/AuthContext';
 import CommentItem from '../components/comments/CommentItem';
 import DefaultAxios from '../api/DefaultAxios';
 import TokenAxios from '../api/TokenAxios';
+import Swal from 'sweetalert2';
 
 function CommentPage() {
   const { articleId } = useParams();
@@ -102,9 +103,31 @@ function CommentPage() {
     }
   };
 
-  const handleCommentDelete = useCallback((commentId) => {
-    setComments(prev => prev.filter(comment => comment.id !== commentId));
-  }, []);
+  const handleCommentDelete = useCallback(async (commentId) => {
+    try {
+      await TokenAxios.delete(`/api/v1/webtoons/${articleId}/comments/${commentId}`);
+      setComments(prev => prev.filter(comment => comment.id !== commentId));
+      Swal.fire('삭제 완료', '댓글이 삭제되었습니다.', 'success');
+    } catch {
+      Swal.fire('오류', '댓글 삭제에 실패했습니다.', 'error');
+    }
+  }, [articleId]);
+
+  const handleCommentEdit = async (commentId, newContent) => {
+    try {
+      await TokenAxios.patch(`/api/v1/webtoons/${articleId}/comments/${commentId}`, {
+        content: newContent
+      });
+      setComments(prev =>
+        prev.map(comment =>
+          comment.id === commentId ? { ...comment, content: newContent } : comment
+        )
+      );
+      Swal.fire('수정 완료', '댓글이 수정되었습니다.', 'success');
+    } catch {
+      Swal.fire('오류', '댓글 수정에 실패했습니다.', 'error');
+    }
+  };
 
   const handleViewReplies = useCallback((commentId) => {
     setSelectedCommentId(commentId);
@@ -171,6 +194,7 @@ function CommentPage() {
                   comment={comment}
                   onReply={() => handleViewReplies(comment.id)}
                   onDelete={handleCommentDelete}
+                  onEdit={handleCommentEdit}
                   level={0}
                   isAuthor={user && comment.author === user.name}
                   replyCount={comment.subComments?.length || 0}
@@ -193,6 +217,7 @@ function CommentPage() {
                   level={0}
                   isAuthor={user && selectedComment.author === user.name}
                   onDelete={handleCommentDelete}
+                  onEdit={handleCommentEdit}
                   replyCount={selectedComment.subComments?.length || 0}
                   likeCount={selectedComment.likeCount || 0}
                 />
@@ -204,6 +229,7 @@ function CommentPage() {
                     level={1}
                     isAuthor={user && reply.author === user.name}
                     onDelete={handleCommentDelete}
+                    onEdit={handleCommentEdit}
                     likeCount={reply.likeCount || 0}
                   />
                 </Box>
@@ -237,7 +263,21 @@ function CommentPage() {
             sx={{
               '& .MuiOutlinedInput-root': {
                 borderRadius: '20px',
-              }
+                background: 'white',
+                color: 'black',
+                '& fieldset': {
+                  borderColor: 'black',
+                },
+                '&:hover fieldset': {
+                  borderColor: 'black',
+                },
+                '&.Mui-focused fieldset': {
+                  borderColor: 'black',
+                },
+              },
+              input: {
+                color: 'black',
+              },
             }}
           />
           <Button
