@@ -83,6 +83,7 @@ function HomePage() {
   const getRecentData = async () => {
     try {
       const res = await TokenAxios.get('/api/v1/webtoons/recent');
+      console.log(res.data)
       setRecentData(res.data?.data || {});
     } catch (err) {
       console.log(err);
@@ -148,7 +149,7 @@ function HomePage() {
               articles={recentData.recentWebtoons.map(article => ({
                 id: article.id,
                 title: article.title,
-                thumbnailUrl: article.image_url,
+                thumbnailUrl: article.thumbnailUrl,
                 viewCount: 0,
               }))}
               onMoreClick={() => handleMoreClick(`/recent`)}
@@ -165,7 +166,7 @@ function HomePage() {
               articles={articles.map(article => ({
                 id: article.id,
                 title: article.title,
-                thumbnailUrl: article.image_url,
+                thumbnailUrl: article.thumbnailUrl,
                 viewCount: 0,
               }))}
               onMoreClick={() => handleMoreClick(`category/${category}`)}
