@@ -8,6 +8,7 @@ import Carousel from '../components/Carousel/Carousel';
 import CategoryTabs from '../components/tabs/CategoryTabs';
 import Footer from '../components/Layout/Footer';
 import DefaultAxios from '../api/DefaultAxios';
+import TokenAxios from '../api/TokenAxios';
 import { useNavigate } from 'react-router-dom';
 const ITEMS_PER_PAGE = 6;
 function HomePage() {
@@ -62,7 +63,8 @@ function HomePage() {
   const getWebtoons = async () => {
     try {
       const res = await DefaultAxios.get('/api/v1/webtoons/main');
-      setWebtoonsData(res.data?.data?.webtoonsByCategory || {});
+      console.log(res.data?.data)
+      setWebtoonsData(res.data?.data || {});
     } catch (err) {
       console.log(err);
     }
@@ -80,7 +82,7 @@ function HomePage() {
 
   const getRecentData = async () => {
     try {
-      const res = await DefaultAxios.get('/api/v1/webtoons/recent');
+      const res = await TokenAxios.get('/api/v1/webtoons/recent');
       setRecentData(res.data?.data || {});
     } catch (err) {
       console.log(err);

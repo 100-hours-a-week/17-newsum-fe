@@ -40,9 +40,10 @@ function ArticlePage() {
       try {
         const res1 = await DefaultAxios.get(`/api/v1/webtoons/${articleId}`);
         const data1 = res1.data?.data;
+        console.log(`/api/v1/webtoons/${articleId}`)
         console.log(data1)
         setSlides(data1?.slides || []);
-        setAuthor(data1?.aiAuthor || null);
+        setAuthor(data1?.author || null);
         setIsLiked(!!data1?.isLiked);
         setIsBookmarked(!!data1?.isBookmarked);
         setLikeCount(data1?.likeCount || 0);
@@ -51,6 +52,7 @@ function ArticlePage() {
 
         const res2 = await DefaultAxios.get(`/api/v1/webtoons/${articleId}/details`);
         const data2 = res2.data?.data;
+        console.log(`/api/v1/webtoons/${articleId}/details :`)
         console.log(data2)
         setSourceNews(data2?.sourceNews || []);
         setCommentCount(data2?.commentCount || 0);

@@ -5,7 +5,9 @@ import { useNavigate } from 'react-router-dom';
 
 export const categories = [
   { value: 'all', label: '전체' }, 
-  { value: 'IT', label: 'IT' }, 
+  { value: 'IT', label: 'IT' },
+  { value: 'FINANCE', label: '경제' },
+  { value: 'POLITICS', label: '정치' }, 
 ];
 
 const StyledTab = styled(Tab)`
