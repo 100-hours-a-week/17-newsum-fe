@@ -4,8 +4,6 @@ import { Box, IconButton, Typography, CircularProgress, Alert, Avatar, Collapse 
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import { useParams, useNavigate } from 'react-router-dom';
 import Carousel from '../components/Carousel/Carousel';
-import NewsBox from '../components/grid/MainGrid';
-import AuthorCard from '../components/author/AuthorCard';
 import FavoriteIcon from '@mui/icons-material/Favorite';
 import FavoriteBorderIcon from '@mui/icons-material/FavoriteBorder';
 import BookmarkIcon from '@mui/icons-material/Bookmark';
@@ -15,6 +13,7 @@ import ChatBubbleOutlineIcon from '@mui/icons-material/ChatBubbleOutline';
 import ArrowDropUpIcon from '@mui/icons-material/ArrowDropUp';
 import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
 import DefaultAxios from '../api/DefaultAxios';
+import CategoryGrid from '../components/grid/CategoryGrid';
 
 function ArticlePage() {
   const { articleId } = useParams();
@@ -144,7 +143,7 @@ function ArticlePage() {
       </Box>
 
       <Box sx={{ p: 2 }}>
-        <NewsBox
+        <CategoryGrid
           title="관련 뉴스"
           articles={relatedNews.map(news => ({
             id: news.id,
@@ -152,7 +151,6 @@ function ArticlePage() {
             thumbnailUrl: news.thumbnailUrl,
             viewCount: 0,
           }))}
-          onMoreClick={() => {}}
         />
       </Box>
     </Box>
