@@ -31,12 +31,12 @@ function Router() {
       <Route element={<MainLayout />}>
         <Route path="/" element={<HomePage />} />
         <Route path="/category/:category_id" element={<CategoryPage />} />
-        
+        <Route path='/article/:articleId' element={<ArticlePage />}/>
       </Route>
 
 
       <Route element={<NoHeaderLayout />}>
-        <Route path='/article/:articleId' element={<ArticlePage />}/>
+        
         <Route path="/recent" element={<RecentPage />} />
       </Route>
     </Routes>
