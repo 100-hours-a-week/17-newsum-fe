@@ -60,20 +60,22 @@ const MoreButton = styled.button`
 `;
 
 const ArticlesContainer = styled.div`
-  display: flex;
-  gap: 6px;
-  
-  .article-card {
-    flex: 1;
-    min-width: 0;
-  }
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
 
-  @media (max-width: 350px) {
-    gap: 2px;
+  @media (max-width: 900px) {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  @media (max-width: 600px) {
+    grid-template-columns: 1fr;
   }
 `;
 
 const NewsBox = ({ title, date, articles, onMoreClick, maxItems = 3 }) => {
+  // 3칸을 맞추기 위한 빈 배열
+  const emptySlots = Array(Math.max(0, 3 - articles.slice(0, maxItems).length)).fill(null);
+
   return (
     <Container>
       <Header>
@@ -88,6 +90,9 @@ const NewsBox = ({ title, date, articles, onMoreClick, maxItems = 3 }) => {
           <div className="article-card" key={article.id}>
             <ArticleCard article={article} />
           </div>
+        ))}
+        {emptySlots.map((_, idx) => (
+          <div className="article-card" key={`empty-${idx}`} />
         ))}
       </ArticlesContainer>
     </Container>
