@@ -72,6 +72,13 @@ const ArticlesContainer = styled.div`
   }
 `;
 
+const categoryNameMap = {
+  POLITICS: '정치',
+  FINANCE: '경제',
+  IT: 'IT',
+  // ... 필요에 따라 추가
+};
+
 const NewsBox = ({ title, date, articles, onMoreClick, maxItems = 3 }) => {
   // 3칸을 맞추기 위한 빈 배열
   const emptySlots = Array(Math.max(0, 3 - articles.slice(0, maxItems).length)).fill(null);
@@ -80,7 +87,7 @@ const NewsBox = ({ title, date, articles, onMoreClick, maxItems = 3 }) => {
     <Container>
       <Header>
         <TitleWrapper>
-          <Title>{title}</Title>
+          <Title>{categoryNameMap[title] || title}</Title>
           <Date>{date}</Date>
         </TitleWrapper>
         <MoreButton onClick={onMoreClick}>더보기</MoreButton>

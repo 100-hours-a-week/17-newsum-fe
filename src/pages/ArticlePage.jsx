@@ -66,7 +66,7 @@ function ArticlePage() {
   }, [articleId]);
 
   const handleBack = () => navigate(-1);
-  const handleCommentClick = () => navigate(`/comment/${articleId}`);
+  const handleCommentClick = () => navigate(`/comment/${articleId}`, { state: { commentCount } });
   const handleLike = () => {
     setIsLiked((prev) => !prev);
     setLikeCount((prev) => (isLiked ? prev - 1 : prev + 1));

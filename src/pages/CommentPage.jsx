@@ -1,12 +1,13 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { Box, IconButton, Typography, CircularProgress, Alert, Link, TextField, Button } from '@mui/material';
-import { useParams, useNavigate, Link as RouterLink } from 'react-router-dom';
+import { useParams, useNavigate, Link as RouterLink, useLocation } from 'react-router-dom';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import { useAuth } from '../contexts/AuthContext';
 import CommentItem from '../components/comments/CommentItem';
 import DefaultAxios from '../api/DefaultAxios';
 import TokenAxios from '../api/TokenAxios';
 import Swal from 'sweetalert2';
+import SendIcon from '@mui/icons-material/SendRounded';
 
 function CommentPage() {
   const { articleId } = useParams();
@@ -19,19 +20,23 @@ function CommentPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [pageInfo, setPageInfo] = useState(null);
+  const location = useLocation();
+  const commentCount = location.state?.commentCount;
+  const listRef = useRef(null);
 
   const fetchComments = async (cursor = null) => {
     try {
       setLoading(true);
       setError(null);
       const params = {
-        size: 10
+        size: 15
       };
       if (cursor) {
         params.cursor = cursor;
       }
 
       const res = await DefaultAxios.get(`/api/v1/webtoons/${articleId}/comments`, { params });
+      console.log(res.data);
       const newComments = res.data?.data?.comments || [];
       const newPageInfo = res.data?.data?.pageInfo || null;
 
@@ -50,25 +55,14 @@ function CommentPage() {
     }
   };
 
-  // 스크롤 이벤트 핸들러
   const handleScroll = useCallback(() => {
     if (loading || !pageInfo?.hasNext || showReplies) return;
-
-    const scrollHeight = document.documentElement.scrollHeight;
-    const scrollTop = window.scrollY;
-    const clientHeight = document.documentElement.clientHeight;
-
-    // 스크롤이 하단에서 100px 이내로 왔을 때 추가 로딩
-    if (scrollHeight - scrollTop - clientHeight < 100) {
+    const el = listRef.current;
+    if (!el) return;
+    if (el.scrollHeight - el.scrollTop - el.clientHeight < 100) {
       fetchComments(pageInfo.nextCursor);
     }
   }, [loading, pageInfo, showReplies]);
-
-  // 스크롤 이벤트 리스너 등록
-  useEffect(() => {
-    window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, [handleScroll]);
 
   useEffect(() => {
     fetchComments();
@@ -147,7 +141,6 @@ function CommentPage() {
         position: 'relative',
         bgcolor: 'white',
         boxShadow: '0px 0px 10px rgba(0, 0, 0, 0.1)',
-        overflow: 'hidden'
       }}
     >
       {/* 헤더 */}
@@ -174,12 +167,21 @@ function CommentPage() {
             fontWeight: 'bold'
           }}
         >
-          {showReplies ? '답글' : `댓글 ${comments.length}개`}
+          {showReplies ? '답글' : commentCount !== undefined ? `댓글 ${commentCount}개` : `댓글 ${comments.length}개`}
         </Typography>
       </Box>
 
       {/* 댓글 목록 */}
-      <Box sx={{ flex: 1, overflow: 'auto', pb: user ? 7 : 0 }}>
+      <Box
+        ref={listRef}
+        onScroll={handleScroll}
+        sx={{
+          position: 'relative',
+          height: 'calc(100vh - 56px - 72px)', // 헤더, 입력창 높이에 맞게 조정
+          overflowY: 'auto',
+          pb: 2,
+        }}
+      >
         {loading && !comments.length ? (
           <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: 200 }}>
             <CircularProgress />
@@ -244,22 +246,34 @@ function CommentPage() {
         <Box
           sx={{
             position: 'absolute',
-            bottom: 0,
             left: 0,
             right: 0,
+            bottom: 0,
             bgcolor: 'white',
             borderTop: '1px solid rgba(0, 0, 0, 0.12)',
             p: 2,
             display: 'flex',
-            gap: 1
+            gap: 1,
+            zIndex: 2,
+            height: '72px', // 입력창 높이와 맞추기
           }}
         >
           <TextField
             fullWidth
             size="small"
+            multiline
+            minRows={1}
+            maxRows={3}
             placeholder={showReplies ? "답글을 입력하세요..." : "댓글을 입력하세요..."}
             value={commentText}
             onChange={(e) => setCommentText(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter' && !e.shiftKey && commentText.trim()) {
+                e.preventDefault();
+                handleCommentSubmit(e);
+              }
+              
+            }}
             sx={{
               '& .MuiOutlinedInput-root': {
                 borderRadius: '20px',
@@ -287,9 +301,9 @@ function CommentPage() {
               bgcolor: 'black',
               color: 'white',
               borderRadius: '20px',
-              minWidth: 80,
+              minWidth: 48,
               height: 40,
-              px: 3,
+              px: 0,
               boxShadow: 'none',
               whiteSpace: 'nowrap',
               '&:hover': { bgcolor: '#222' }
@@ -297,7 +311,7 @@ function CommentPage() {
             disabled={!commentText.trim()}
             onClick={handleCommentSubmit}
           >
-            {showReplies ? "답글" : "댓글"}
+            <SendIcon sx={{ fontSize: 24 }} />
           </Button>
         </Box>
       ) : (
