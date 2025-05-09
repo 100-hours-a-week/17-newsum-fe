@@ -7,6 +7,7 @@ import CommentItem from '../components/comments/CommentItem';
 import DefaultAxios from '../api/DefaultAxios';
 import TokenAxios from '../api/TokenAxios';
 import Swal from 'sweetalert2';
+import SendIcon from '@mui/icons-material/SendRounded';
 
 function CommentPage() {
   const { articleId } = useParams();
@@ -300,9 +301,9 @@ function CommentPage() {
               bgcolor: 'black',
               color: 'white',
               borderRadius: '20px',
-              minWidth: 80,
+              minWidth: 48,
               height: 40,
-              px: 3,
+              px: 0,
               boxShadow: 'none',
               whiteSpace: 'nowrap',
               '&:hover': { bgcolor: '#222' }
@@ -310,7 +311,7 @@ function CommentPage() {
             disabled={!commentText.trim()}
             onClick={handleCommentSubmit}
           >
-            {showReplies ? "답글" : "댓글"}
+            <SendIcon sx={{ fontSize: 24 }} />
           </Button>
         </Box>
       ) : (

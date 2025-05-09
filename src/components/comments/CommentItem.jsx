@@ -7,6 +7,7 @@ import FavoriteBorderIcon from '@mui/icons-material/FavoriteBorder';
 import FavoriteIcon from '@mui/icons-material/Favorite';
 import Swal from 'sweetalert2';
 import TokenAxios from '../../api/TokenAxios';
+import SendIcon from '@mui/icons-material/SendRounded';
 
 function CommentItem({ comment, onDelete, onReply, level, isAuthor = false, likeCount = 0, replyCount = 0, onEdit }) {
   const [editMode, setEditMode] = useState(false);
@@ -156,7 +157,7 @@ function CommentItem({ comment, onDelete, onReply, level, isAuthor = false, like
                     '&:hover': { bgcolor: '#222' }
                   }}
                 >
-                  수정
+                  <SendIcon sx={{ fontSize: 24 }} />
                 </Button>
                 <Button
                   size="small"
