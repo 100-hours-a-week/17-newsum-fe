@@ -14,6 +14,7 @@ import ArrowDropUpIcon from '@mui/icons-material/ArrowDropUp';
 import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
 import DefaultAxios from '../api/DefaultAxios';
 import CategoryGrid from '../components/grid/CategoryGrid';
+import { useTitleStore } from '../store/titleStore';
 
 function ArticlePage() {
   const { articleId } = useParams();
@@ -26,7 +27,8 @@ function ArticlePage() {
   const [sourceNews, setSourceNews] = useState([]);
   const [commentCount, setCommentCount] = useState(0);
   const [relatedNews, setRelatedNews] = useState([]);
-  const [title, setTitle] = useState('');
+  const title = useTitleStore((state) => state.title);
+  const thumbnailUrl = useTitleStore((state) => state.thumbnailUrl);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [showOriginal, setShowOriginal] = useState(false);
@@ -46,7 +48,6 @@ function ArticlePage() {
         setIsLiked(!!data1?.isLiked);
         setIsBookmarked(!!data1?.isBookmarked);
         setLikeCount(data1?.likeCount || 0);
-        setTitle(data1?.slides?.[0]?.content || '');
         setViewCount(data1?.viewCount || 0);
 
         const res2 = await DefaultAxios.get(`/api/v1/webtoons/${articleId}/details`);
@@ -79,14 +80,22 @@ function ArticlePage() {
 
   return (
     <Box sx={{ pb: 7 }}>
-      <Box sx={{ position: 'sticky', top: 0, bgcolor: 'white', zIndex: 1, borderBottom: '1px solid rgba(0, 0, 0, 0.12)', px: 2, py: 1, display: 'flex', alignItems: 'center' }}>
+      <Box sx={{ position: 'sticky', top: 0, bgcolor: 'white', zIndex: 1, borderBottom: '1px solid rgba(0, 0, 0, 0.12)', px: 2, py: 1, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
         <IconButton onClick={handleBack} edge="start"><ArrowBackIcon /></IconButton>
-        <Typography variant="subtitle1" component="h1" sx={{ ml: 1, flexGrow: 1, fontWeight: 'bold', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{title}</Typography>
+        <Typography variant="subtitle1" component="h1" sx={{ ml: 1, flexGrow: 1, fontWeight: 'bold', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', textAlign: 'center' }}>{title}</Typography>
+        <Box sx={{ width: 35, height: 35, ml: 1 }} />
       </Box>
 
       <Box sx={{ p: 2, pt: 3 }}>
         <Carousel
-          items={slides.map((slide) => (
+          items={[
+            ...(thumbnailUrl ? [{
+              slideSeq: 'thumbnail',
+              imageUrl: thumbnailUrl,
+              content: title,
+            }] : []),
+            ...slides
+          ].map((slide) => (
             <SlideWithMoreButton key={slide.slideSeq} slide={slide} />
           ))}
         />
