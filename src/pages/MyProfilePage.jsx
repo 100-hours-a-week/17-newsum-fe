@@ -12,16 +12,13 @@ function MyProfilePage() {
   const fileInputRef = useRef();
 
   useEffect(() => {
-    const userInfo = localStorage.getItem('userInfo');
-    if (userInfo) {
-      setUser(JSON.parse(userInfo));
+    const userStr = localStorage.getItem('userInfo');
+    if (userStr) {
+      const userObj = JSON.parse(userStr);
+      setUser(userObj);
+      setProfileImg(userObj.profileImageUrl || '');
     } else {
       navigate('/login', { replace: true });
-    }
-
-    const localImg = localStorage.getItem('profileImage');
-    if (localImg) {
-      setProfileImg(localImg);
     }
   }, [navigate]);
 
@@ -29,41 +26,17 @@ function MyProfilePage() {
     navigate('/edit-profile');
   };
 
-  const handleAvatarClick = () => {
-    fileInputRef.current.click();
-  };
-
-  const handleFileChange = (e) => {
-    const file = e.target.files[0];
-    if (!file) return;
-
-    const reader = new FileReader();
-    reader.onload = (ev) => {
-      const imageDataUrl = ev.target.result;
-      setProfileImg(imageDataUrl);
-      localStorage.setItem('profileImage', imageDataUrl);
-    };
-    reader.readAsDataURL(file);
-  };
-
   const handleLogoutClick = () => setOpen(true);
 
   const handleLogout = () => {
     setOpen(false);
-    localStorage.clear();
+    sessionStorage.clear();
     localStorage.removeItem('profileImage');
     localStorage.removeItem('user');
     navigate('/');
   };
 
   const handleCancel = () => setOpen(false);
-
-  // 🔽 최종 프로필 이미지 선택 로직
-  const resolvedProfileImage =
-    profileImg ||
-    user?.profileImage ||
-    user?.picture ||
-    '/default-profile.png';
 
   return (
     <Box sx={{ minHeight: '100vh', bgcolor: '#fff', display: 'flex', flexDirection: 'column', alignItems: 'center', pt: 0 }}>
@@ -76,23 +49,21 @@ function MyProfilePage() {
         </Typography>
       </Box>
 
-      <input type="file" accept="image/*" style={{ display: 'none' }} ref={fileInputRef} onChange={handleFileChange} />
       <Avatar
-        src={resolvedProfileImage}
-        alt={user?.name || '프로필'}
+        src={profileImg}
+        alt={user?.nickname || '프로필'}
         sx={{
           width: 100,
           height: 100,
           margin: '24px auto 0 auto',
           border: '2px solid #eee',
           boxShadow: '0 2px 8px rgba(0,0,0,0.06)',
-          cursor: 'pointer',
+          cursor: 'default',
         }}
-        onClick={handleAvatarClick}
       />
 
       <Typography variant="h6" sx={{ mt: 3, mb: 0.5, fontWeight: 600, textAlign: 'center' }}>
-        {user?.name || '이름 없음'}
+        {user?.nickname || '이름 없음'}
       </Typography>
       <Typography variant="body2" sx={{ color: '#888', mb: 3, textAlign: 'center' }}>
         {user?.email || '이메일 없음'}

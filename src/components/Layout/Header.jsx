@@ -103,14 +103,17 @@ function Header() {
 
   // 프로필 이미지(1순위: localStorage, 2순위: user.picture, 3순위: user.profileImage)
   let profileImg = '';
+  let nickname = '';
+
   try {
-    profileImg =
-      localStorage.getItem('profileImage') ||
-      user?.picture ||
-      user?.profileImage ||
-      '';
+    const userInfoStr = localStorage.getItem('userInfo');
+    if (userInfoStr) {
+      const parsed = JSON.parse(userInfoStr);
+      profileImg = parsed.profileImageUrl || '';
+      nickname = parsed.nickname || '';
+    }
   } catch (e) {
-    profileImg = user?.picture || user?.profileImage || '';
+    profileImg = '';
   }
 
   const handleUserIconClick = () => {

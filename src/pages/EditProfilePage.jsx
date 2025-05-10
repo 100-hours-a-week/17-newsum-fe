@@ -16,7 +16,7 @@ function EditProfilePage() {
   const fileInputRef = useRef();
 
   useEffect(() => {
-    const userInfo = localStorage.getItem('user');
+    const userInfo = localStorage.getItem('userInfo');
     if (userInfo) {
       const parsed = JSON.parse(userInfo);
       setNickname(parsed.nickname || '');
@@ -45,11 +45,15 @@ function EditProfilePage() {
 
   const handleSave = async () => {
     try {
-      const response = await TokenAxios.patch('/api/v1/users/me', {
+      const body = {
         nickname: nickname,
-        profileimage: profileImg,
-      });
-      localStorage.setItem('user', JSON.stringify(response.data.data));
+        profileImage: profileImg,
+      };
+
+      const response = await TokenAxios.patch('/api/v1/users/me', body);
+
+      const updated = response.data.data;
+      localStorage.setItem('userInfo', JSON.stringify(updated));
       setSuccessModalOpen(true);
       setTimeout(() => {
         setSuccessModalOpen(false);
@@ -114,7 +118,6 @@ function EditProfilePage() {
         </Button>
       </Box>
 
-      {/* 회원탈퇴 안내 모달 */}
       <Modal open={open} onClose={handleCloseModal}>
         <Box sx={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', bgcolor: '#fff', borderRadius: 3, boxShadow: 24, p: 4, width: 320, minHeight: 200, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
           <Typography sx={{ fontWeight: 600, fontSize: 18, mb: 2 }}>
@@ -126,12 +129,11 @@ function EditProfilePage() {
         </Box>
       </Modal>
 
-      {/* 저장 완료 안내 모달 */}
       <Modal open={successModalOpen}>
-        <Box sx={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', bgcolor: '#fff', borderRadius: 3, boxShadow: 24, p: 4, width: 320, minHeight: 320, display: 'flex', flexDirection: 'column', alignItems: 'center', outline: 'none' }}>
+        <Box sx={{ position: 'absolute', top: '40%', left: '50%', transform: 'translate(-50%, -50%)', bgcolor: '#fff', borderRadius: 3, boxShadow: 24, width: 320, height: 320, display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', outline: 'none' }}>
           <Box component="img" src={logoutLogo} alt="완료" sx={{ width: 90, height: 90, borderRadius: '50%', objectFit: 'cover', mb: 2 }} />
-          <Typography sx={{ fontWeight: 600, fontSize: 18, textAlign: 'center', mt: 5 }}>
-            회원정보가  수정되었습니다!
+          <Typography sx={{ fontWeight: 600, fontSize: 18, textAlign: 'center' }}>
+            회원정보가<br />수정되었습니다!
           </Typography>
         </Box>
       </Modal>
