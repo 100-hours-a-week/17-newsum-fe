@@ -16,7 +16,7 @@ function EditProfilePage() {
   const fileInputRef = useRef();
 
   useEffect(() => {
-    const userInfo = localStorage.getItem('userInfo');
+    const userInfo = localStorage.getItem('user');
     if (userInfo) {
       const parsed = JSON.parse(userInfo);
       setNickname(parsed.nickname || '');
@@ -53,7 +53,7 @@ function EditProfilePage() {
       const response = await TokenAxios.patch('/api/v1/users/me', body);
 
       const updated = response.data.data;
-      localStorage.setItem('userInfo', JSON.stringify(updated));
+      localStorage.setItem('user', JSON.stringify(updated));
       setSuccessModalOpen(true);
       setTimeout(() => {
         setSuccessModalOpen(false);

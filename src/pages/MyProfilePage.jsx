@@ -12,7 +12,7 @@ function MyProfilePage() {
   const fileInputRef = useRef();
 
   useEffect(() => {
-    const userStr = localStorage.getItem('userInfo');
+    const userStr = localStorage.getItem('user');
     if (userStr) {
       const userObj = JSON.parse(userStr);
       setUser(userObj);

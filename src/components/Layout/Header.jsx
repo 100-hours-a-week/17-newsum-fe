@@ -101,14 +101,14 @@ function Header() {
   const navigate = useNavigate();
   const { user } = useAuth();
 
-  // 프로필 이미지(1순위: localStorage, 2순위: user.picture, 3순위: user.profileImage)
+  // 프로필 이미지(1순위: localStorage의 user, 2순위: user.picture)
   let profileImg = '';
   let nickname = '';
 
   try {
-    const userInfoStr = localStorage.getItem('userInfo');
-    if (userInfoStr) {
-      const parsed = JSON.parse(userInfoStr);
+    const userStr = localStorage.getItem('user');
+    if (userStr) {
+      const parsed = JSON.parse(userStr);
       profileImg = parsed.profileImageUrl || '';
       nickname = parsed.nickname || '';
     }
@@ -155,7 +155,7 @@ function Header() {
             {user && profileImg ? (
               <Avatar
                 src={profileImg}
-                alt={user?.name || '프로필'}
+                alt={nickname || '프로필'}
                 sx={{
                   width: 32,
                   height: 32,
