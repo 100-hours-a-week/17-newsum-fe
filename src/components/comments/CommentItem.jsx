@@ -1,12 +1,13 @@
 // src/components/comments/CommentItem.jsx
 import React, { useState } from 'react';
 import { ListItem, ListItemAvatar, Avatar, ListItemText, Typography, Box, IconButton, Menu, MenuItem, TextField, Button } from '@mui/material';
-import MoreVertIcon from '@mui/icons-material/MoreVert';
+import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
 import ChatBubbleOutlineIcon from '@mui/icons-material/ChatBubbleOutline';
 import FavoriteBorderIcon from '@mui/icons-material/FavoriteBorder';
 import FavoriteIcon from '@mui/icons-material/Favorite';
 import Swal from 'sweetalert2';
 import TokenAxios from '../../api/TokenAxios';
+import SendIcon from '@mui/icons-material/SendRounded';
 
 function CommentItem({ comment, onDelete, onReply, level, isAuthor = false, likeCount = 0, replyCount = 0, onEdit }) {
   const [editMode, setEditMode] = useState(false);
@@ -114,6 +115,15 @@ function CommentItem({ comment, onDelete, onReply, level, isAuthor = false, like
                   onChange={e => setEditContent(e.target.value)}
                   size="small"
                   fullWidth
+                  multiline
+                  minRows={1}
+                  maxRows={3}
+                  onKeyDown={e => {
+                    if (e.key === 'Enter' && !e.shiftKey && editContent.trim()) {
+                      e.preventDefault();
+                      handleEditSubmit();
+                    }
+                  }}
                   sx={{
                     '& .MuiOutlinedInput-root': {
                       borderRadius: '12px',
@@ -147,7 +157,7 @@ function CommentItem({ comment, onDelete, onReply, level, isAuthor = false, like
                     '&:hover': { bgcolor: '#222' }
                   }}
                 >
-                  수정
+                  <SendIcon sx={{ fontSize: 24 }} />
                 </Button>
                 <Button
                   size="small"
@@ -173,85 +183,41 @@ function CommentItem({ comment, onDelete, onReply, level, isAuthor = false, like
                 {comment.content}
               </Typography>
             )}
-            <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mt: 1 }}>
-              <Box 
-                sx={{ 
-                  display: 'flex', 
-                  alignItems: 'center', 
-                  gap: 0.5, 
-                  cursor: 'pointer',
-                  bgcolor: 'rgba(0, 0, 0, 0.05)',
-                  borderRadius: '16px',
-                  padding: '4px 8px',
-                  '&:hover': {
-                    bgcolor: 'rgba(0, 0, 0, 0.1)',
-                  }
-                }} 
-                onClick={handleLikeClick}
-              >
-                {isLiked ? (
-                  <FavoriteIcon sx={{ fontSize: '1rem', color: 'red' }} />
-                ) : (
-                  <FavoriteBorderIcon sx={{ fontSize: '1rem' }} />
-                )}
-                <Typography variant="caption" color="text.secondary">
-                  {likeCount}
-                </Typography>
-              </Box>
-              {!level && (
-                <Box 
-                  sx={{ 
-                    display: 'flex', 
-                    alignItems: 'center', 
-                    gap: 0.5, 
-                    cursor: 'pointer',
-                    bgcolor: 'rgba(0, 0, 0, 0.05)',
-                    borderRadius: '16px',
-                    padding: '4px 8px',
-                    '&:hover': {
-                      bgcolor: 'rgba(0, 0, 0, 0.1)',
-                    }
-                  }} 
-                  onClick={handleReplyClick}
-                >
-                  <ChatBubbleOutlineIcon sx={{ fontSize: '1rem' }} />
-                  <Typography variant="caption" color="text.secondary">
-                    {replyCount}
-                  </Typography>
-                </Box>
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mt: 1 }}>
+              <IconButton size="small" onClick={handleLikeClick}>
+                <FavoriteBorderIcon fontSize="small" />
+                <Typography variant="caption" sx={{ ml: 0.5 }}>{likeCount}</Typography>
+              </IconButton>
+              <IconButton size="small" onClick={handleReplyClick}>
+                <ChatBubbleOutlineIcon fontSize="small" />
+                <Typography variant="caption" sx={{ ml: 0.5 }}>{replyCount}</Typography>
+              </IconButton>
+              {isAuthor && (
+                <IconButton size="small" onClick={handleMoreClick}>
+                  <MoreHorizIcon fontSize="small" />
+                </IconButton>
               )}
             </Box>
           </React.Fragment>
         }
       />
       {isAuthor && (
-        <>
-          <IconButton
-            edge="end"
-            aria-label="more"
-            onClick={handleMoreClick}
-            size="small"
-            sx={{ mt: 1 }}
-          >
-            <MoreVertIcon fontSize="small" />
-          </IconButton>
-          <Menu
-            anchorEl={anchorEl}
-            open={open}
-            onClose={handleClose}
-            anchorOrigin={{
-              vertical: 'bottom',
-              horizontal: 'right',
-            }}
-            transformOrigin={{
-              vertical: 'top',
-              horizontal: 'right',
-            }}
-          >
-            <MenuItem onClick={handleEditClick}>수정</MenuItem>
-            <MenuItem onClick={handleDeleteClick}>삭제</MenuItem>
-          </Menu>
-        </>
+        <Menu
+          anchorEl={anchorEl}
+          open={open}
+          onClose={handleClose}
+          anchorOrigin={{
+            vertical: 'bottom',
+            horizontal: 'right',
+          }}
+          transformOrigin={{
+            vertical: 'top',
+            horizontal: 'right',
+          }}
+        >
+          <MenuItem onClick={handleEditClick}>수정</MenuItem>
+          <MenuItem onClick={handleDeleteClick}>삭제</MenuItem>
+        </Menu>
       )}
     </ListItem>
   );
