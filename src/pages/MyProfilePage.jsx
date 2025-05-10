@@ -26,7 +26,7 @@ function MyProfilePage() {
   }, [navigate]);
 
   const handleEdit = () => {
-    alert('회원정보 수정 기능은 준비중입니다.');
+    navigate('/edit-profile');
   };
 
   const handleAvatarClick = () => {
