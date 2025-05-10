@@ -15,18 +15,21 @@ function LoginPage() {
     const clientId = import.meta.env.VITE_GOOGLE_CLIENT_ID;
     const redirectUri = import.meta.env.VITE_GOOGLE_REDIRECT_URI;
     const scope = 'openid email profile';
+    const from = new URLSearchParams(window.location.search).get('from') || '/';
 
     const url = `${authUrl}`
       + `?client_id=${encodeURIComponent(clientId)}`
       + `&redirect_uri=${encodeURIComponent(redirectUri)}`
       + `&response_type=code`
-      + `&scope=${encodeURIComponent(scope)}`;
+      + `&scope=${encodeURIComponent(scope)}`
+      + `&state=${encodeURIComponent(from)}`;
 
     window.location.assign(url);
   };
 
   const handleKakaoLogin = () => {
-    const KAKAO_AUTH_URL = `https://kauth.kakao.com/oauth/authorize?client_id=${import.meta.env.VITE_KAKAO_REST_API_KEY}&redirect_uri=${import.meta.env.VITE_KAKAO_REDIRECT_URI}&response_type=code`;
+    const from = new URLSearchParams(window.location.search).get('from') || '/';
+    const KAKAO_AUTH_URL = `https://kauth.kakao.com/oauth/authorize?client_id=${import.meta.env.VITE_KAKAO_REST_API_KEY}&redirect_uri=${import.meta.env.VITE_KAKAO_REDIRECT_URI}&response_type=code&state=${encodeURIComponent(from)}`;
     window.location.href = KAKAO_AUTH_URL;
   };
 
@@ -97,7 +100,7 @@ function LoginPage() {
           refreshToken: sessionStorage.getItem("refreshToken")
         });
 
-        // 홈페이지로 이동
+        // 이전 화면으로 이동
         navigate('/');
       } else if (accessToken && refreshToken) {
         // URL에 토큰이 직접 포함된 경우
@@ -108,7 +111,8 @@ function LoginPage() {
           accessToken: sessionStorage.getItem("accessToken"),
           refreshToken: sessionStorage.getItem("refreshToken")
         });
-        navigate('/');
+        // 이전 화면으로 이동
+        navigate('-1');
       }
     } catch (error) {
       const errorLog = {
@@ -150,7 +154,7 @@ function LoginPage() {
           left: 20,
         }}
       >
-        <IconButton onClick={() => navigate('/')}>
+        <IconButton onClick={() => navigate(-1)}>
           <ArrowBackIcon />
         </IconButton>
       </Box>

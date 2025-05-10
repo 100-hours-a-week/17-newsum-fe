@@ -338,7 +338,7 @@ function CommentPage() {
               }
             }}
           >
-            댓글을 작성하려면 <Link component={RouterLink} to="/login">로그인</Link>이 필요합니다.
+            댓글을 작성하려면 <Link component={RouterLink} to={`/login?from=${encodeURIComponent(location.pathname)}`}>로그인</Link>이 필요합니다.
           </Alert>
         </Box>
       )}

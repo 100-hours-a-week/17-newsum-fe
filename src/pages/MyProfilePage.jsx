@@ -53,7 +53,7 @@ function MyProfilePage() {
     localStorage.clear();
     localStorage.removeItem('profileImage');
     localStorage.removeItem('user');
-    navigate('/');
+    navigate(-1);
   };
 
   const handleCancel = () => setOpen(false);
