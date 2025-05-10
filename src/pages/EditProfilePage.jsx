@@ -13,6 +13,8 @@ function EditProfilePage() {
   const [profileImg, setProfileImg] = useState('');
   const [open, setOpen] = useState(false);
   const [successModalOpen, setSuccessModalOpen] = useState(false);
+  const [nicknameError, setNicknameError] = useState('');
+  const [emptyNicknameModalOpen, setEmptyNicknameModalOpen] = useState(false);
   const fileInputRef = useRef();
 
   useEffect(() => {
@@ -43,7 +45,26 @@ function EditProfilePage() {
 
   const handleClearNickname = () => setNickname('');
 
+  const handleNicknameChange = (e) => {
+    const value = e.target.value;
+    if (value.length > 16) {
+      setNicknameError('닉네임은 16자 이상 불가능합니다');
+      return;
+    }
+    setNicknameError('');
+    setNickname(value);
+  };
+
   const handleSave = async () => {
+    if (!nickname.trim()) {
+      setEmptyNicknameModalOpen(true);
+      setTimeout(() => {
+        setEmptyNicknameModalOpen(false);
+        navigate(-1);
+      }, 2000);
+      return;
+    }
+
     try {
       const body = {
         nickname: nickname,
@@ -94,8 +115,10 @@ function EditProfilePage() {
         <TextField
           fullWidth
           value={nickname}
-          onChange={(e) => setNickname(e.target.value)}
+          onChange={handleNicknameChange}
           placeholder="닉네임"
+          error={!!nicknameError}
+          helperText={nicknameError}
           InputProps={{
             endAdornment: nickname && (
               <InputAdornment position="end">
@@ -134,6 +157,15 @@ function EditProfilePage() {
           <Box component="img" src={logoutLogo} alt="완료" sx={{ width: 90, height: 90, borderRadius: '50%', objectFit: 'cover', mb: 2 }} />
           <Typography sx={{ fontWeight: 600, fontSize: 18, textAlign: 'center' }}>
             회원정보가<br />수정되었습니다!
+          </Typography>
+        </Box>
+      </Modal>
+
+      <Modal open={emptyNicknameModalOpen}>
+        <Box sx={{ position: 'absolute', top: '40%', left: '50%', transform: 'translate(-50%, -50%)', bgcolor: '#fff', borderRadius: 3, boxShadow: 24, width: 320, height: 320, display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', outline: 'none' }}>
+          <Box component="img" src={logoutLogo} alt="완료" sx={{ width: 90, height: 90, borderRadius: '50%', objectFit: 'cover', mb: 2 }} />
+          <Typography sx={{ fontWeight: 600, fontSize: 18, textAlign: 'center' }}>
+            닉네임을 입력하지 않으시면<br />기존 닉네임을 사용합니다!
           </Typography>
         </Box>
       </Modal>
