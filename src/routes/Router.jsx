@@ -12,6 +12,7 @@ import MyProfilePage from '../pages/MyProfilePage';
 import GoogleRedirectHandler from '../pages/GoogleRedirectHandler';
 import KakaoRedirectHandler from '../pages/KakaoRedirectHandler';
 import RecentPage from '../pages/RecentPage';
+import EditProfilePage from '../pages/EditProfilePage';
 
 function Router() {
   return (
@@ -36,7 +37,7 @@ function Router() {
 
 
       <Route element={<NoHeaderLayout />}>
-        
+        <Route path="/edit-profile" element={<EditProfilePage />} />
         <Route path="/recent" element={<RecentPage />} />
       </Route>
     </Routes>

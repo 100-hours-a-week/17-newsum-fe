@@ -5,12 +5,14 @@ import CloseIcon from '@mui/icons-material/Close';
 import AddCircleIcon from '@mui/icons-material/AddCircle';
 import { useNavigate } from 'react-router-dom';
 import TokenAxios from '../api/TokenAxios';
+import logoutLogo from '../assets/logout_logo.jpeg';
 
 function EditProfilePage() {
   const navigate = useNavigate();
   const [nickname, setNickname] = useState('');
   const [profileImg, setProfileImg] = useState('');
   const [open, setOpen] = useState(false);
+  const [successModalOpen, setSuccessModalOpen] = useState(false);
   const fileInputRef = useRef();
 
   useEffect(() => {
@@ -18,7 +20,7 @@ function EditProfilePage() {
     if (userInfo) {
       const parsed = JSON.parse(userInfo);
       setNickname(parsed.nickname || '');
-      setProfileImg(parsed.profileImageUrl || '');
+      setProfileImg(parsed.profileImageUrl || '/default-profile.png');
     } else {
       navigate('/login', { replace: true });
     }
@@ -47,9 +49,12 @@ function EditProfilePage() {
         nickname: nickname,
         profileimage: profileImg,
       });
-      alert('저장되었습니다.');
       localStorage.setItem('user', JSON.stringify(response.data.data));
-      navigate(-1);
+      setSuccessModalOpen(true);
+      setTimeout(() => {
+        setSuccessModalOpen(false);
+        navigate(-1);
+      }, 2000);
     } catch (e) {
       alert('저장 실패');
     }
@@ -109,6 +114,7 @@ function EditProfilePage() {
         </Button>
       </Box>
 
+      {/* 회원탈퇴 안내 모달 */}
       <Modal open={open} onClose={handleCloseModal}>
         <Box sx={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', bgcolor: '#fff', borderRadius: 3, boxShadow: 24, p: 4, width: 320, minHeight: 200, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
           <Typography sx={{ fontWeight: 600, fontSize: 18, mb: 2 }}>
@@ -117,6 +123,16 @@ function EditProfilePage() {
           <Button onClick={handleCloseModal} variant="contained" sx={{ bgcolor: '#111', color: '#fff', borderRadius: 2, fontWeight: 600 }}>
             확인
           </Button>
+        </Box>
+      </Modal>
+
+      {/* 저장 완료 안내 모달 */}
+      <Modal open={successModalOpen}>
+        <Box sx={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', bgcolor: '#fff', borderRadius: 3, boxShadow: 24, p: 4, width: 320, minHeight: 320, display: 'flex', flexDirection: 'column', alignItems: 'center', outline: 'none' }}>
+          <Box component="img" src={logoutLogo} alt="완료" sx={{ width: 90, height: 90, borderRadius: '50%', objectFit: 'cover', mb: 2 }} />
+          <Typography sx={{ fontWeight: 600, fontSize: 18, textAlign: 'center', mt: 5 }}>
+            회원정보가  수정되었습니다!
+          </Typography>
         </Box>
       </Modal>
     </Box>
