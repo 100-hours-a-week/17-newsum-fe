@@ -39,7 +39,7 @@ function KakaoRedirectHandler() {
         login(user); // Context 업데이트
 
         // ✅ userInfo는 이제 사용하지 않음
-        localStorage.removeItem('userInfo');
+        //localStorage.removeItem('userInfo');
 
         navigate('/');
       } catch (error) {
