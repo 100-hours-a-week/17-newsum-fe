@@ -87,10 +87,7 @@ function ArticlePage() {
       <Box sx={{ p: 2, pt: 3 }}>
         <Carousel
           items={slides.map((slide) => (
-            <Box key={slide.slideSeq} sx={{ width: '100%', aspectRatio: '1/1', position: 'relative', borderRadius: 2, overflow: 'hidden' }}>
-              <img src={slide.imageUrl} alt={slide.content} style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', objectFit: 'cover' }} />
-              <Box sx={{ position: 'absolute', left: 0, bottom: 0, width: '100%', bgcolor: 'rgba(0,0,0,0.4)', color: 'white', p: 1, fontSize: 14 }}>{slide.content}</Box>
-            </Box>
+            <SlideWithMoreButton key={slide.slideSeq} slide={slide} />
           ))}
         />
       </Box>
@@ -152,6 +149,115 @@ function ArticlePage() {
             viewCount: 0,
           }))}
         />
+      </Box>
+    </Box>
+  );
+}
+
+function SlideWithMoreButton({ slide }) {
+  const [showAll, setShowAll] = useState(false);
+  const isLong = slide.content.length > 30;
+
+  // 한 줄일 때만 gradient mask 적용
+  const gradientMask = 'linear-gradient(to right, #fff 80%, transparent 100%)';
+
+  return (
+    <Box sx={{ width: '100%', aspectRatio: '1/1', position: 'relative', borderRadius: 2, overflow: 'hidden' }}>
+      <img
+        src={slide.imageUrl}
+        alt={slide.content}
+        style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', objectFit: 'cover' }}
+      />
+      <Box
+        sx={{
+          position: 'absolute',
+          left: 0,
+          bottom: 0,
+          width: '100%',
+          bgcolor: 'rgba(0,0,0,0.4)',
+          color: 'white',
+          p: 1,
+          fontSize: 14,
+          minHeight: showAll ? 56 : 28,
+          transition: 'min-height 0.2s',
+          display: 'flex',
+          flexDirection: 'column',
+          justifyContent: 'flex-end',
+        }}
+      >
+        {!showAll ? (
+          <Box
+            sx={{
+              display: 'flex',
+              alignItems: 'center',
+              width: '100%',
+            }}
+          >
+            <Box
+              sx={{
+                overflow: 'hidden',
+                display: '-webkit-box',
+                WebkitBoxOrient: 'vertical',
+                whiteSpace: 'normal',
+                WebkitLineClamp: 1,
+                textOverflow: 'ellipsis',
+                WebkitMaskImage: gradientMask,
+                maskImage: gradientMask,
+                flex: '1 1 auto',
+                transition: 'all 0.2s',
+              }}
+            >
+              {slide.content}
+            </Box>
+            {isLong && (
+              <button
+                style={{
+                  background: 'none',
+                  border: 'none',
+                  color: 'white',
+                  cursor: 'pointer',
+                  fontSize: 12,
+                  padding: 0,
+                  textDecoration: 'underline',
+                  marginLeft: 8,
+                  flex: '0 0 auto',
+                }}
+                onClick={() => setShowAll(true)}
+              >
+                더보기
+              </button>
+            )}
+          </Box>
+        ) : (
+          <>
+            <Box
+              sx={{
+                overflow: 'hidden',
+                whiteSpace: 'normal',
+                wordBreak: 'break-all',
+                mb: 1,
+              }}
+            >
+              {slide.content}
+            </Box>
+            <Box sx={{ display: 'flex', justifyContent: 'flex-end', width: '100%' }}>
+              <button
+                style={{
+                  background: 'none',
+                  border: 'none',
+                  color: 'white',
+                  cursor: 'pointer',
+                  fontSize: 12,
+                  padding: 0,
+                  textDecoration: 'underline',
+                }}
+                onClick={() => setShowAll(false)}
+              >
+                간략히
+              </button>
+            </Box>
+          </>
+        )}
       </Box>
     </Box>
   );

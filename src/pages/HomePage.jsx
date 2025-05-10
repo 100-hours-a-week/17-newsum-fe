@@ -121,6 +121,8 @@ function HomePage() {
                     }} />
                   </Box>
                 ))}
+                autoSlide={true}
+                autoSlideInterval={5000}
               />
             </Box>
           )}
