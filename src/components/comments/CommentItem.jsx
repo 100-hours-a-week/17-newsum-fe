@@ -91,7 +91,7 @@ function CommentItem({ comment, onDelete, onReply, level, isAuthor = false, like
         <Avatar
           sx={{ width: 30, height: 30 }}
           alt={comment.author}
-          src={`https://api.dicebear.com/8.x/initials/svg?seed=${comment.author}`}
+          src={`${comment.authorProfileImageUrl}`}
         />
       </ListItemAvatar>
       <ListItemText
@@ -188,10 +188,12 @@ function CommentItem({ comment, onDelete, onReply, level, isAuthor = false, like
                 <FavoriteBorderIcon fontSize="small" />
                 <Typography variant="caption" sx={{ ml: 0.5 }}>{likeCount}</Typography>
               </IconButton>
-              <IconButton size="small" onClick={handleReplyClick}>
-                <ChatBubbleOutlineIcon fontSize="small" />
-                <Typography variant="caption" sx={{ ml: 0.5 }}>{replyCount}</Typography>
-              </IconButton>
+              {level === 0 && (
+                <IconButton size="small" onClick={handleReplyClick}>
+                  <ChatBubbleOutlineIcon fontSize="small" />
+                  <Typography variant="caption" sx={{ ml: 0.5 }}>{replyCount}</Typography>
+                </IconButton>
+              )}
               {isAuthor && (
                 <IconButton size="small" onClick={handleMoreClick}>
                   <MoreHorizIcon fontSize="small" />
