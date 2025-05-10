@@ -24,19 +24,15 @@ function Router() {
       <Route path="/oauth2/callback/kakao" element={<KakaoRedirectHandler />} />
       <Route path='/comment/:articleId' element={<CommentPage />} />
 
-      {/* ⭐️ 기존 헤더/바텀네비 없는 단독 페이지로 분리 ⭐️ */}
-      <Route path="/users/profile" element={<MyProfilePage />} />
-
-   
       {/* MainLayout: 헤더/푸터 있는 공통 레이아웃 */}
       <Route element={<MainLayout />}>
         <Route path="/" element={<HomePage />} />
         <Route path="/category/:category_id" element={<CategoryPage />} />
-        <Route path='/article/:articleId' element={<ArticlePage />}/>
+        <Route path='/article/:articleId' element={<ArticlePage />} />
       </Route>
 
-
       <Route element={<NoHeaderLayout />}>
+        <Route path="/users/profile" element={<MyProfilePage />} />
         <Route path="/edit-profile" element={<EditProfilePage />} />
         <Route path="/recent" element={<RecentPage />} />
       </Route>
