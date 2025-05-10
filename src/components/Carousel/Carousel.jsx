@@ -63,6 +63,9 @@ const Carousel = ({ items, autoSlide = false, autoSlideInterval = 5000 }) => {
   const [currentIndex, setCurrentIndex] = useState(0);
   const totalItems = items.length;
   const intervalRef = useRef(null);
+  // 터치 스와이프 상태
+  const touchStartX = useRef(null);
+  const touchEndX = useRef(null);
 
   const nextSlide = () => {
     setCurrentIndex((prevIndex) => (prevIndex + 1) % totalItems);
@@ -80,6 +83,26 @@ const Carousel = ({ items, autoSlide = false, autoSlideInterval = 5000 }) => {
   const handlePrevClick = () => {
     prevSlide();
     if (autoSlide) resetInterval();
+  };
+
+  // 터치 이벤트 핸들러
+  const onTouchStart = (e) => {
+    touchStartX.current = e.touches[0].clientX;
+  };
+  const onTouchMove = (e) => {
+    touchEndX.current = e.touches[0].clientX;
+  };
+  const onTouchEnd = () => {
+    if (touchStartX.current !== null && touchEndX.current !== null) {
+      const diff = touchStartX.current - touchEndX.current;
+      if (Math.abs(diff) > 40) { // 스와이프 최소 거리
+        if (diff > 0) nextSlide(); // 왼쪽으로 스와이프
+        else prevSlide(); // 오른쪽으로 스와이프
+        if (autoSlide) resetInterval();
+      }
+    }
+    touchStartX.current = null;
+    touchEndX.current = null;
   };
 
   // 자동 슬라이드 관리
@@ -114,7 +137,11 @@ const Carousel = ({ items, autoSlide = false, autoSlideInterval = 5000 }) => {
       >
         <ArrowBack />
       </NavigationButton>
-      <CarouselContainer>
+      <CarouselContainer
+        onTouchStart={onTouchStart}
+        onTouchMove={onTouchMove}
+        onTouchEnd={onTouchEnd}
+      >
         <SlideContainer>
           {items.map((item, index) => (
             <Slide
