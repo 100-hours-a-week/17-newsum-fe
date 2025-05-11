@@ -72,9 +72,17 @@ function EditProfilePage() {
       };
 
       const response = await TokenAxios.patch('/api/v1/users/me', body);
-
       const updated = response.data.data;
-      localStorage.setItem('user', JSON.stringify(updated));
+
+      const prev = JSON.parse(localStorage.getItem('user') || '{}');
+
+      const merged = {
+        ...prev,
+        ...updated, // nickname, profileImageUrl 덮어쓰기 (email 유지됨)
+      };
+
+      localStorage.setItem('user', JSON.stringify(merged));
+
       setSuccessModalOpen(true);
       setTimeout(() => {
         setSuccessModalOpen(false);
