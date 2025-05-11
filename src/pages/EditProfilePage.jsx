@@ -58,10 +58,11 @@ function EditProfilePage() {
   const handleSave = async () => {
     if (!nickname.trim()) {
       setEmptyNicknameModalOpen(true);
-      setTimeout(() => {
-        setEmptyNicknameModalOpen(false);
-        navigate(-1);
-      }, 2000);
+      return;
+    }
+
+    if (nickname.trim().length < 2) {
+      setNicknameError('닉네임은 2~16자로 설정해주세요');
       return;
     }
 
@@ -78,7 +79,7 @@ function EditProfilePage() {
 
       const merged = {
         ...prev,
-        ...updated, // nickname, profileImageUrl 덮어쓰기 (email 유지됨)
+        ...updated,
       };
 
       localStorage.setItem('user', JSON.stringify(merged));
@@ -169,12 +170,19 @@ function EditProfilePage() {
         </Box>
       </Modal>
 
-      <Modal open={emptyNicknameModalOpen}>
+      <Modal open={emptyNicknameModalOpen} onClose={() => setEmptyNicknameModalOpen(false)}>
         <Box sx={{ position: 'absolute', top: '40%', left: '50%', transform: 'translate(-50%, -50%)', bgcolor: '#fff', borderRadius: 3, boxShadow: 24, width: 320, height: 320, display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', outline: 'none' }}>
-          <Box component="img" src={logoutLogo} alt="완료" sx={{ width: 90, height: 90, borderRadius: '50%', objectFit: 'cover', mb: 2 }} />
+          <Box component="img" src={logoutLogo} alt="경고" sx={{ width: 90, height: 90, borderRadius: '50%', objectFit: 'cover', mb: 2 }} />
           <Typography sx={{ fontWeight: 600, fontSize: 18, textAlign: 'center' }}>
-            닉네임을 입력하지 않으시면<br />기존 닉네임을 사용합니다!
+            잘못된 닉네임입니다.<br />닉네임은 2~16자로 설정해주세요
           </Typography>
+          <Button
+            onClick={() => setEmptyNicknameModalOpen(false)}
+            variant="contained"
+            sx={{ mt: 3, bgcolor: '#111', color: '#fff', borderRadius: 2, fontWeight: 600 }}
+          >
+            확인
+          </Button>
         </Box>
       </Modal>
     </Box>
