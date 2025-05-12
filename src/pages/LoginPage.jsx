@@ -86,15 +86,15 @@ function LoginPage() {
         const data = await res.json();
         addLog('서버 응답 데이터', data);
 
-        // 세션 스토리지에 사용자 정보 저장
-        sessionStorage.setItem("userInfo", JSON.stringify(data.userInfo));
-        sessionStorage.setItem("accessToken", data.accessToken);
-        sessionStorage.setItem("refreshToken", data.refreshToken);
+        // 로컬 스토리지에 사용자 정보 저장
+        localStorage.setItem("userInfo", JSON.stringify(data.userInfo));
+        localStorage.setItem("accessToken", data.accessToken);
+        localStorage.setItem("refreshToken", data.refreshToken);
 
-        addLog('세션 스토리지에 정보 저장', {
-          userInfo: sessionStorage.getItem("userInfo"),
-          accessToken: sessionStorage.getItem("accessToken"),
-          refreshToken: sessionStorage.getItem("refreshToken")
+        addLog('로컬 스토리지에 정보 저장', {
+          userInfo: localStorage.getItem("userInfo"),
+          accessToken: localStorage.getItem("accessToken"),
+          refreshToken: localStorage.getItem("refreshToken")
         });
 
         // 홈페이지로 이동
@@ -102,11 +102,11 @@ function LoginPage() {
       } else if (accessToken && refreshToken) {
         // URL에 토큰이 직접 포함된 경우
         addLog('URL에서 직접 토큰을 받음');
-        sessionStorage.setItem("accessToken", accessToken);
-        sessionStorage.setItem("refreshToken", refreshToken);
-        addLog('세션 스토리지에 토큰 저장', {
-          accessToken: sessionStorage.getItem("accessToken"),
-          refreshToken: sessionStorage.getItem("refreshToken")
+        localStorage.setItem("accessToken", accessToken);
+        localStorage.setItem("refreshToken", refreshToken);
+        addLog('로컬 스토리지에 토큰 저장', {
+          accessToken: localStorage.getItem("accessToken"),
+          refreshToken: localStorage.getItem("refreshToken")
         });
         navigate('/');
       }
