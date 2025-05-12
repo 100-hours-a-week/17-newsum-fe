@@ -1,9 +1,11 @@
 // src/components/article/ArticleCard.jsx
 import React, { useState, useEffect, useRef, useMemo } from 'react';
-import { Card, CardActionArea, Typography, Box } from '@mui/material';
+import { Card, CardActionArea, Box } from '@mui/material';
 import { Link as RouterLink } from 'react-router-dom';
 import styled from '@emotion/styled';
 import ColorThief from 'colorthief';
+import { formatNumber } from '../../utils/numberFormat';
+import { CardTitle, ViewCount } from '../../components/common/StyledTypography';
 
 const StyledCard = styled(Card)`
   position: relative;
@@ -37,30 +39,28 @@ const StyledCardActionArea = styled(CardActionArea)`
   justify-content: flex-end;
 `;
 
-const Title = styled(Typography)`
+const WhiteCardTitle = styled(CardTitle)`
   color: white;
-  font-weight: bold;
-  font-size: 0.8rem;
-  line-height: 1.2;
-  margin-bottom: 4px;
-  display: -webkit-box;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  -webkit-box-orient: vertical;
   -webkit-line-clamp: 1;
-  word-break: keep-all;
-`;
-
-const ViewCount = styled(Typography)`
-  color: rgba(255, 255, 255, 0.8);
-  font-size: 0.7rem;
 `;
 
 // 컬러 추출 결과를 캐시하기 위한 Map
 const colorCache = new Map();
 
+/**
+ * 웹툰 카드 컴포넌트
+ * 
+ * @param {Object} props
+ * @param {Object} props.article - 웹툰 카드 데이터
+ * @param {number} props.article.id - 웹툰 ID
+ * @param {string} props.article.title - 웹툰 제목
+ * @param {string} props.article.thumbnailUrl - 썸네일 URL
+ * @param {string} props.article.createdAt - 생성 날짜 (ISO 형식)
+ * @param {number} props.article.viewCount - 조회수
+ */
 const ArticleCard = ({ article }) => {
-  const { id, title, thumbnailUrl, viewCount } = article;
+  // WebtoonCardDto와 필드명 맞추기 (id, title, thumbnailUrl, createdAt, viewCount)
+  const { id, title, thumbnailUrl, createdAt, viewCount } = article;
   const imageRef = useRef(null);
   const [gradient, setGradient] = useState(null);
   const [isImageLoaded, setIsImageLoaded] = useState(false);
@@ -99,10 +99,6 @@ const ArticleCard = ({ article }) => {
     setIsImageLoaded(true);
   };
 
-  const formatViewCount = (count) => {
-    return `${(count / 10000).toFixed(1)}만`;
-  };
-
   const defaultThumbnail = 'https://sinsa-image.s3.ap-northeast-2.amazonaws.com/not_image.png';
 
   return (
@@ -117,12 +113,14 @@ const ArticleCard = ({ article }) => {
           onLoad={handleImageLoad}
         />
         <GradientOverlay gradient={gradient}>
-          <Title variant="h6" component="h2">
+          <WhiteCardTitle variant="h6" component="h2">
             {title}
-          </Title>
-          <ViewCount>
-            {formatViewCount(viewCount || 0)}
-          </ViewCount>
+          </WhiteCardTitle>
+          <ViewCount 
+            count={formatNumber(viewCount || 0)} 
+            color="rgba(255, 255, 255, 0.8)"
+            fontSize="0.7rem"
+          />
         </GradientOverlay>
       </StyledCardActionArea>
     </StyledCard>
