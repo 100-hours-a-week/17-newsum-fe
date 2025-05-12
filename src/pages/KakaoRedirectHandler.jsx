@@ -2,6 +2,7 @@ import React, { useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import DefaultAxios from '../api/DefaultAxios';
+import TokenAxios from '../api/TokenAxios';
 
 function KakaoRedirectHandler() {
   const navigate = useNavigate();
@@ -22,13 +23,26 @@ function KakaoRedirectHandler() {
           { code }
         );
 
-        const data = response.data;
+        const { accessToken, refreshToken } = response.data;
 
-        localStorage.setItem('userInfo', JSON.stringify(data.userInfo));
-        localStorage.setItem('accessToken', data.accessToken);
-        localStorage.setItem('refreshToken', data.refreshToken);
+        // 1️⃣ 토큰 저장
+        localStorage.setItem('accessToken', accessToken);
+        localStorage.setItem('refreshToken', refreshToken);
 
-        login(data.userInfo);
+        // 2️⃣ TokenAxios에 토큰 설정
+        TokenAxios.defaults.headers.common['Authorization'] = `Bearer ${accessToken}`;
+
+        // 3️⃣ 서버에서 사용자 프로필 받아오기
+        const userRes = await TokenAxios.get('/api/v1/users/profile');
+        const user = userRes.data.data;
+
+        // 4️⃣ user 저장 (nickname 포함됨)
+        localStorage.setItem('user', JSON.stringify(user));
+        login(user); // Context 업데이트
+
+        // ✅ userInfo는 이제 사용하지 않음
+        //localStorage.removeItem('userInfo');
+
         navigate(from);
       } catch (error) {
         console.error('카카오 로그인 처리 중 오류:', error);

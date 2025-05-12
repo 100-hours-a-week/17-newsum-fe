@@ -1,8 +1,7 @@
-// src/components/Layout/MainLayout.jsx
+// src/components/Layout/NoHeaderLayout.jsx
 import React from 'react';
 import { Outlet } from 'react-router-dom';
-import { Box, Toolbar } from '@mui/material';
-import Header from './Header';
+import { Box } from '@mui/material';
 import BottomNav from './BottomNav';
 import styled from '@emotion/styled';
 
@@ -40,7 +39,7 @@ const ContentBox = styled(Box)`
   }
 `;
 
-function MainLayout() {
+function NoHeaderLayout() {
   return (
     <MainContainer>
       <ContentBox component="main">
@@ -51,4 +50,4 @@ function MainLayout() {
   );
 }
 
-export default MainLayout;
+export default NoHeaderLayout;
