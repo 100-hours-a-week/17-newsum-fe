@@ -7,7 +7,6 @@ import Carousel from '../components/Carousel/Carousel';
 import DefaultAxios from '../api/DefaultAxios';
 import CategoryGrid from '../components/grid/CategoryGrid';
 import { useTitleStore } from '../store/titleStore';
-import { HeaderText } from '../components/common/StyledTypography';
 import ArticleInfo from '../components/article/ArticleInfo';
 import CommentButton from '../components/article/CommentButton';
 
@@ -93,8 +92,8 @@ function ArticlePage() {
     <Box sx={{ pb: 7 }}>
       <Box sx={{ position: 'sticky', top: 0, bgcolor: 'white', zIndex: 1, borderBottom: '1px solid rgba(0, 0, 0, 0.12)', px: 2, py: 1, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
         <IconButton onClick={handleBack} edge="start"><ArrowBackIcon /></IconButton>
-        {/* TODO : 중앙 정렬이 아니라면 오른쪽에 박스 추가 */}
-        <HeaderText variant="subtitle1" component="h1" sx={{ ml: 1, flexGrow: 1 }}>{title}</HeaderText>
+        <Typography variant="subtitle1" component="h1" sx={{ ml: 1, flexGrow: 1, fontWeight: 'bold', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', textAlign: 'center' }}>{title}</Typography>
+        <Box sx={{ width: 35, height: 35, ml: 1 }} />
       </Box>
 
       <Box sx={{ p: 2, pt: 3 }}>
