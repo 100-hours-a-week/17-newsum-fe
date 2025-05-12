@@ -116,8 +116,9 @@ function HomePage() {
                     <ArticleCard article={{
                       id: article.id,
                       title: article.title,
-                      thumbnailUrl: article.thumbnailUrl, // ✅ 수정
-                      viewCount: 0,
+                      thumbnailUrl: article.thumbnailUrl,
+                      createdAt: article.createdAt,
+                      viewCount: article.viewCount || 0,
                     }} />
                   </Box>
                 ))}
@@ -131,12 +132,13 @@ function HomePage() {
           {top3Data.todaysNews && top3Data.todaysNews.length > 0 && (
             <NewsBox
               title="오늘의 뉴스"
-              date={top3Data.todaysNews[0]?.created_at ? new Date(top3Data.todaysNews[0].created_at).toLocaleString('ko-KR', { dateStyle: 'short', timeStyle: 'short' }) + " 기준" : ''}
+              date={top3Data.todaysNews[0]?.createdAt ? new Date(top3Data.todaysNews[0].createdAt).toLocaleString('ko-KR', { dateStyle: 'short', timeStyle: 'short' }) + " 기준" : ''}
               articles={top3Data.todaysNews.map(article => ({
                 id: article.id,
                 title: article.title,
                 thumbnailUrl: article.thumbnailUrl,
-                viewCount: 0,
+                createdAt: article.createdAt,
+                viewCount: article.viewCount || 0,
               }))}
               onMoreClick={() => handleMoreClick(`/today`)}
               maxItems={3}
@@ -147,12 +149,13 @@ function HomePage() {
           {recentData.recentWebtoons && recentData.recentWebtoons.length > 0 && (
             <NewsBox
               title="최근 본 뉴스"
-              date={recentData.recentWebtoons[0]?.viewed_at ? new Date(recentData.recentWebtoons[0].viewed_at).toLocaleString('ko-KR', { dateStyle: 'short', timeStyle: 'short' }) + " 기준" : ''}
+              date={recentData.recentWebtoons[0]?.viewedAt ? new Date(recentData.recentWebtoons[0].viewedAt).toLocaleString('ko-KR', { dateStyle: 'short', timeStyle: 'short' }) + " 기준" : ''}
               articles={recentData.recentWebtoons.map(article => ({
                 id: article.id,
                 title: article.title,
                 thumbnailUrl: article.thumbnailUrl,
-                viewCount: 0,
+                createdAt: article.createdAt,
+                viewCount: article.viewCount || 0,
               }))}
               onMoreClick={() => handleMoreClick(`/recent`)}
               maxItems={3}
@@ -164,12 +167,13 @@ function HomePage() {
             <NewsBox
               key={category}
               title={category}
-              date={articles[0]?.created_at ? new Date(articles[0].created_at).toLocaleString('ko-KR', { dateStyle: 'short', timeStyle: 'short' }) + " 기준" : ''}
+              date={articles[0]?.createdAt ? new Date(articles[0].createdAt).toLocaleString('ko-KR', { dateStyle: 'short', timeStyle: 'short' }) + " 기준" : ''}
               articles={articles.map(article => ({
                 id: article.id,
                 title: article.title,
                 thumbnailUrl: article.thumbnailUrl,
-                viewCount: 0,
+                createdAt: article.createdAt,
+                viewCount: article.viewCount || 0,
               }))}
               onMoreClick={() => handleMoreClick(`category/${category}`)}
               maxItems={3}

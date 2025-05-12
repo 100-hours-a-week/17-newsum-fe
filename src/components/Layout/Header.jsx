@@ -155,7 +155,7 @@ function Header() {
           >
             {user && profileImg ? (
               <Avatar
-                src={profileImg}
+                src={user && profileImg ? profileImg : defaultImg}
                 alt={nickname || '프로필'}
                 sx={{
                   width: 32,

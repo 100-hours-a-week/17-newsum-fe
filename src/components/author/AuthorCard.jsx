@@ -5,6 +5,8 @@ import BookmarkBorderIcon from '@mui/icons-material/BookmarkBorder';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
 import { Box, IconButton, Typography, Avatar, Collapse } from '@mui/material';
+import { formatNumber } from '../../utils/numberFormat';
+import { HeaderText, ViewCount } from '../common/StyledTypography';
 
 function AuthorCard({ author, viewCount }) {
   const [showOriginalArticle, setShowOriginalArticle] = useState(false);
@@ -24,12 +26,16 @@ function AuthorCard({ author, viewCount }) {
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
           <Avatar src={author?.image} alt={author?.name} />
           <Box>
-            <Typography variant="subtitle2" sx={{ fontWeight: 600 }}>
+            <HeaderText variant="subtitle2">
               {author?.name}
-            </Typography>
-            <Typography variant="caption" color="text.secondary">
-              {viewCount}명 읽는 중
-            </Typography>
+            </HeaderText>
+            <ViewCount 
+              count={formatNumber(viewCount || 0)} 
+              label="명 읽는 중"
+              color="text.secondary"
+              fontSize="0.75rem"
+              variant="caption"
+            />
           </Box>
         </Box>
         
@@ -78,7 +84,7 @@ function AuthorCard({ author, viewCount }) {
           py: 1
         }}
       >
-        <Typography 
+        <HeaderText 
           variant="body2" 
           sx={{ 
             color: 'text.primary',
@@ -89,7 +95,7 @@ function AuthorCard({ author, viewCount }) {
         >
           원본 기사 보기
           {showOriginalArticle ? <KeyboardArrowUpIcon /> : <KeyboardArrowDownIcon />}
-        </Typography>
+        </HeaderText>
       </Box>
 
       {/* 확장되는 원본 기사 섹션 */}
