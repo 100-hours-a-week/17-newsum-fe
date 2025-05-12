@@ -62,22 +62,6 @@ function CommentItem({ comment, onDelete, onReply, level, isAuthor = false, like
     setEditMode(false);
   };
 
-  const handleCommentEdit = async (commentId, newContent) => {
-    try {
-      await TokenAxios.patch(`/api/v1/webtoons/${articleId}/comments/${commentId}`, {
-        content: newContent
-      });
-      setComments(prev =>
-        prev.map(comment =>
-          comment.id === commentId ? { ...comment, content: newContent } : comment
-        )
-      );
-      Swal.fire('수정 완료', '댓글이 수정되었습니다.', 'success');
-    } catch {
-      Swal.fire('오류', '댓글 수정에 실패했습니다.', 'error');
-    }
-  };
-
   return (
     <ListItem
       alignItems="flex-start"
