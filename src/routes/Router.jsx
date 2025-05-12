@@ -3,6 +3,7 @@ import React from 'react';
 import { Routes, Route } from 'react-router-dom';
 import MainLayout from '../components/Layout/MainLayout';
 import NoHeaderLayout from '../components/Layout/NoHeaderLayout'
+import ArticleLayout from '../components/Layout/ArticleLayout';
 import HomePage from '../pages/HomePage';
 import ArticlePage from '../pages/ArticlePage';
 import LoginPage from '../pages/LoginPage';
@@ -30,6 +31,9 @@ function Router() {
       <Route element={<MainLayout />}>
         <Route path="/" element={<HomePage />} />
         <Route path="/category/:category_id" element={<CategoryPage />} />
+      </Route>
+
+      <Route element={<ArticleLayout />}>
         <Route path='/article/:articleId' element={<ArticlePage />} />
       </Route>
 
