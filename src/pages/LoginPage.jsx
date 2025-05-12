@@ -1,6 +1,6 @@
 // src/pages/LoginPage.jsx
 import React from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { Box, Typography, IconButton, Button } from '@mui/material';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import newsumLogo from '../assets/newsum_logo.jpeg';
@@ -9,6 +9,8 @@ import kakaoLoginBtn from '../assets/kakao_login.png';
 
 function LoginPage() {
   const navigate = useNavigate();
+  const location = useLocation();
+  const from = new URLSearchParams(location.search).get('from') || '/';
 
   const handleGoogleLogin = () => {
     const authUrl = 'https://accounts.google.com/o/oauth2/auth';
@@ -126,6 +128,10 @@ function LoginPage() {
     }
   };
 
+  const handleBack = () => {
+    navigate(from);
+  };
+
   // 컴포넌트 마운트 시 토큰 확인
   React.useEffect(() => {
     const log = {
@@ -154,7 +160,7 @@ function LoginPage() {
           left: 20,
         }}
       >
-        <IconButton onClick={() => navigate(-1)}>
+        <IconButton onClick={handleBack}>
           <ArrowBackIcon />
         </IconButton>
       </Box>
