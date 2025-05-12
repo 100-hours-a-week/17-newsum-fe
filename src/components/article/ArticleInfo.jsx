@@ -47,11 +47,12 @@ const StyledIconButton = styled(IconButton)`
 
 const ArticleLink = styled(Link)`
   display: block;
-  padding: 4px 0;
-  margin-bottom: 4px;
+  padding: 2px 0;
+  margin-bottom: 1px;
   text-decoration: underline;
   color: ${props => props.theme?.palette?.primary?.main || '#1976d2'};
   font-size: 0.875rem;
+  line-height: 1.4;
   
   &:hover {
     opacity: 0.8;
@@ -245,20 +246,22 @@ const ArticleInfo = ({
           <MoreContent>
             {sourceNews.length > 0 && (
               <Box>
-                <Typography variant="body2" sx={{ fontWeight: 'medium', mb: 1 }}>
+                <Typography variant="body2" sx={{ fontWeight: 'medium', mb: 0.5 }}>
                   원본 기사
                 </Typography>
-                {sourceNews.map((news, idx) => (
-                  <ArticleLink
-                    key={idx}
-                    href={news.link}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    underline="always"
-                  >
-                    {news.title}
-                  </ArticleLink>
-                ))}
+                <Box sx={{ display: 'flex', flexDirection: 'column', gap: 0 }}>
+                  {sourceNews.map((news, idx) => (
+                    <ArticleLink
+                      key={idx}
+                      href={news.link}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      underline="always"
+                    >
+                      {news.title}
+                    </ArticleLink>
+                  ))}
+                </Box>
               </Box>
             )}
           </MoreContent>
