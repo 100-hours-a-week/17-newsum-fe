@@ -21,7 +21,7 @@ function Router() {
       {/* <Route path="/login" element={<GoogleRedirectHandler />} /> */}
       <Route path="/oauth2/callback/google" element={<GoogleRedirectHandler />} />
       <Route path="/oauth2/callback/kakao" element={<KakaoRedirectHandler />} />
-      <Route path='/comment/:articleId' element={<CommentPage />} />
+      <Route path='/article/:articleId/comments' element={<CommentPage />} />
 
       {/* ⭐️ 기존 헤더/바텀네비 없는 단독 페이지로 분리 ⭐️ */}
 
