@@ -30,8 +30,9 @@ function MyProfilePage() {
 
   const handleLogout = () => {
     setOpen(false);
-    sessionStorage.clear();
     localStorage.removeItem('profileImage');
+    localStorage.removeItem('accessToken');
+    localStorage.removeItem('refreshToken');
     localStorage.removeItem('user');
     navigate(-1);
   };
