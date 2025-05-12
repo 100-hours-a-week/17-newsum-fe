@@ -1,8 +1,14 @@
 /* src/index.css */
 @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700&display=swap');
 
-html { box-sizing: border-box; /* ... */ }
-*, *::before, *::after { box-sizing: inherit; }
+html { 
+  box-sizing: border-box;
+  overflow-y: scroll; /* 항상 스크롤바 표시 */
+} 
+
+*, *::before, *::after { 
+  box-sizing: inherit; 
+}
 
 body {
   margin: 0;
