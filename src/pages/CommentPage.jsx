@@ -20,8 +20,9 @@ function CommentPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [pageInfo, setPageInfo] = useState(null);
+  const [commentsCount, setCommentsCount] = useState(0);
+  const [subCommentsCount, setSubCommentsCount] = useState(0);
   const location = useLocation();
-  const commentCount = location.state?.commentCount;
   const listRef = useRef(null);
 
   const fetchComments = async (cursor = null) => {
@@ -88,15 +89,6 @@ function CommentPage() {
         parentId: parentId
       });
       setCommentText('');
-      
-      // 댓글 작성 후 댓글 개수 업데이트
-      if (commentCount !== undefined) {
-        const newCommentCount = commentCount + 1;
-        navigate(`/comment/${articleId}`, { 
-          state: { commentCount: newCommentCount },
-          replace: true 
-        });
-      }
       
       fetchComments(); // 댓글 작성 후 목록 새로고침
       if (showReplies && selectedCommentId) {
@@ -177,7 +169,7 @@ function CommentPage() {
             fontWeight: 'bold'
           }}
         >
-          {showReplies ? '답글' : commentCount !== undefined ? `댓글 ${commentCount}개` : `댓글 ${comments.length}개`}
+          {showReplies ?  `답글 ${replies.length}개` : `댓글 ${comments.length}개`}
         </Typography>
       </Box>
 
@@ -278,7 +270,7 @@ function CommentPage() {
             value={commentText}
             onChange={(e) => setCommentText(e.target.value)}
             onKeyDown={(e) => {
-              if (e.key === 'Enter' && !e.shiftKey && !e.isComposing && commentText.trim()) {
+              if (e.key === 'Enter' && !e.shiftKey && !e.nativeEvent.isComposing && commentText.trim()) {
                 e.preventDefault();
                 handleCommentSubmit(e);
               }
