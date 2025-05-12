@@ -11,7 +11,8 @@ import BookmarkBorderIcon from '@mui/icons-material/BookmarkBorder';
 import PersonIcon from '@mui/icons-material/Person';
 import PersonOutlineIcon from '@mui/icons-material/PersonOutline';
 import styled from '@emotion/styled';
-import Swal from 'sweetalert2';
+import { showInfoSwal } from '../modal/ShowInfoModal';
+
 
 const StyledPaper = styled(Paper)`
   max-width: 430px;
@@ -126,12 +127,7 @@ function BottomNav() {
       setValue(newValue);
       navigate(newValue);
     } else {
-      Swal.fire({
-        icon: 'info',
-        title: '해당기능은 준비중입니다!',
-        confirmButtonColor: '#222',
-        confirmButtonText: '확인'
-      });
+      showInfoSwal();
     }
   };
 

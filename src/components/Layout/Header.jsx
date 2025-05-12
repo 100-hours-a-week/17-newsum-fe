@@ -129,6 +129,7 @@ function Header() {
     Swal.fire({
       icon: 'info',
       title: '해당기능은 준비중입니다!',
+      scrollbarPadding: false,
       confirmButtonColor: '#222',
       confirmButtonText: '확인'
     });
