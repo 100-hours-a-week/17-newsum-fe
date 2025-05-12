@@ -33,6 +33,7 @@ function MyProfilePage() {
     sessionStorage.clear();
     localStorage.removeItem('profileImage');
     localStorage.removeItem('user');
+    setUser(null);
     navigate('/');
   };
 
