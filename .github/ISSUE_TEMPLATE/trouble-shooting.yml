@@ -12,7 +12,7 @@ body:
     attributes:
       label: 수정 내용
       description: 문제 해결을 위해 수정한 부분을 간략히 설명해주세요.
-      placeholder: 예시: !e.nativeEvent.isComposing 한 줄을 추가하여 해결.
+      placeholder: 예시: 스프링 CORS Config 수정, application.yml 수정
       
   - type: textarea
     attributes:
