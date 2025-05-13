@@ -10,6 +10,7 @@ import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
 import VisibilityIcon from '@mui/icons-material/Visibility';
 import { formatNumber } from '../../utils/numberFormat';
+import { formatDate } from '../../utils/dateFormat';
 import { HeaderText, ViewCount } from '../common/StyledTypography';
 import styled from '@emotion/styled';
 
@@ -122,14 +123,6 @@ const ArticleInfo = ({
   const handleShare = () => {
     navigator.clipboard.writeText(window.location.href);
     alert('URL이 복사되었습니다!');
-  };
-  
-  // 날짜 포맷팅 (YYYY년 MM월 DD일)
-  const formatDate = (dateString) => {
-    if (!dateString) return '';
-    
-    const date = new Date(dateString);
-    return `${date.getFullYear()}년 ${date.getMonth() + 1}월 ${date.getDate()}일`;
   };
 
   return (
