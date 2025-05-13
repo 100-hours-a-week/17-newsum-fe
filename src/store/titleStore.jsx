@@ -14,4 +14,4 @@ export const useTitleStore = create(
       partialize: (state) => ({ title: state.title, thumbnailUrl: state.thumbnailUrl }), // title, thumbnailUrl만 저장
     }
   )
-);
+); 

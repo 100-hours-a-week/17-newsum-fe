@@ -1,4 +1,3 @@
-// src/theme/theme.js
 import { createTheme } from '@mui/material/styles';
 
 // 이전 테마 설정 내용을 JavaScript 객체로 가져옵니다.
@@ -48,4 +47,4 @@ const theme = createTheme({
   },
 });
 
-export default theme;
+export default theme; 

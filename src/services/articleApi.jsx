@@ -1,4 +1,4 @@
-// src/services/articleApi.js
+// src/services/articleApi.jsx
 
 // --- 임시 목업 데이터 (상세 내용 및 parentId 포함) ---
 // JavaScript에서는 타입을 명시하지 않습니다.
@@ -95,4 +95,4 @@ export const fetchArticleById = async (id) => {
   await new Promise(resolve => setTimeout(resolve, 300));
   const article = mockArticles.find(article => article.id === id);
   return article || null;
-};
+}; 
