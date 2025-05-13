@@ -1,11 +1,11 @@
-name: "트러블슈팅 경험 공유"
+name: "🔥트러블슈팅 경험 공유"
 description: "발생한 문제와 해결 방법을 기록하여 공유하는 템플릿입니다."
 labels: ["trouble-shooting", "FE"]
 body:
   - type: textarea
     attributes:
       label: 연관된 이슈
-      description: 연관된 이슈 번호를 입력하세요
+      description: 연관된 이슈 번호를 작성해주세요.
       placeholder: "# 이슈번호"
     validations:
       required: false
