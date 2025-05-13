@@ -1,5 +1,5 @@
-name: 트러블슈팅 경험 공유
-description: 발생한 문제와 해결 방법을 기록하여 공유하는 템플릿입니다.
+name: "트러블슈팅 경험 공유"
+description: "발생한 문제와 해결 방법을 기록하여 공유하는 템플릿입니다."
 labels: ["trouble-shooting", "FE"]
 
 body:
