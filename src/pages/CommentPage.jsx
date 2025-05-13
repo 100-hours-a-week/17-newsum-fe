@@ -105,6 +105,8 @@ function CommentPage() {
       await TokenAxios.delete(`/api/v1/webtoons/${articleId}/comments/${commentId}`);
       setComments(prev => prev.filter(comment => comment.id !== commentId));
       Swal.fire('삭제 완료', '댓글이 삭제되었습니다.', 'success');
+
+      fetchComments(); // 댓글 작성 후 목록 새로고침
     } catch {
       Swal.fire('오류', '댓글 삭제에 실패했습니다.', 'error');
     }
@@ -307,7 +309,7 @@ function CommentPage() {
                     borderRadius: '22px',
                     background: 'linear-gradient(45deg, #ff0000, #ff8000, #ffff00, #80ff00, #00ff00, #00ff80, #00ffff, #0080ff, #0000ff, #8000ff, #ff00ff, #ff0080)',
                     backgroundSize: '200% 200%',
-                    animation: 'rainbow 3s linear',
+                    animation: 'rainbow 2s linear',
                     zIndex: -1,
                   }
                 })
