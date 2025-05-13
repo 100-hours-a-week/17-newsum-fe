@@ -6,13 +6,14 @@ import { useParams, useNavigate } from 'react-router-dom';
 import Carousel from '../components/Carousel/Carousel';
 import DefaultAxios from '../api/DefaultAxios';
 import CategoryGrid from '../components/grid/CategoryGrid';
-import { useTitleStore } from '../store/titleStore';
 import ArticleInfo from '../components/article/ArticleInfo';
 import CommentButton from '../components/article/CommentButton';
 
 function ArticlePage() {
   const { articleId } = useParams();
   const navigate = useNavigate();
+  const [title, setTitle] = useState(null);
+  const [thumbnailUrl, setThumbnailUrl] = useState(null)
   const [slides, setSlides] = useState([]);
   const [author, setAuthor] = useState(null);
   const [isLiked, setIsLiked] = useState(false);
@@ -21,8 +22,6 @@ function ArticlePage() {
   const [sourceNews, setSourceNews] = useState([]);
   const [commentCount, setCommentCount] = useState(0);
   const [relatedNews, setRelatedNews] = useState([]);
-  const title = useTitleStore((state) => state.title);
-  const thumbnailUrl = useTitleStore((state) => state.thumbnailUrl);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [viewCount, setViewCount] = useState(0);
@@ -42,6 +41,8 @@ function ArticlePage() {
         setAuthor(data1?.author || null);
         setIsLiked(!!data1?.isLiked);
         setIsBookmarked(!!data1?.isBookmarked);
+        setTitle(data1?.title)
+        setThumbnailUrl(data1.thumbnailImageUrl)
         setLikeCount(data1?.likeCount || 0);
         setViewCount(data1?.viewCount || 0);
         setCreatedAt(data1?.createdAt || '');
