@@ -3,8 +3,8 @@ description: "발생한 문제와 해결 방법을 기록하여 공유하는 템
 labels: ["trouble-shooting", "FE"]
 body:
   - type: markdown
-      name: 연관된 이슈
-      description: # 이슈번호
+    name: "연관된 이슈"
+    description: "# 이슈번호"
   - type: textarea
     attributes:
       label: 수정 내용
