@@ -1,4 +1,5 @@
 import React, { createContext, useContext, useState, useCallback } from 'react';
+import TokenAxios from '../api/TokenAxios';
 
 const AuthContext = createContext(null);
 
@@ -24,8 +25,11 @@ export function AuthProvider({ children }) {
   }, []);
 
   const logout = useCallback(() => {
-    setUser(null);
     localStorage.removeItem('user');
+    localStorage.removeItem('accessToken');
+    localStorage.removeItem('refreshToken');
+    delete TokenAxios.defaults.headers.common['Authorization'];
+    setUser(null);
   }, []);
 
   return (

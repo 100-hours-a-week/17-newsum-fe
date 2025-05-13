@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { Box, CircularProgress } from '@mui/material';
+import { Box, CircularProgress, Container } from '@mui/material';
 import { useNavigate, useParams } from 'react-router-dom';
 import CategoryTabs, { categories } from '../components/tabs/CategoryTabs';
 import CategoryGrid from '../components/grid/CategoryGrid';
@@ -100,9 +100,10 @@ function CategoryPage() {
   }, [activeTab]);
 
   return (
-    <Box sx={{ p: 2 }}>
-      <CategoryTabs activeTab={activeTab} onTabChange={handleTabChange} />
-      <CategoryGrid
+    <Container maxWidth="lg">
+      <Box sx={{ my: 1 }}>
+        <CategoryTabs activeTab={activeTab} onTabChange={handleTabChange} />
+        <CategoryGrid
         title={getCategoryName()}
         time={getTimeString()}
         articles={articles}
@@ -118,6 +119,7 @@ function CategoryPage() {
         </Box>
       )}
     </Box>
+    </Container>
   );
 }
 

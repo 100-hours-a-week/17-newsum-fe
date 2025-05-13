@@ -7,7 +7,7 @@ import PersonOutlineOutlinedIcon from '@mui/icons-material/PersonOutlineOutlined
 import styled from '@emotion/styled';
 import logo from '../../assets/logo.png';
 import { useAuth } from '../../contexts/AuthContext';
-import Swal from 'sweetalert2';
+import { showInfoSwal } from '../modal/ShowInfoModal';
 
 const StyledAppBar = styled(AppBar)`
   max-width: 430px;
@@ -126,12 +126,7 @@ function Header() {
 
   const handleNotificationClick = (e) => {
     e.preventDefault();
-    Swal.fire({
-      icon: 'info',
-      title: '해당기능은 준비중입니다!',
-      confirmButtonColor: '#222',
-      confirmButtonText: '확인'
-    });
+    showInfoSwal();
   };
 
   return (

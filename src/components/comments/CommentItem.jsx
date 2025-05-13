@@ -1,13 +1,20 @@
 // src/components/comments/CommentItem.jsx
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { ListItem, ListItemAvatar, Avatar, ListItemText, Typography, Box, IconButton, Menu, MenuItem, TextField, Button } from '@mui/material';
 import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
 import ChatBubbleOutlineIcon from '@mui/icons-material/ChatBubbleOutline';
 import FavoriteBorderIcon from '@mui/icons-material/FavoriteBorder';
-import FavoriteIcon from '@mui/icons-material/Favorite';
-import Swal from 'sweetalert2';
-import TokenAxios from '../../api/TokenAxios';
 import SendIcon from '@mui/icons-material/SendRounded';
+
+function getLines(text, maxLines = 4) {
+  // 줄바꿈 기준으로 자르기
+  const lines = text.split('\n');
+  if (lines.length <= maxLines) return { visible: text, hidden: '' };
+  return {
+    visible: lines.slice(0, maxLines).join('\n'),
+    hidden: lines.slice(maxLines).join('\n'),
+  };
+}
 
 function CommentItem({ comment, onDelete, onReply, level, isAuthor = false, likeCount = 0, replyCount = 0, onEdit }) {
   const [editMode, setEditMode] = useState(false);
@@ -15,6 +22,23 @@ function CommentItem({ comment, onDelete, onReply, level, isAuthor = false, like
   const [anchorEl, setAnchorEl] = useState(null);
   const [isLiked, setIsLiked] = useState(false);
   const open = Boolean(anchorEl);
+  const [expanded, setExpanded] = useState(false);
+  const [isLong, setIsLong] = useState(false);
+  const contentRef = useRef(null);
+  const { visible, hidden } = getLines(comment.content, 4);
+
+  useEffect(() => {
+    if (contentRef.current) {
+      // 4줄을 넘어가는지 체크
+      const lineHeight = parseFloat(getComputedStyle(contentRef.current).lineHeight);
+      const maxHeight = lineHeight * 4;
+      if (contentRef.current.scrollHeight > maxHeight + 2) {
+        setIsLong(true);
+      } else {
+        setIsLong(false);
+      }
+    }
+  }, [comment.content]);
 
   const formatDateTime = (dateString) => {
     try {
@@ -62,22 +86,6 @@ function CommentItem({ comment, onDelete, onReply, level, isAuthor = false, like
     setEditMode(false);
   };
 
-  const handleCommentEdit = async (commentId, newContent) => {
-    try {
-      await TokenAxios.patch(`/api/v1/webtoons/${articleId}/comments/${commentId}`, {
-        content: newContent
-      });
-      setComments(prev =>
-        prev.map(comment =>
-          comment.id === commentId ? { ...comment, content: newContent } : comment
-        )
-      );
-      Swal.fire('수정 완료', '댓글이 수정되었습니다.', 'success');
-    } catch {
-      Swal.fire('오류', '댓글 수정에 실패했습니다.', 'error');
-    }
-  };
-
   return (
     <ListItem
       alignItems="flex-start"
@@ -91,7 +99,7 @@ function CommentItem({ comment, onDelete, onReply, level, isAuthor = false, like
         <Avatar
           sx={{ width: 30, height: 30 }}
           alt={comment.author}
-          src={`https://api.dicebear.com/8.x/initials/svg?seed=${comment.author}`}
+          src={`${comment.authorProfileImageUrl}`}
         />
       </ListItemAvatar>
       <ListItemText
@@ -105,7 +113,22 @@ function CommentItem({ comment, onDelete, onReply, level, isAuthor = false, like
             </Typography>
           </Box>
         }
-        secondaryTypographyProps={{ component: 'div' }}
+        sx={{
+          overflow: 'visible',
+          textOverflow: 'unset ',
+          whiteSpace: 'normal',
+        }}
+        secondaryTypographyProps={{
+          component: 'div',
+          sx: {
+            overflow: 'visible ',
+            textOverflow: 'unset ',
+            display: 'block ',
+            whiteSpace: 'normal ',
+            WebkitLineClamp: 'unset ',
+            WebkitBoxOrient: 'unset ',
+          }
+        }}
         secondary={
           <React.Fragment>
             {editMode ? (
@@ -174,24 +197,52 @@ function CommentItem({ comment, onDelete, onReply, level, isAuthor = false, like
                 </Button>
               </Box>
             ) : (
-              <Typography
-                component="span"
-                variant="body2"
-                color="text.primary"
-                sx={{ display: 'block', whiteSpace: 'pre-wrap', wordBreak: 'break-word', mb: 0.5 }}
-              >
-                {comment.content}
-              </Typography>
+              <>
+                <Typography
+                  ref={contentRef}
+                  component="div"
+                  variant="body2"
+                  color="text.primary"
+                  sx={{
+                    whiteSpace: 'pre-line',
+                    wordBreak: 'break-word',
+                    mb: 0.5,
+                    display: 'block',
+                  }}
+                >
+                  {expanded ? comment.content : visible}
+                </Typography>
+                {!expanded && hidden && (
+                  <Button
+                    size="small"
+                    sx={{ mt: 0.5, minHeight: 0, minWidth: 0, p: 0, fontSize: 12, color: 'black', display: 'block' }}
+                    onClick={() => setExpanded(true)}
+                  >
+                    ... 자세히보기
+                  </Button>
+                )}
+                {expanded && hidden && (
+                  <Button
+                    size="small"
+                    sx={{ mt: 0.5, minHeight: 0, minWidth: 0, p: 0, fontSize: 12, color: 'black', display: 'block' }}
+                    onClick={() => setExpanded(false)}
+                  >
+                    접기
+                  </Button>
+                )}
+              </>
             )}
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mt: 1 }}>
               <IconButton size="small" onClick={handleLikeClick}>
                 <FavoriteBorderIcon fontSize="small" />
                 <Typography variant="caption" sx={{ ml: 0.5 }}>{likeCount}</Typography>
               </IconButton>
-              <IconButton size="small" onClick={handleReplyClick}>
-                <ChatBubbleOutlineIcon fontSize="small" />
-                <Typography variant="caption" sx={{ ml: 0.5 }}>{replyCount}</Typography>
-              </IconButton>
+              {level === 0 && (
+                <IconButton size="small" onClick={handleReplyClick}>
+                  <ChatBubbleOutlineIcon fontSize="small" />
+                  <Typography variant="caption" sx={{ ml: 0.5 }}>{replyCount}</Typography>
+                </IconButton>
+              )}
               {isAuthor && (
                 <IconButton size="small" onClick={handleMoreClick}>
                   <MoreHorizIcon fontSize="small" />

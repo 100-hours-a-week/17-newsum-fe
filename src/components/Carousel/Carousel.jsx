@@ -49,8 +49,8 @@ const NavigationButton = styled(IconButton)(({ theme }) => ({
 
 const PageIndicator = styled(Box)({
   position: 'absolute',
-  bottom: '16px',
-  right: '16px',
+  top: '8px',
+  right: '8px',
   backgroundColor: 'rgba(0, 0, 0, 0.6)',
   color: 'white',
   padding: '4px 8px',
@@ -59,18 +59,13 @@ const PageIndicator = styled(Box)({
   fontSize: '14px',
 });
 
-const Carousel = ({ items }) => {
+const Carousel = ({ items, autoSlide = false, autoSlideInterval = 5000 }) => {
   const [currentIndex, setCurrentIndex] = useState(0);
   const totalItems = items.length;
-
-  const resetInterval = () => {
-    if (intervalRef.current) {
-      clearInterval(intervalRef.current);
-    }
-    intervalRef.current = setInterval(() => {
-      nextSlide();
-    }, 5000);
-  };
+  const intervalRef = useRef(null);
+  // 터치 스와이프 상태
+  const touchStartX = useRef(null);
+  const touchEndX = useRef(null);
 
   const nextSlide = () => {
     setCurrentIndex((prevIndex) => (prevIndex + 1) % totalItems);
@@ -82,27 +77,56 @@ const Carousel = ({ items }) => {
 
   const handleNextClick = () => {
     nextSlide();
-    resetInterval();
+    if (autoSlide) resetInterval();
   };
 
   const handlePrevClick = () => {
     prevSlide();
-    resetInterval();
+    if (autoSlide) resetInterval();
   };
 
-  const intervalRef = useRef(null);
+  // 터치 이벤트 핸들러
+  const onTouchStart = (e) => {
+    touchStartX.current = e.touches[0].clientX;
+  };
+  const onTouchMove = (e) => {
+    touchEndX.current = e.touches[0].clientX;
+  };
+  const onTouchEnd = () => {
+    if (touchStartX.current !== null && touchEndX.current !== null) {
+      const diff = touchStartX.current - touchEndX.current;
+      if (Math.abs(diff) > 40) { // 스와이프 최소 거리
+        if (diff > 0) nextSlide(); // 왼쪽으로 스와이프
+        else prevSlide(); // 오른쪽으로 스와이프
+        if (autoSlide) resetInterval();
+      }
+    }
+    touchStartX.current = null;
+    touchEndX.current = null;
+  };
 
-  useEffect(() => {
+  // 자동 슬라이드 관리
+  const resetInterval = () => {
+    if (intervalRef.current) {
+      clearInterval(intervalRef.current);
+    }
     intervalRef.current = setInterval(() => {
       nextSlide();
-    }, 5000);
+    }, autoSlideInterval);
+  };
 
-    return () => {
-      if (intervalRef.current) {
-        clearInterval(intervalRef.current);
-      }
-    };
-  }, []);
+  useEffect(() => {
+    if (autoSlide) {
+      intervalRef.current = setInterval(() => {
+        nextSlide();
+      }, autoSlideInterval);
+      return () => {
+        if (intervalRef.current) {
+          clearInterval(intervalRef.current);
+        }
+      };
+    }
+  }, [autoSlide, autoSlideInterval, totalItems]);
 
   return (
     <CarouselWrapper>
@@ -113,7 +137,11 @@ const Carousel = ({ items }) => {
       >
         <ArrowBack />
       </NavigationButton>
-      <CarouselContainer>
+      <CarouselContainer
+        onTouchStart={onTouchStart}
+        onTouchMove={onTouchMove}
+        onTouchEnd={onTouchEnd}
+      >
         <SlideContainer>
           {items.map((item, index) => (
             <Slide

@@ -1,11 +1,12 @@
 import React, { useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import DefaultAxios from '../api/DefaultAxios';
 import TokenAxios from '../api/TokenAxios';
 
 function KakaoRedirectHandler() {
   const navigate = useNavigate();
+  const location = useLocation();
   const { login } = useAuth();
 
   useEffect(() => {
@@ -13,6 +14,7 @@ function KakaoRedirectHandler() {
       try {
         const urlParams = new URLSearchParams(window.location.search);
         const code = urlParams.get('code');
+        const from = urlParams.get('state') || '/';
 
         if (!code) throw new Error('카카오 인증 코드를 받지 못했습니다.');
 
@@ -41,7 +43,7 @@ function KakaoRedirectHandler() {
         // ✅ userInfo는 이제 사용하지 않음
         //localStorage.removeItem('userInfo');
 
-        navigate('/');
+        navigate(from);
       } catch (error) {
         console.error('카카오 로그인 처리 중 오류:', error);
         navigate('/login');
@@ -49,7 +51,7 @@ function KakaoRedirectHandler() {
     };
 
     handleKakaoCallback();
-  }, [navigate, login]);
+  }, [navigate, login, location]);
 
   return null;
 }

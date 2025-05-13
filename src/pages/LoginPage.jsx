@@ -1,6 +1,6 @@
 // src/pages/LoginPage.jsx
 import React from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { Box, Typography, IconButton, Button } from '@mui/material';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import newsumLogo from '../assets/newsum_logo.jpeg';
@@ -9,24 +9,29 @@ import kakaoLoginBtn from '../assets/kakao_login.png';
 
 function LoginPage() {
   const navigate = useNavigate();
+  const location = useLocation();
+  const from = new URLSearchParams(location.search).get('from') || '/';
 
   const handleGoogleLogin = () => {
     const authUrl = 'https://accounts.google.com/o/oauth2/auth';
     const clientId = import.meta.env.VITE_GOOGLE_CLIENT_ID;
     const redirectUri = import.meta.env.VITE_GOOGLE_REDIRECT_URI;
     const scope = 'openid email profile';
+    const from = new URLSearchParams(window.location.search).get('from') || '/';
 
     const url = `${authUrl}`
       + `?client_id=${encodeURIComponent(clientId)}`
       + `&redirect_uri=${encodeURIComponent(redirectUri)}`
       + `&response_type=code`
-      + `&scope=${encodeURIComponent(scope)}`;
+      + `&scope=${encodeURIComponent(scope)}`
+      + `&state=${encodeURIComponent(from)}`;
 
     window.location.assign(url);
   };
 
   const handleKakaoLogin = () => {
-    const KAKAO_AUTH_URL = `https://kauth.kakao.com/oauth/authorize?client_id=${import.meta.env.VITE_KAKAO_REST_API_KEY}&redirect_uri=${import.meta.env.VITE_KAKAO_REDIRECT_URI}&response_type=code`;
+    const from = new URLSearchParams(window.location.search).get('from') || '/';
+    const KAKAO_AUTH_URL = `https://kauth.kakao.com/oauth/authorize?client_id=${import.meta.env.VITE_KAKAO_REST_API_KEY}&redirect_uri=${import.meta.env.VITE_KAKAO_REDIRECT_URI}&response_type=code&state=${encodeURIComponent(from)}`;
     window.location.href = KAKAO_AUTH_URL;
   };
 
@@ -97,7 +102,7 @@ function LoginPage() {
           refreshToken: localStorage.getItem("refreshToken")
         });
 
-        // 홈페이지로 이동
+        // 이전 화면으로 이동
         navigate('/');
       } else if (accessToken && refreshToken) {
         // URL에 토큰이 직접 포함된 경우
@@ -108,7 +113,8 @@ function LoginPage() {
           accessToken: localStorage.getItem("accessToken"),
           refreshToken: localStorage.getItem("refreshToken")
         });
-        navigate('/');
+        // 이전 화면으로 이동
+        navigate('-1');
       }
     } catch (error) {
       const errorLog = {
@@ -120,6 +126,10 @@ function LoginPage() {
       console.error('토큰 처리 중 오류 발생:', error);
       alert('로그인 처리 중 오류가 발생했습니다. 다시 시도해주세요.');
     }
+  };
+
+  const handleBack = () => {
+    navigate(from);
   };
 
   // 컴포넌트 마운트 시 토큰 확인
@@ -150,7 +160,7 @@ function LoginPage() {
           left: 20,
         }}
       >
-        <IconButton onClick={() => navigate('/')}>
+        <IconButton onClick={handleBack}>
           <ArrowBackIcon />
         </IconButton>
       </Box>

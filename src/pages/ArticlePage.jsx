@@ -6,7 +6,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import Carousel from '../components/Carousel/Carousel';
 import DefaultAxios from '../api/DefaultAxios';
 import CategoryGrid from '../components/grid/CategoryGrid';
-import { HeaderText } from '../components/common/StyledTypography';
+import { useTitleStore } from '../store/titleStore';
 import ArticleInfo from '../components/article/ArticleInfo';
 import CommentButton from '../components/article/CommentButton';
 
@@ -21,7 +21,8 @@ function ArticlePage() {
   const [sourceNews, setSourceNews] = useState([]);
   const [commentCount, setCommentCount] = useState(0);
   const [relatedNews, setRelatedNews] = useState([]);
-  const [title, setTitle] = useState('');
+  const title = useTitleStore((state) => state.title);
+  const thumbnailUrl = useTitleStore((state) => state.thumbnailUrl);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [viewCount, setViewCount] = useState(0);
@@ -42,7 +43,6 @@ function ArticlePage() {
         setIsLiked(!!data1?.isLiked);
         setIsBookmarked(!!data1?.isBookmarked);
         setLikeCount(data1?.likeCount || 0);
-        setTitle(data1?.slides?.[0]?.content || '');
         setViewCount(data1?.viewCount || 0);
         setCreatedAt(data1?.createdAt || '');
         // 실시간 시청자 수를 임의의 값으로 설정 (API에서 받아오는 경우 수정 필요)
@@ -90,18 +90,23 @@ function ArticlePage() {
 
   return (
     <Box sx={{ pb: 7 }}>
-      <Box sx={{ position: 'sticky', top: 0, bgcolor: 'white', zIndex: 1, borderBottom: '1px solid rgba(0, 0, 0, 0.12)', px: 2, py: 1, display: 'flex', alignItems: 'center' }}>
+      <Box sx={{ position: 'sticky', top: 0, bgcolor: 'white', zIndex: 1, borderBottom: '1px solid rgba(0, 0, 0, 0.12)', px: 2, py: 1, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
         <IconButton onClick={handleBack} edge="start"><ArrowBackIcon /></IconButton>
-        <HeaderText variant="subtitle1" component="h1" sx={{ ml: 1, flexGrow: 1 }}>{title}</HeaderText>
+        <Typography variant="subtitle1" component="h1" sx={{ ml: 1, flexGrow: 1, fontWeight: 'bold', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', textAlign: 'center' }}>{title}</Typography>
+        <Box sx={{ width: 35, height: 35, ml: 1 }} />
       </Box>
 
       <Box sx={{ p: 2, pt: 3 }}>
         <Carousel
-          items={slides.map((slide) => (
-            <Box key={slide.slideSeq} sx={{ width: '100%', aspectRatio: '1/1', position: 'relative', borderRadius: 2, overflow: 'hidden' }}>
-              <img src={slide.imageUrl} alt={slide.content} style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', objectFit: 'cover' }} />
-              <Box sx={{ position: 'absolute', left: 0, bottom: 0, width: '100%', bgcolor: 'rgba(0,0,0,0.4)', color: 'white', p: 1, fontSize: 14 }}>{slide.content}</Box>
-            </Box>
+          items={[
+            ...(thumbnailUrl ? [{
+              slideSeq: 'thumbnail',
+              imageUrl: thumbnailUrl,
+              content: title,
+            }] : []),
+            ...slides
+          ].map((slide) => (
+            <SlideWithMoreButton key={slide.slideSeq} slide={slide} />
           ))}
         />
       </Box>
@@ -139,6 +144,115 @@ function ArticlePage() {
             viewCount: news.viewCount || 0,
           }))}
         />
+      </Box>
+    </Box>
+  );
+}
+
+function SlideWithMoreButton({ slide }) {
+  const [showAll, setShowAll] = useState(false);
+  const isLong = slide.content.length > 30;
+
+  // 한 줄일 때만 gradient mask 적용
+  const gradientMask = 'linear-gradient(to right, #fff 80%, transparent 100%)';
+
+  return (
+    <Box sx={{ width: '100%', aspectRatio: '1/1', position: 'relative', borderRadius: 2, overflow: 'hidden' }}>
+      <img
+        src={slide.imageUrl}
+        alt={slide.content}
+        style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', objectFit: 'cover' }}
+      />
+      <Box
+        sx={{
+          position: 'absolute',
+          left: 0,
+          bottom: 0,
+          width: '100%',
+          bgcolor: 'rgba(0,0,0,0.4)',
+          color: 'white',
+          p: 1,
+          fontSize: 14,
+          minHeight: showAll ? 56 : 28,
+          transition: 'min-height 0.2s',
+          display: 'flex',
+          flexDirection: 'column',
+          justifyContent: 'flex-end',
+        }}
+      >
+        {!showAll ? (
+          <Box
+            sx={{
+              display: 'flex',
+              alignItems: 'center',
+              width: '100%',
+            }}
+          >
+            <Box
+              sx={{
+                overflow: 'hidden',
+                display: '-webkit-box',
+                WebkitBoxOrient: 'vertical',
+                whiteSpace: 'normal',
+                WebkitLineClamp: 1,
+                textOverflow: 'ellipsis',
+                WebkitMaskImage: gradientMask,
+                maskImage: gradientMask,
+                flex: '1 1 auto',
+                transition: 'all 0.2s',
+              }}
+            >
+              {slide.content}
+            </Box>
+            {isLong && (
+              <button
+                style={{
+                  background: 'none',
+                  border: 'none',
+                  color: 'white',
+                  cursor: 'pointer',
+                  fontSize: 12,
+                  padding: 0,
+                  textDecoration: 'underline',
+                  marginLeft: 8,
+                  flex: '0 0 auto',
+                }}
+                onClick={() => setShowAll(true)}
+              >
+                더보기
+              </button>
+            )}
+          </Box>
+        ) : (
+          <>
+            <Box
+              sx={{
+                overflow: 'hidden',
+                whiteSpace: 'normal',
+                wordBreak: 'break-all',
+                mb: 1,
+              }}
+            >
+              {slide.content}
+            </Box>
+            <Box sx={{ display: 'flex', justifyContent: 'flex-end', width: '100%' }}>
+              <button
+                style={{
+                  background: 'none',
+                  border: 'none',
+                  color: 'white',
+                  cursor: 'pointer',
+                  fontSize: 12,
+                  padding: 0,
+                  textDecoration: 'underline',
+                }}
+                onClick={() => setShowAll(false)}
+              >
+                간략히
+              </button>
+            </Box>
+          </>
+        )}
       </Box>
     </Box>
   );

@@ -1,11 +1,12 @@
 import React, { useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import DefaultAxios from '../api/DefaultAxios';
 import TokenAxios from '../api/TokenAxios';
 
 function GoogleRedirectHandler() {
   const navigate = useNavigate();
+  const location = useLocation();
   const { login } = useAuth();
 
   useEffect(() => {
@@ -13,6 +14,7 @@ function GoogleRedirectHandler() {
       try {
         const urlParams = new URLSearchParams(window.location.search);
         const code = urlParams.get('code');
+        const from = urlParams.get('state') || '/';
 
         if (!code) throw new Error('구글 인증 코드를 받지 못했습니다.');
 
@@ -87,7 +89,7 @@ function GoogleRedirectHandler() {
           }
         }
 
-        navigate('/');
+        navigate(from);
       } catch (error) {
         console.error('구글 로그인 처리 중 오류:', error);
         if (error.response) {
@@ -98,7 +100,7 @@ function GoogleRedirectHandler() {
     };
 
     handleGoogleCallback();
-  }, [navigate, login]);
+  }, [navigate, login, location]);
 
   return null;
 }

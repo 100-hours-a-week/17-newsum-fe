@@ -3,9 +3,11 @@ import { Box, Typography, Button, Avatar, IconButton, Modal } from '@mui/materia
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import { useNavigate } from 'react-router-dom';
 import logoutLogo from '../assets/logout_logo.jpeg';
+import { useAuth } from '../contexts/AuthContext';
 
 function MyProfilePage() {
   const navigate = useNavigate();
+  const { logout } = useAuth();
   const [user, setUser] = useState(null);
   const [profileImg, setProfileImg] = useState('');
   const [open, setOpen] = useState(false);
@@ -30,11 +32,8 @@ function MyProfilePage() {
 
   const handleLogout = () => {
     setOpen(false);
-    sessionStorage.clear();
-    localStorage.removeItem('profileImage');
-    localStorage.removeItem('user');
-    setUser(null);
-    navigate('/');
+    logout();
+    navigate(-1);
   };
 
   const handleCancel = () => setOpen(false);

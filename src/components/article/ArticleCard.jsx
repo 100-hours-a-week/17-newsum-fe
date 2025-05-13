@@ -4,6 +4,7 @@ import { Card, CardActionArea, Box } from '@mui/material';
 import { Link as RouterLink } from 'react-router-dom';
 import styled from '@emotion/styled';
 import ColorThief from 'colorthief';
+import { useTitleStore } from '../../store/titleStore';
 import { formatNumber } from '../../utils/numberFormat';
 import { CardTitle, ViewCount } from '../../components/common/StyledTypography';
 
@@ -64,6 +65,8 @@ const ArticleCard = ({ article }) => {
   const imageRef = useRef(null);
   const [gradient, setGradient] = useState(null);
   const [isImageLoaded, setIsImageLoaded] = useState(false);
+  const setTitle = useTitleStore((state) => state.setTitle);
+  const setThumbnailUrl = useTitleStore((state) => state.setThumbnailUrl);
 
   // 이미지 URL에서 캐시된 컬러 가져오기
   const cachedColor = useMemo(() => colorCache.get(thumbnailUrl), [thumbnailUrl]);
@@ -103,7 +106,14 @@ const ArticleCard = ({ article }) => {
 
   return (
     <StyledCard elevation={0}>
-      <StyledCardActionArea component={RouterLink} to={`/article/${id}`}>
+      <StyledCardActionArea
+        component={RouterLink}
+        to={`/article/${id}`}
+        onClick={() => {
+          setTitle(title);
+          setThumbnailUrl(thumbnailUrl || defaultThumbnail);
+        }}
+      >
         <CardImage
           ref={imageRef}
           src={thumbnailUrl || defaultThumbnail}

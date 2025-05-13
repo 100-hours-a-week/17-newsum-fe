@@ -20,8 +20,9 @@ function CommentPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [pageInfo, setPageInfo] = useState(null);
+  const [commentsCount, setCommentsCount] = useState(0);
+  const [subCommentsCount, setSubCommentsCount] = useState(0);
   const location = useLocation();
-  const commentCount = location.state?.commentCount;
   const listRef = useRef(null);
 
   const fetchComments = async (cursor = null) => {
@@ -88,6 +89,7 @@ function CommentPage() {
         parentId: parentId
       });
       setCommentText('');
+      
       fetchComments(); // 댓글 작성 후 목록 새로고침
       if (showReplies && selectedCommentId) {
         handleViewReplies(selectedCommentId);
@@ -167,7 +169,7 @@ function CommentPage() {
             fontWeight: 'bold'
           }}
         >
-          {showReplies ? '답글' : commentCount !== undefined ? `댓글 ${commentCount}개` : `댓글 ${comments.length}개`}
+          {showReplies ?  `답글 ${replies.length}개` : `댓글 ${comments.length}개`}
         </Typography>
       </Box>
 
@@ -198,7 +200,7 @@ function CommentPage() {
                   onDelete={handleCommentDelete}
                   onEdit={handleCommentEdit}
                   level={0}
-                  isAuthor={user && comment.author === user.name}
+                  isAuthor={user && comment.author === user.nickname}
                   replyCount={comment.subComments?.length || 0}
                   likeCount={comment.likeCount || 0}
                 />
@@ -217,7 +219,7 @@ function CommentPage() {
                 <CommentItem
                   comment={selectedComment}
                   level={0}
-                  isAuthor={user && selectedComment.author === user.name}
+                  isAuthor={user && selectedComment.author === user.nickname}
                   onDelete={handleCommentDelete}
                   onEdit={handleCommentEdit}
                   replyCount={selectedComment.subComments?.length || 0}
@@ -229,7 +231,7 @@ function CommentPage() {
                   <CommentItem
                     comment={reply}
                     level={1}
-                    isAuthor={user && reply.author === user.name}
+                    isAuthor={user && reply.author === user.nickname}
                     onDelete={handleCommentDelete}
                     onEdit={handleCommentEdit}
                     likeCount={reply.likeCount || 0}
@@ -268,11 +270,10 @@ function CommentPage() {
             value={commentText}
             onChange={(e) => setCommentText(e.target.value)}
             onKeyDown={(e) => {
-              if (e.key === 'Enter' && !e.shiftKey && commentText.trim()) {
+              if (e.key === 'Enter' && !e.shiftKey && !e.nativeEvent.isComposing && commentText.trim()) {
                 e.preventDefault();
                 handleCommentSubmit(e);
               }
-              
             }}
             sx={{
               '& .MuiOutlinedInput-root': {
@@ -338,7 +339,7 @@ function CommentPage() {
               }
             }}
           >
-            댓글을 작성하려면 <Link component={RouterLink} to="/login">로그인</Link>이 필요합니다.
+            댓글을 작성하려면 <Link component={RouterLink} to={`/login?from=${encodeURIComponent(location.pathname)}`}>로그인</Link>이 필요합니다.
           </Alert>
         </Box>
       )}
