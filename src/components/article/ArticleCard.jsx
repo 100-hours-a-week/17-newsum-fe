@@ -12,9 +12,16 @@ const StyledCard = styled(Card)`
   position: relative;
   width: 100%;
   aspect-ratio: 1/1;
-  border-radius: 8px;
+  border-radius: 12px;
   overflow: hidden;
   min-width: 60px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  
+  &:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+  }
 `;
 
 const CardImage = styled.img`
@@ -28,8 +35,8 @@ const GradientOverlay = styled.div`
   bottom: 0;
   left: 0;
   right: 0;
-  padding: 8px;
-  background: ${props => props.gradient || 'linear-gradient(to bottom, transparent 0%, rgba(0, 0, 0, 0.7) 40%, rgba(0, 0, 0, 0.9) 100%)'};
+  padding: 12px;
+  background: ${props => props.gradient || 'linear-gradient(to bottom, transparent 0%, rgba(0, 0, 0, 0.7) 50%, rgba(0, 0, 0, 0.9) 100%)'};
   transition: background 0.3s ease;
 `;
 
