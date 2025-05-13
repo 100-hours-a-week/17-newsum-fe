@@ -21,6 +21,7 @@ function CommentPage() {
   const [error, setError] = useState(null);
   const [pageInfo, setPageInfo] = useState(null);
   const [commentCount, setCommentCount] = useState(0);
+  const [showGradient, setShowGradient] = useState(false);
   const location = useLocation();
   const listRef = useRef(null);
 
@@ -128,6 +129,10 @@ function CommentPage() {
   const handleViewReplies = useCallback((commentId) => {
     setSelectedCommentId(commentId);
     setShowReplies(true);
+    setShowGradient(true);
+    setTimeout(() => {
+      setShowGradient(false);
+    }, 3000);
   }, []);
 
   const selectedComment = selectedCommentId ? comments.find(c => c.id === selectedCommentId) : null;
@@ -281,19 +286,46 @@ function CommentPage() {
                 borderRadius: '20px',
                 background: 'white',
                 color: 'black',
+                position: 'relative',
                 '& fieldset': {
-                  borderColor: 'black',
+                  borderColor: showGradient ? 'transparent' : 'black',
                 },
                 '&:hover fieldset': {
-                  borderColor: 'black',
+                  borderColor: showGradient ? 'transparent' : 'black',
                 },
                 '&.Mui-focused fieldset': {
-                  borderColor: 'black',
+                  borderColor: showGradient ? 'transparent' : 'black',
                 },
+                ...(showGradient && {
+                  '&::before': {
+                    content: '""',
+                    position: 'absolute',
+                    top: -2,
+                    left: -2,
+                    right: -2,
+                    bottom: -2,
+                    borderRadius: '22px',
+                    background: 'linear-gradient(45deg, #ff0000, #ff8000, #ffff00, #80ff00, #00ff00, #00ff80, #00ffff, #0080ff, #0000ff, #8000ff, #ff00ff, #ff0080)',
+                    backgroundSize: '200% 200%',
+                    animation: 'rainbow 3s linear',
+                    zIndex: -1,
+                  }
+                })
               },
               input: {
                 color: 'black',
               },
+              '@keyframes rainbow': {
+                '0%': {
+                  backgroundPosition: '0% 50%'
+                },
+                '50%': {
+                  backgroundPosition: '100% 50%'
+                },
+                '100%': {
+                  backgroundPosition: '0% 50%'
+                }
+              }
             }}
           />
           <Button
