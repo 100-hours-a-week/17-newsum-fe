@@ -20,8 +20,7 @@ function CommentPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [pageInfo, setPageInfo] = useState(null);
-  const [commentsCount, setCommentsCount] = useState(0);
-  const [subCommentsCount, setSubCommentsCount] = useState(0);
+  const [commentCount, setCommentCount] = useState(0);
   const location = useLocation();
   const listRef = useRef(null);
 
@@ -40,6 +39,7 @@ function CommentPage() {
       console.log(res.data);
       const newComments = res.data?.data?.comments || [];
       const newPageInfo = res.data?.data?.pageInfo || null;
+      setCommentCount(res.data?.data?.commentCount)
 
       if (cursor) {
         // 추가 로딩인 경우 기존 데이터에 추가
@@ -169,7 +169,7 @@ function CommentPage() {
             fontWeight: 'bold'
           }}
         >
-          {showReplies ?  `답글 ${replies.length}개` : `댓글 ${comments.length}개`}
+          {showReplies ?  `답글 ${replies.length}개` : `댓글 ${commentCount}개`}
         </Typography>
       </Box>
 
@@ -224,6 +224,7 @@ function CommentPage() {
                   onEdit={handleCommentEdit}
                   replyCount={selectedComment.subComments?.length || 0}
                   likeCount={selectedComment.likeCount || 0}
+                  isReplying={true}
                 />
               </Box>
               {replies.map(reply => (

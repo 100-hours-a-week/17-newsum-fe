@@ -1,5 +1,5 @@
 // src/components/comments/CommentItem.jsx
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef } from 'react';
 import { ListItem, ListItemAvatar, Avatar, ListItemText, Typography, Box, IconButton, Menu, MenuItem, TextField, Button } from '@mui/material';
 import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
 import ChatBubbleOutlineIcon from '@mui/icons-material/ChatBubbleOutline';
@@ -16,34 +16,20 @@ function getLines(text, maxLines = 4) {
   };
 }
 
-function CommentItem({ comment, onDelete, onReply, level, isAuthor = false, likeCount = 0, replyCount = 0, onEdit }) {
+function CommentItem({ comment, onDelete, onReply, level, isAuthor = false, likeCount = 0, replyCount = 0, onEdit, isReplying = false }) {
   const [editMode, setEditMode] = useState(false);
   const [editContent, setEditContent] = useState(comment.content);
   const [anchorEl, setAnchorEl] = useState(null);
   const [isLiked, setIsLiked] = useState(false);
   const open = Boolean(anchorEl);
   const [expanded, setExpanded] = useState(false);
-  const [isLong, setIsLong] = useState(false);
   const contentRef = useRef(null);
   const { visible, hidden } = getLines(comment.content, 4);
-
-  useEffect(() => {
-    if (contentRef.current) {
-      // 4줄을 넘어가는지 체크
-      const lineHeight = parseFloat(getComputedStyle(contentRef.current).lineHeight);
-      const maxHeight = lineHeight * 4;
-      if (contentRef.current.scrollHeight > maxHeight + 2) {
-        setIsLong(true);
-      } else {
-        setIsLong(false);
-      }
-    }
-  }, [comment.content]);
 
   const formatDateTime = (dateString) => {
     try {
       return new Date(dateString).toLocaleString('ko-KR', { dateStyle: 'short', timeStyle: 'short' });
-    } catch (e) {
+    } catch {
       return dateString;
     }
   };
@@ -91,7 +77,7 @@ function CommentItem({ comment, onDelete, onReply, level, isAuthor = false, like
       alignItems="flex-start"
       sx={{
         pl: level * 3,
-        bgcolor: level > 0 ? `rgba(0, 0, 0, ${level * 0.03})` : 'inherit',
+        bgcolor: isReplying ? 'rgba(0, 0, 0, 0.03)' : level > 0 ? `rgba(0, 0, 0, ${level * 0.03})` : 'inherit',
         py: 1,
       }}
     >
@@ -238,7 +224,10 @@ function CommentItem({ comment, onDelete, onReply, level, isAuthor = false, like
                 <Typography variant="caption" sx={{ ml: 0.5 }}>{likeCount}</Typography>
               </IconButton>
               {level === 0 && (
-                <IconButton size="small" onClick={handleReplyClick}>
+                <IconButton 
+                  size="small" 
+                  onClick={handleReplyClick}
+                >
                   <ChatBubbleOutlineIcon fontSize="small" />
                   <Typography variant="caption" sx={{ ml: 0.5 }}>{replyCount}</Typography>
                 </IconButton>
