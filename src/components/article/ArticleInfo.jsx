@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Box, IconButton, Avatar, Collapse, Typography, Paper, Button, Link } from '@mui/material';
+import { Box, IconButton, Avatar, Collapse, Typography, Paper, Link } from '@mui/material';
 import ShareIcon from '@mui/icons-material/Share';
 import FavoriteIcon from '@mui/icons-material/Favorite';
 import FavoriteBorderIcon from '@mui/icons-material/FavoriteBorder';
@@ -36,14 +36,19 @@ const ViewersText = styled(Typography)`
 const InfoContainer = styled(Paper)`
   padding: 16px;
   margin-bottom: 16px;
-  border-radius: 12px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  border-radius: 0;
+  background-color: transparent;
+  box-shadow: none;
 `;
 
 const StyledIconButton = styled(IconButton)`
   width: 36px;
   height: 36px;
   border-radius: 50%;
+  background-color: transparent;
+  &:hover {
+    background-color: rgba(0, 0, 0, 0.04);
+  }
 `;
 
 const ArticleLink = styled(Link)`
@@ -54,7 +59,6 @@ const ArticleLink = styled(Link)`
   color: ${props => props.theme?.palette?.primary?.main || '#1976d2'};
   font-size: 0.875rem;
   line-height: 1.4;
-  
   &:hover {
     opacity: 0.8;
   }
@@ -85,23 +89,6 @@ const MoreContent = styled(Box)`
   padding: 8px 8px 4px;
 `;
 
-/**
- * 게시물 정보 컴포넌트
- * 
- * @param {Object} props
- * @param {Object} props.author - 작가 정보
- * @param {string} props.author.name - 작가 이름
- * @param {string} props.author.profileImageUrl - 작가 프로필 이미지 URL
- * @param {number} props.viewCount - 조회수
- * @param {number} props.activeViewers - 실시간 시청자 수
- * @param {string} props.createdAt - 생성일(ISO 포맷)
- * @param {number} props.likeCount - 좋아요 수
- * @param {boolean} props.isLiked - 좋아요 상태
- * @param {boolean} props.isBookmarked - 북마크 상태
- * @param {Array} props.sourceNews - 원본 기사 목록
- * @param {Function} props.onLikeClick - 좋아요 클릭 핸들러
- * @param {Function} props.onBookmarkClick - 북마크 클릭 핸들러
- */
 const ArticleInfo = ({ 
   author, 
   viewCount, 
@@ -115,10 +102,7 @@ const ArticleInfo = ({
   onBookmarkClick
 }) => {
   const [showDetails, setShowDetails] = useState(false);
-  
-  const toggleDetails = () => {
-    setShowDetails(prev => !prev);
-  };
+  const toggleDetails = () => setShowDetails(prev => !prev);
   
   const handleShare = () => {
     navigator.clipboard.writeText(window.location.href);
@@ -127,9 +111,7 @@ const ArticleInfo = ({
 
   return (
     <InfoContainer elevation={0}>
-      {/* 작가 정보 및 상단 부분 */}
       <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 2 }}>
-        {/* 작가 프로필 및 정보 */}
         <Box sx={{ display: 'flex', alignItems: 'flex-start', gap: 2 }}>
           <Avatar 
             src={author?.profileImageUrl} 
@@ -141,57 +123,39 @@ const ArticleInfo = ({
             <ViewersText>{activeViewers}명 보는 중</ViewersText>
           </Box>
         </Box>
-        
-        {/* 액션 버튼 */}
+
         <Box sx={{ display: 'flex', gap: 1 }}>
           <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-            <StyledIconButton 
-              onClick={handleShare}
-              sx={{ bgcolor: 'action.hover', '&:hover': { bgcolor: 'action.selected' } }}
-            >
+            <StyledIconButton onClick={handleShare}>
               <ShareIcon fontSize="small" />
             </StyledIconButton>
           </Box>
-          
+
           <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-            <StyledIconButton 
-              onClick={onLikeClick}
-              color={isLiked ? 'error' : 'default'}
-              sx={{ bgcolor: 'action.hover', '&:hover': { bgcolor: 'action.selected' } }}
-            >
-              {isLiked ? <FavoriteIcon fontSize="small" /> : <FavoriteBorderIcon fontSize="small" />}
+            <StyledIconButton onClick={onLikeClick}>
+              {isLiked ? (
+                <FavoriteIcon fontSize="small" sx={{ color: '#f44336' }} />
+              ) : (
+                <FavoriteBorderIcon fontSize="small" sx={{ color: '#aaa' }} />
+              )}
             </StyledIconButton>
             <CountText>{formatNumber(likeCount)}</CountText>
           </Box>
-          
+
           <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-            <StyledIconButton 
-              onClick={onBookmarkClick}
-              sx={{ 
-                bgcolor: 'action.hover', 
-                '&:hover': { bgcolor: 'action.selected' },
-                color: isBookmarked ? 'black' : 'default'
-              }}
-            >
-              {isBookmarked ? <BookmarkIcon fontSize="small" /> : <BookmarkBorderIcon fontSize="small" />}
+            <StyledIconButton onClick={onBookmarkClick}>
+              {isBookmarked ? (
+                <BookmarkIcon fontSize="small" sx={{ color: '#000' }} />
+              ) : (
+                <BookmarkBorderIcon fontSize="small" sx={{ color: '#aaa' }} />
+              )}
             </StyledIconButton>
           </Box>
         </Box>
       </Box>
-      
-      {/* 더보기 섹션 */}
+
       <MoreSection isOpen={showDetails}>
-        {/* 더보기 버튼과 정보 */}
-        <Box 
-          sx={{ 
-            display: 'flex', 
-            justifyContent: 'space-between',
-            alignItems: 'center',
-            py: 1.5,
-            px: 1,
-          }}
-        >
-          {/* 조회수와 날짜 정보 (더보기 눌렀을 때만 표시) */}
+        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', py: 1.5, px: 1 }}>
           {showDetails && (
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
               <DetailItem>
@@ -208,33 +172,15 @@ const ArticleInfo = ({
               </DetailItem>
             </Box>
           )}
-          
-          {/* 더보기 버튼 */}
-          <Box 
-            onClick={toggleDetails}
-            sx={{ 
-              display: 'flex', 
-              alignItems: 'center',
-              cursor: 'pointer',
-              ml: 'auto'
-            }}
-          >
-            <HeaderText 
-              variant="body2" 
-              sx={{ 
-                display: 'flex', 
-                alignItems: 'center', 
-                gap: 0.5,
-                color: 'text.primary',
-              }}
-            >
+
+          <Box onClick={toggleDetails} sx={{ display: 'flex', alignItems: 'center', cursor: 'pointer', ml: 'auto' }}>
+            <HeaderText variant="body2" sx={{ display: 'flex', alignItems: 'center', gap: 0.5, color: 'text.primary' }}>
               더보기
               {showDetails ? <KeyboardArrowUpIcon /> : <KeyboardArrowDownIcon />}
             </HeaderText>
           </Box>
         </Box>
-        
-        {/* 원본 기사 목록 (더보기 눌렀을 때만 표시) */}
+
         <Collapse in={showDetails}>
           <MoreContent>
             {sourceNews.length > 0 && (
@@ -264,4 +210,4 @@ const ArticleInfo = ({
   );
 };
 
-export default ArticleInfo; 
+export default ArticleInfo;

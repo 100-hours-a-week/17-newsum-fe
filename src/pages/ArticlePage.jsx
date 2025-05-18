@@ -5,13 +5,16 @@ import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import { useParams, useNavigate } from 'react-router-dom';
 import Carousel from '../components/Carousel/Carousel';
 import DefaultAxios from '../api/DefaultAxios';
+import TokenAxios from '../api/TokenAxios';
 import CategoryGrid from '../components/grid/CategoryGrid';
 import ArticleInfo from '../components/article/ArticleInfo';
 import CommentButton from '../components/article/CommentButton';
+import { useAuth } from '../contexts/AuthContext';
 
 function ArticlePage() {
   const { articleId } = useParams();
   const navigate = useNavigate();
+  const { user, isLoggedIn } = useAuth();
   const [title, setTitle] = useState(null);
   const [thumbnailUrl, setThumbnailUrl] = useState(null)
   const [slides, setSlides] = useState([]);
@@ -27,6 +30,11 @@ function ArticlePage() {
   const [viewCount, setViewCount] = useState(0);
   const [activeViewers, setActiveViewers] = useState(0);
   const [createdAt, setCreatedAt] = useState('');
+
+  useEffect(() => {
+    console.log('로그인 상태:', isLoggedIn);
+    console.log('사용자 정보:', user);
+  }, [isLoggedIn, user]);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -66,20 +74,50 @@ function ArticlePage() {
   }, [articleId]);
 
   const handleBack = () => navigate(-1);
-  
+
   const handleLike = async () => {
+    console.log('ArticlePage - handleLike 호출됨');
+    console.log('로그인 상태:', isLoggedIn);
+    console.log('토큰:', localStorage.getItem('accessToken'));
+    console.log('현재 좋아요 상태:', { isLiked, likeCount });
+
+    if (!isLoggedIn) {
+      console.log('로그인되지 않은 상태');
+      alert('로그인이 필요한 기능입니다.');
+      navigate('/login');
+      return;
+    }
+
     try {
-      const res = await DefaultAxios.post(`/api/v1/webtoons/${articleId}/likes`);
-      const { liked, likeCount } = res.data.data;
-      setIsLiked(liked);         // API가 true/false 반환
-      setLikeCount(likeCount);   // 정확한 count를 반영
+      console.log('🔥 좋아요 API 호출 시작');
+      const res = await TokenAxios.post(`/api/v1/webtoons/${articleId}/likes`);
+      console.log('✅ 서버 응답 전체:', res);
+      console.log('✅ 서버 응답 데이터:', res.data);
+      console.log('✅ 서버 응답 data 필드:', res.data?.data);
+
+      if (res.data?.data) {
+        const { liked, likeCount } = res.data.data;
+        console.log('좋아요 상태 업데이트:', { liked, likeCount });
+        console.log('이전 상태:', { isLiked, likeCount: likeCount });
+        setIsLiked(liked);
+        setLikeCount(likeCount);
+        console.log('상태 업데이트 후:', { isLiked: liked, likeCount });
+      } else {
+        console.error('서버 응답에 data가 없습니다:', res.data);
+      }
     } catch (error) {
       console.error("좋아요 처리 중 오류 발생:", error);
+      console.error("에러 상세:", error.response?.data);
+
+      if (error.response?.status === 401) {
+        alert('로그인이 필요한 기능입니다.');
+        navigate('/login');
+      } else {
+        alert('좋아요 처리 중 오류가 발생했습니다.');
+      }
     }
   };
-  
-  
-  
+
   const handleBookmark = async () => {
     try {
       // API 호출 추가 가능
@@ -117,7 +155,7 @@ function ArticlePage() {
 
       {/* ArticleInfo 컴포넌트 사용 */}
       <Box sx={{ px: 2 }}>
-        <ArticleInfo 
+        <ArticleInfo
           author={author}
           viewCount={viewCount}
           activeViewers={activeViewers}
@@ -128,10 +166,11 @@ function ArticlePage() {
           sourceNews={sourceNews}
           onLikeClick={handleLike}
           onBookmarkClick={handleBookmark}
+          isLoggedIn={isLoggedIn}
         />
-        
+
         {/* 댓글 버튼 컴포넌트 */}
-        <CommentButton 
+        <CommentButton
           articleId={articleId}
           commentCount={commentCount}
         />
