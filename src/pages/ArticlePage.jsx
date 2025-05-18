@@ -69,13 +69,16 @@ function ArticlePage() {
   
   const handleLike = async () => {
     try {
-      // API 호출 추가 가능
-      setIsLiked((prev) => !prev);
-      setLikeCount((prev) => (isLiked ? prev - 1 : prev + 1));
+      const res = await DefaultAxios.post(`/api/v1/webtoons/${articleId}/likes`);
+      const { liked, likeCount } = res.data.data;
+      setIsLiked(liked);         // API가 true/false 반환
+      setLikeCount(likeCount);   // 정확한 count를 반영
     } catch (error) {
       console.error("좋아요 처리 중 오류 발생:", error);
     }
   };
+  
+  
   
   const handleBookmark = async () => {
     try {
