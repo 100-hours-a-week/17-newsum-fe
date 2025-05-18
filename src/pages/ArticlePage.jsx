@@ -1,6 +1,6 @@
 // src/pages/ArticlePage.jsx
 import React, { useState, useEffect } from 'react';
-import { Box, IconButton, Typography, CircularProgress, Alert } from '@mui/material';
+import { Box, IconButton, Typography, CircularProgress, Alert, Modal, Button } from '@mui/material';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import { useParams, useNavigate } from 'react-router-dom';
 import Carousel from '../components/Carousel/Carousel';
@@ -10,6 +10,7 @@ import CategoryGrid from '../components/grid/CategoryGrid';
 import ArticleInfo from '../components/article/ArticleInfo';
 import CommentButton from '../components/article/CommentButton';
 import { useAuth } from '../contexts/AuthContext';
+import MoveLogin from '../components/modal/MoveLogin';
 
 function ArticlePage() {
   const { articleId } = useParams();
@@ -30,6 +31,7 @@ function ArticlePage() {
   const [viewCount, setViewCount] = useState(0);
   const [activeViewers, setActiveViewers] = useState(0);
   const [createdAt, setCreatedAt] = useState('');
+  const [loginModalOpen, setLoginModalOpen] = useState(false);
 
   useEffect(() => {
     console.log('로그인 상태:', isLoggedIn);
@@ -82,9 +84,7 @@ function ArticlePage() {
     console.log('현재 좋아요 상태:', { isLiked, likeCount });
 
     if (!isLoggedIn) {
-      console.log('로그인되지 않은 상태');
-      alert('로그인이 필요한 기능입니다.');
-      navigate('/login');
+      setLoginModalOpen(true);
       return;
     }
 
@@ -110,8 +110,7 @@ function ArticlePage() {
       console.error("에러 상세:", error.response?.data);
 
       if (error.response?.status === 401) {
-        alert('로그인이 필요한 기능입니다.');
-        navigate('/login');
+        setLoginModalOpen(true);
       } else {
         alert('좋아요 처리 중 오류가 발생했습니다.');
       }
@@ -119,6 +118,11 @@ function ArticlePage() {
   };
 
   const handleBookmark = async () => {
+    if (!isLoggedIn) {
+      setLoginModalOpen(true);
+      return;
+    }
+
     try {
       // API 호출 추가 가능
       setIsBookmarked((prev) => !prev);
@@ -188,6 +192,8 @@ function ArticlePage() {
           }))}
         />
       </Box>
+
+      <MoveLogin open={loginModalOpen} onCancel={() => setLoginModalOpen(false)} />
     </Box>
   );
 }
