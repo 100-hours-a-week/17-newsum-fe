@@ -2,7 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import { Box, IconButton, Typography, CircularProgress, Alert, Modal, Button } from '@mui/material';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import Carousel from '../components/Carousel/Carousel';
 import DefaultAxios from '../api/DefaultAxios';
 import TokenAxios from '../api/TokenAxios';
@@ -15,6 +15,7 @@ import MoveLogin from '../components/modal/MoveLogin';
 function ArticlePage() {
   const { articleId } = useParams();
   const navigate = useNavigate();
+  const location = useLocation();
   const { user, isLoggedIn } = useAuth();
   const [title, setTitle] = useState(null);
   const [thumbnailUrl, setThumbnailUrl] = useState(null)
@@ -91,9 +92,7 @@ function ArticlePage() {
     try {
       console.log('🔥 좋아요 API 호출 시작');
       const res = await TokenAxios.post(`/api/v1/webtoons/${articleId}/likes`);
-      console.log('✅ 서버 응답 전체:', res);
-      console.log('✅ 서버 응답 데이터:', res.data);
-      console.log('✅ 서버 응답 data 필드:', res.data?.data);
+
 
       if (res.data?.data) {
         const { liked, likeCount } = res.data.data;
@@ -193,7 +192,7 @@ function ArticlePage() {
         />
       </Box>
 
-      <MoveLogin open={loginModalOpen} onCancel={() => setLoginModalOpen(false)} />
+      <MoveLogin open={loginModalOpen} onCancel={() => setLoginModalOpen(false)} from={location.pathname} />
     </Box>
   );
 }

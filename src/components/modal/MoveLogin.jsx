@@ -3,11 +3,11 @@ import { useNavigate } from 'react-router-dom';
 import { Box, Typography, Button, Modal } from '@mui/material';
 import logoutLogo from '../../assets/logout_logo.jpeg';
 
-function MoveLogin({ open, onCancel }) {
+function MoveLogin({ open, onCancel, from }) {
     const navigate = useNavigate();
 
     const handleLogin = () => {
-        navigate('/login');
+        navigate(`/login?from=${encodeURIComponent(from)}`);
     };
 
     return (

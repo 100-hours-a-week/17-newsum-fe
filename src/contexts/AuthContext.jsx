@@ -1,4 +1,5 @@
-import React, { createContext, useContext, useState, useCallback, useEffect } from 'react';
+import React, { createContext, useContext, useState, useCallback } from 'react';
+// import { useNavigate } from 'react-router-dom'; // 주석 처리 또는 제거
 import TokenAxios from '../api/TokenAxios';
 
 const AuthContext = createContext(null);
@@ -15,14 +16,10 @@ export function AuthProvider({ children }) {
     }
   });
 
-  const [isLoggedIn, setIsLoggedIn] = useState(() => {
-    return !!localStorage.getItem('accessToken');
-  });
-
-  useEffect(() => {
-    const token = localStorage.getItem('accessToken');
-    setIsLoggedIn(!!token);
-  }, []);
+  // useEffect(() => {
+  //   const token = localStorage.getItem('accessToken');
+  //   setIsLoggedIn(!!token);
+  // }, []);
 
   const login = useCallback((userData) => {
     if (!userData) {
@@ -30,18 +27,19 @@ export function AuthProvider({ children }) {
       return;
     }
     setUser(userData);
-    setIsLoggedIn(true);
     localStorage.setItem('user', JSON.stringify(userData));
   }, []);
 
   const logout = useCallback(() => {
+    setUser(null);
     localStorage.removeItem('user');
     localStorage.removeItem('accessToken');
     localStorage.removeItem('refreshToken');
     delete TokenAxios.defaults.headers.common['Authorization'];
-    setUser(null);
-    setIsLoggedIn(false);
   }, []);
+
+  // user 상태를 기반으로 isLoggedIn 값을 제공
+  const isLoggedIn = !!user;
 
   return (
     <AuthContext.Provider value={{ user, isLoggedIn, login, logout }}>

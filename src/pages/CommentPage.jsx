@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
-import { Box, IconButton, Typography, CircularProgress, Alert, Link, TextField, Button } from '@mui/material';
+import { Box, IconButton, Typography, CircularProgress, Alert, Link, TextField, Button, Modal } from '@mui/material';
 import { useParams, useNavigate, Link as RouterLink, useLocation } from 'react-router-dom';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import { useAuth } from '../contexts/AuthContext';
@@ -8,11 +8,12 @@ import DefaultAxios from '../api/DefaultAxios';
 import TokenAxios from '../api/TokenAxios';
 import Swal from 'sweetalert2';
 import SendIcon from '@mui/icons-material/SendRounded';
+import MoveLogin from '../components/modal/MoveLogin';
 
 function CommentPage() {
   const { articleId } = useParams();
   const navigate = useNavigate();
-  const { user } = useAuth();
+  const { user, isLoggedIn } = useAuth();
   const [comments, setComments] = useState([]);
   const [selectedCommentId, setSelectedCommentId] = useState(null);
   const [showReplies, setShowReplies] = useState(false);
@@ -22,6 +23,7 @@ function CommentPage() {
   const [pageInfo, setPageInfo] = useState(null);
   const [commentCount, setCommentCount] = useState(0);
   const [showGradient, setShowGradient] = useState(false);
+  const [loginModalOpen, setLoginModalOpen] = useState(false);
   const location = useLocation();
   const listRef = useRef(null);
 
@@ -81,7 +83,19 @@ function CommentPage() {
 
   const handleCommentSubmit = async (e) => {
     e.preventDefault();
-    if (!commentText.trim()) return;
+    if (!commentText.trim()) {
+      if (!isLoggedIn) { // 비회원일 경우 로그인 모달 표시
+        setLoginModalOpen(true);
+        return;
+      }
+      return; // 로그인 상태이고 내용이 없으면 그냥 리턴
+    }
+
+    // 로그인 상태가 아니면 모달 표시 (내용이 있더라도)
+    if (!isLoggedIn) {
+      setLoginModalOpen(true);
+      return;
+    }
 
     try {
       const parentId = showReplies && selectedCommentId ? selectedCommentId : 0;
@@ -90,7 +104,7 @@ function CommentPage() {
         parentId: parentId
       });
       setCommentText('');
-      
+
       fetchComments(); // 댓글 작성 후 목록 새로고침
       if (showReplies && selectedCommentId) {
         handleViewReplies(selectedCommentId);
@@ -142,8 +156,8 @@ function CommentPage() {
   const topLevelComments = comments;
 
   return (
-    <Box 
-      sx={{ 
+    <Box
+      sx={{
         maxWidth: '430px',
         margin: '0 auto',
         height: '100vh',
@@ -153,10 +167,10 @@ function CommentPage() {
       }}
     >
       {/* 헤더 */}
-      <Box sx={{ 
-        position: 'sticky', 
-        top: 0, 
-        bgcolor: 'white', 
+      <Box sx={{
+        position: 'sticky',
+        top: 0,
+        bgcolor: 'white',
         zIndex: 1,
         borderBottom: '1px solid rgba(0, 0, 0, 0.12)',
         px: 2,
@@ -167,16 +181,16 @@ function CommentPage() {
         <IconButton onClick={handleBack} edge="start">
           <ArrowBackIcon />
         </IconButton>
-        <Typography 
-          variant="subtitle1" 
-          component="h1" 
-          sx={{ 
+        <Typography
+          variant="subtitle1"
+          component="h1"
+          sx={{
             ml: 1,
             flexGrow: 1,
             fontWeight: 'bold'
           }}
         >
-          {showReplies ?  `답글 ${replies.length}개` : `댓글 ${commentCount}개`}
+          {showReplies ? `답글 ${replies.length}개` : `댓글 ${commentCount}개`}
         </Typography>
       </Box>
 
@@ -288,46 +302,19 @@ function CommentPage() {
                 borderRadius: '20px',
                 background: 'white',
                 color: 'black',
-                position: 'relative',
                 '& fieldset': {
-                  borderColor: showGradient ? 'transparent' : 'black',
+                  borderColor: 'black',
                 },
                 '&:hover fieldset': {
-                  borderColor: showGradient ? 'transparent' : 'black',
+                  borderColor: 'black',
                 },
                 '&.Mui-focused fieldset': {
-                  borderColor: showGradient ? 'transparent' : 'black',
+                  borderColor: 'black',
                 },
-                ...(showGradient && {
-                  '&::before': {
-                    content: '""',
-                    position: 'absolute',
-                    top: -2,
-                    left: -2,
-                    right: -2,
-                    bottom: -2,
-                    borderRadius: '22px',
-                    background: 'linear-gradient(45deg, #ff0000, #ff8000, #ffff00, #80ff00, #00ff00, #00ff80, #00ffff, #0080ff, #0000ff, #8000ff, #ff00ff, #ff0080)',
-                    backgroundSize: '200% 200%',
-                    animation: 'rainbow 2s linear',
-                    zIndex: -1,
-                  }
-                })
               },
               input: {
                 color: 'black',
               },
-              '@keyframes rainbow': {
-                '0%': {
-                  backgroundPosition: '0% 50%'
-                },
-                '50%': {
-                  backgroundPosition: '100% 50%'
-                },
-                '100%': {
-                  backgroundPosition: '0% 50%'
-                }
-              }
             }}
           />
           <Button
@@ -359,11 +346,15 @@ function CommentPage() {
             right: 0,
             bgcolor: 'rgba(232, 245, 253, 0.95)',
             borderTop: '1px solid rgba(0, 0, 0, 0.12)',
+            p: 2,
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center',
           }}
         >
-          <Alert 
-            severity="info" 
-            sx={{ 
+          <Alert
+            severity="info"
+            sx={{
               py: 1.5,
               '& .MuiAlert-message': {
                 width: '100%',
@@ -378,6 +369,8 @@ function CommentPage() {
           </Alert>
         </Box>
       )}
+
+      <MoveLogin open={loginModalOpen} onCancel={() => setLoginModalOpen(false)} from={location.pathname} />
     </Box>
   );
 }
