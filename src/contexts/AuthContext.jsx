@@ -1,4 +1,5 @@
 import React, { createContext, useContext, useState, useCallback } from 'react';
+// import { useNavigate } from 'react-router-dom'; // 주석 처리 또는 제거
 import TokenAxios from '../api/TokenAxios';
 
 const AuthContext = createContext(null);
@@ -15,6 +16,11 @@ export function AuthProvider({ children }) {
     }
   });
 
+  // useEffect(() => {
+  //   const token = localStorage.getItem('accessToken');
+  //   setIsLoggedIn(!!token);
+  // }, []);
+
   const login = useCallback((userData) => {
     if (!userData) {
       console.warn('login에 전달된 userData가 없습니다.');
@@ -25,15 +31,18 @@ export function AuthProvider({ children }) {
   }, []);
 
   const logout = useCallback(() => {
+    setUser(null);
     localStorage.removeItem('user');
     localStorage.removeItem('accessToken');
     localStorage.removeItem('refreshToken');
     delete TokenAxios.defaults.headers.common['Authorization'];
-    setUser(null);
   }, []);
 
+  // user 상태를 기반으로 isLoggedIn 값을 제공
+  const isLoggedIn = !!user;
+
   return (
-    <AuthContext.Provider value={{ user, login, logout }}>
+    <AuthContext.Provider value={{ user, isLoggedIn, login, logout }}>
       {children}
     </AuthContext.Provider>
   );

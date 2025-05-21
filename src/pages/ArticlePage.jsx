@@ -1,17 +1,22 @@
 // src/pages/ArticlePage.jsx
 import React, { useState, useEffect } from 'react';
-import { Box, IconButton, Typography, CircularProgress, Alert } from '@mui/material';
+import { Box, IconButton, Typography, CircularProgress, Alert, Modal, Button } from '@mui/material';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import Carousel from '../components/Carousel/Carousel';
 import DefaultAxios from '../api/DefaultAxios';
+import TokenAxios from '../api/TokenAxios';
 import CategoryGrid from '../components/grid/CategoryGrid';
 import ArticleInfo from '../components/article/ArticleInfo';
 import CommentButton from '../components/article/CommentButton';
+import { useAuth } from '../contexts/AuthContext';
+import MoveLogin from '../components/modal/MoveLogin';
 
 function ArticlePage() {
   const { articleId } = useParams();
   const navigate = useNavigate();
+  const location = useLocation();
+  const { user, isLoggedIn } = useAuth();
   const [title, setTitle] = useState(null);
   const [thumbnailUrl, setThumbnailUrl] = useState(null)
   const [slides, setSlides] = useState([]);
@@ -27,6 +32,12 @@ function ArticlePage() {
   const [viewCount, setViewCount] = useState(0);
   const [activeViewers, setActiveViewers] = useState(0);
   const [createdAt, setCreatedAt] = useState('');
+  const [loginModalOpen, setLoginModalOpen] = useState(false);
+
+  useEffect(() => {
+    console.log('로그인 상태:', isLoggedIn);
+    console.log('사용자 정보:', user);
+  }, [isLoggedIn, user]);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -66,18 +77,51 @@ function ArticlePage() {
   }, [articleId]);
 
   const handleBack = () => navigate(-1);
-  
+
   const handleLike = async () => {
+    console.log('ArticlePage - handleLike 호출됨');
+    console.log('로그인 상태:', isLoggedIn);
+    console.log('토큰:', localStorage.getItem('accessToken'));
+    console.log('현재 좋아요 상태:', { isLiked, likeCount });
+
+    if (!isLoggedIn) {
+      setLoginModalOpen(true);
+      return;
+    }
+
     try {
-      // API 호출 추가 가능
-      setIsLiked((prev) => !prev);
-      setLikeCount((prev) => (isLiked ? prev - 1 : prev + 1));
+      console.log('🔥 좋아요 API 호출 시작');
+      const res = await TokenAxios.post(`/api/v1/webtoons/${articleId}/likes`);
+
+
+      if (res.data?.data) {
+        const { liked, likeCount } = res.data.data;
+        console.log('좋아요 상태 업데이트:', { liked, likeCount });
+        console.log('이전 상태:', { isLiked, likeCount: likeCount });
+        setIsLiked(liked);
+        setLikeCount(likeCount);
+        console.log('상태 업데이트 후:', { isLiked: liked, likeCount });
+      } else {
+        console.error('서버 응답에 data가 없습니다:', res.data);
+      }
     } catch (error) {
       console.error("좋아요 처리 중 오류 발생:", error);
+      console.error("에러 상세:", error.response?.data);
+
+      if (error.response?.status === 401) {
+        setLoginModalOpen(true);
+      } else {
+        alert('좋아요 처리 중 오류가 발생했습니다.');
+      }
     }
   };
-  
+
   const handleBookmark = async () => {
+    if (!isLoggedIn) {
+      setLoginModalOpen(true);
+      return;
+    }
+
     try {
       // API 호출 추가 가능
       setIsBookmarked((prev) => !prev);
@@ -114,7 +158,7 @@ function ArticlePage() {
 
       {/* ArticleInfo 컴포넌트 사용 */}
       <Box sx={{ px: 2 }}>
-        <ArticleInfo 
+        <ArticleInfo
           author={author}
           viewCount={viewCount}
           activeViewers={activeViewers}
@@ -125,10 +169,11 @@ function ArticlePage() {
           sourceNews={sourceNews}
           onLikeClick={handleLike}
           onBookmarkClick={handleBookmark}
+          isLoggedIn={isLoggedIn}
         />
-        
+
         {/* 댓글 버튼 컴포넌트 */}
-        <CommentButton 
+        <CommentButton
           articleId={articleId}
           commentCount={commentCount}
         />
@@ -146,6 +191,8 @@ function ArticlePage() {
           }))}
         />
       </Box>
+
+      <MoveLogin open={loginModalOpen} onCancel={() => setLoginModalOpen(false)} from={location.pathname} />
     </Box>
   );
 }

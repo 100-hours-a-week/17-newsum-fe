@@ -10,7 +10,7 @@ import kakaoLoginBtn from '../assets/kakao_login.png';
 function LoginPage() {
   const navigate = useNavigate();
   const location = useLocation();
-  const from = new URLSearchParams(location.search).get('from') || '/';
+  const from = new URLSearchParams(location.search).get('from');
 
   const handleGoogleLogin = () => {
     const authUrl = 'https://accounts.google.com/o/oauth2/auth';
@@ -103,7 +103,7 @@ function LoginPage() {
         });
 
         // 이전 화면으로 이동
-        navigate('/');
+        navigate(from || '/');
       } else if (accessToken && refreshToken) {
         // URL에 토큰이 직접 포함된 경우
         addLog('URL에서 직접 토큰을 받음');
@@ -114,7 +114,7 @@ function LoginPage() {
           refreshToken: localStorage.getItem("refreshToken")
         });
         // 이전 화면으로 이동
-        navigate('-1');
+        navigate(from || '/');
       }
     } catch (error) {
       const errorLog = {
