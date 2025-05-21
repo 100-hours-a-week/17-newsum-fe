@@ -155,7 +155,9 @@ const ArticleInfo = ({
       </Box>
 
       <MoreSection isOpen={showDetails}>
+        {/* 더보기 버튼과 정보 */}
         <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', py: 1.5, px: 1 }}>
+        {/* 조회수와 날짜 정보 (더보기 눌렀을 때만 표시) */}
           {showDetails && (
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
               <DetailItem>
@@ -180,6 +182,7 @@ const ArticleInfo = ({
             </HeaderText>
           </Box>
         </Box>
+        {/* 원본 기사 목록 (더보기 눌렀을 때만 표시) */}
 
         <Collapse in={showDetails}>
           <MoreContent>
