@@ -248,37 +248,94 @@ function CommentPage() {
                 </Box>
               )}
             </>
-          ) : (
-            selectedComment && (
-              <>
-                <Box sx={{ px: 2 }}>
-                  <CommentItem
-                    comment={selectedComment}
-                    level={0}
-                    isAuthor={user && selectedComment.author === user.nickname}
-                    onDelete={handleCommentDelete}
-                    onEdit={handleCommentEdit}
-                    replyCount={selectedComment.subComments?.length || 0}
-                    likeCount={selectedComment.likeCount || 0}
-                    isReplying={true}
-                  />
-                </Box>
-                {replies.map(reply => (
-                  <Box key={reply.id} sx={{ pl: 4, pr: 2 }}>
-                    <CommentItem
-                      comment={reply}
-                      level={1}
-                      isAuthor={user && reply.author === user.nickname}
-                      onDelete={handleCommentDelete}
-                      onEdit={handleCommentEdit}
-                      likeCount={reply.likeCount || 0}
-                    />
-                  </Box>
-                ))}
-              </>
-            )
-          )}
+          ) : null}
         </Box>
+
+        {/* 댓글 입력 영역 (메인) */}
+        {isLoggedIn ? (
+          <Box
+            component="form"
+            onSubmit={handleCommentSubmit}
+            sx={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: 1,
+              mt: 2,
+              p: 2,
+              borderTop: '1px solid #eee',
+              bgcolor: 'white',
+            }}
+          >
+            <TextField
+              fullWidth
+              size="small"
+              multiline
+              minRows={1}
+              maxRows={3}
+              placeholder="댓글을 입력하세요..."
+              value={commentText}
+              onChange={(e) => setCommentText(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter' && !e.shiftKey && !e.nativeEvent.isComposing && commentText.trim()) {
+                  e.preventDefault();
+                  handleCommentSubmit(e);
+                }
+              }}
+              sx={{
+                '& .MuiOutlinedInput-root': {
+                  borderRadius: '20px',
+                  background: 'white',
+                  color: 'black',
+                  '& fieldset': {
+                    borderColor: 'black',
+                  },
+                  '&:hover fieldset': {
+                    borderColor: 'black',
+                  },
+                  '&.Mui-focused fieldset': {
+                    borderColor: 'black',
+                  },
+                },
+                input: {
+                  color: 'black',
+                },
+              }}
+            />
+            <Button
+              type="submit"
+              variant="contained"
+              sx={{
+                bgcolor: 'black',
+                color: 'white',
+                borderRadius: '20px',
+                minWidth: 48,
+                height: 40,
+                px: 0,
+                boxShadow: 'none',
+                whiteSpace: 'nowrap',
+                '&:hover': { bgcolor: '#222' }
+              }}
+              disabled={!commentText.trim()}
+            >
+              <SendIcon sx={{ fontSize: 24 }} />
+            </Button>
+          </Box>
+        ) : (
+          <Alert severity="info" sx={{ mx: 2, my: 2 }}>
+            <Typography variant="body2" display="inline">
+              댓글을 작성하려면&nbsp;
+            </Typography>
+            <Link
+              component={RouterLink}
+              to={`/login?from=${encodeURIComponent(location.pathname)}`}
+              underline="hover"
+              color="inherit"
+              sx={{ fontWeight: 'bold' }}
+            >
+              로그인이 필요합니다.
+            </Link>
+          </Alert>
+        )}
       </Box>
 
       {/* 답글 페이지 영역 */}
