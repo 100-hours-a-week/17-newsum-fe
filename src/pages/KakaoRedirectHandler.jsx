@@ -9,6 +9,8 @@ function KakaoRedirectHandler() {
   const location = useLocation();
   const { login } = useAuth();
 
+  const from = new URLSearchParams(location.search).get('from');
+
   useEffect(() => {
     const handleKakaoCallback = async () => {
       try {
@@ -43,7 +45,7 @@ function KakaoRedirectHandler() {
         // ✅ userInfo는 이제 사용하지 않음
         //localStorage.removeItem('userInfo');
 
-        navigate(from);
+        navigate(from || '/');
       } catch (error) {
         console.error('카카오 로그인 처리 중 오류:', error);
         navigate('/login');
@@ -51,7 +53,7 @@ function KakaoRedirectHandler() {
     };
 
     handleKakaoCallback();
-  }, [navigate, login, location]);
+  }, [navigate, login, from]);
 
   return null;
 }

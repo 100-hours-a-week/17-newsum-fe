@@ -9,6 +9,8 @@ function GoogleRedirectHandler() {
   const location = useLocation();
   const { login } = useAuth();
 
+  const from = new URLSearchParams(location.search).get('from');
+
   useEffect(() => {
     const handleGoogleCallback = async () => {
       try {
@@ -26,7 +28,7 @@ function GoogleRedirectHandler() {
             provider: 'GOOGLE'
           }
         );
-        
+
         console.log('구글 로그인 응답:', response.data);
 
         // 2️⃣ 응답 데이터 구조 확인 및 처리
@@ -89,7 +91,7 @@ function GoogleRedirectHandler() {
           }
         }
 
-        navigate(from);
+        navigate(from || '/');
       } catch (error) {
         console.error('구글 로그인 처리 중 오류:', error);
         if (error.response) {
@@ -100,7 +102,7 @@ function GoogleRedirectHandler() {
     };
 
     handleGoogleCallback();
-  }, [navigate, login, location]);
+  }, [navigate, login, from]);
 
   return null;
 }
