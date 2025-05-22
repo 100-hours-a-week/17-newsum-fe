@@ -10,48 +10,83 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v3
-    - name: Setup Node.js
-      uses: actions/setup-node@v3
-      with:
-        node-version: '18'
-        cache: 'npm'
-    - run: npm ci
-    - run: npm run build
-    - name: Upload dist
-      uses: actions/upload-artifact@v4
-      with:
-        name: dist
-        path: dist/
+      - uses: actions/checkout@v3
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+          cache: 'npm'
+
+      - run: npm ci
+
+      - run: npm run build
+
+      - name: Upload dist
+        uses: actions/upload-artifact@v4
+        with:
+          name: dist
+          path: dist/
 
   # test:
   #   runs-on: ubuntu-latest
   #   steps:
-  #   - uses: actions/checkout@v3
-  #   - uses: actions/setup-node@v3
-  #     with:
-  #       node-version: '18'
-  #       cache: 'npm'
-  #   - run: npm ci
-  #   - run: npm test
+  #     - uses: actions/checkout@v3
+  #     - uses: actions/setup-node@v3
+  #       with:
+  #         node-version: '18'
+  #         cache: 'npm'
+  #     - run: npm ci
+  #     - run: npm test
 
   deploy:
-    needs: [build] #test
+    needs: [build] # test
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v3
-    - name: Download dist
-      uses: actions/download-artifact@v4
-      with:
-        name: dist
-        path: dist/
-    - name: Setup SSH
-      run: |
-        mkdir -p ~/.ssh
-        echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
-        chmod 600 ~/.ssh/id_rsa
-        ssh-keyscan -H ${{ secrets.GCP_VM_IP }} >> ~/.ssh/known_hosts
-    - name: Deploy
-      run: |
-        scp -r dist/* ${{ secrets.GCP_VM_USER }}@${{ secrets.GCP_VM_IP }}:/home/${{ secrets.GCP_VM_USER }}/fe
+      - uses: actions/checkout@v3
+
+      - name: Download dist
+        uses: actions/download-artifact@v4
+        with:
+          name: dist
+          path: dist/
+
+      - name: Setup SSH
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+          ssh-keyscan -H ${{ secrets.GCP_VM_IP }} >> ~/.ssh/known_hosts
+
+      - name: Deploy build files
+        run: |
+          ssh ${{ secrets.GCP_VM_USER }}@${{ secrets.GCP_VM_IP }} "mkdir -p /home/${{ secrets.GCP_VM_USER }}/fe"
+          scp -r dist/* ${{ secrets.GCP_VM_USER }}@${{ secrets.GCP_VM_IP }}:/home/${{ secrets.GCP_VM_USER }}/fe
+
+      - name: Setup Nginx and Configure Site
+        run: |
+          ssh ${{ secrets.GCP_VM_USER }}@${{ secrets.GCP_VM_IP }} << 'EOF'
+            sudo apt update && sudo apt install -y nginx
+
+            # 기본 설정 삭제
+            sudo rm -f /etc/nginx/sites-available/default
+            sudo rm -f /etc/nginx/sites-enabled/default
+            
+            # 새 nginx 설정 추가
+            cat <<EOL | sudo tee /etc/nginx/sites-available/myapp
+server {
+    listen 80;
+    server_name _;
+
+    location / {
+        root /home/${USER}/fe;
+        index index.html index.htm;
+        try_files \$uri \$uri/ /index.html;
+    }
+}
+EOL
+
+            sudo ln -sf /etc/nginx/sites-available/myapp /etc/nginx/sites-enabled/myapp
+            sudo nginx -t && sudo systemctl restart nginx
+          EOF
 
