@@ -19,7 +19,7 @@ jobs:
     - run: npm ci
     - run: npm run build
     - name: Upload dist
-      uses: actions/upload-artifact@v3.1.2 #버전을 고정된 릴리스로 명시
+      uses: actions/upload-artifact@v3.0.2
       with:
         name: dist
         path: dist/
@@ -41,7 +41,7 @@ jobs:
     steps:
     - uses: actions/checkout@v3
     - name: Download dist
-      uses: actions/download-artifact@v3.1.2  
+      uses: actions/download-artifact@v3.0.2
       with:
         name: dist
         path: dist/
@@ -53,4 +53,5 @@ jobs:
         ssh-keyscan -H ${{ secrets.GCP_VM_IP }} >> ~/.ssh/known_hosts
     - name: Deploy
       run: |
-        scp -r dist/* ${{ secrets.GCP_VM_USER }}@${{ secrets.GCP_VM_IP }}:/home/deploy/be/src/main/resources/static/# trigger rerun
+        scp -r dist/* ${{ secrets.GCP_VM_USER }}@${{ secrets.GCP_VM_IP }}:/home/deploy/be/src/main/resources/static/
+
