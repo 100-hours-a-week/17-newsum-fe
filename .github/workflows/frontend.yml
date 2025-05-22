@@ -55,3 +55,4 @@ jobs:
       run: |
         scp -r dist/* ${{ secrets.GCP_VM_USER }}@${{ secrets.GCP_VM_IP }}:/home/${{ secrets.GCP_VM_USER }}/fe
 
+#2
