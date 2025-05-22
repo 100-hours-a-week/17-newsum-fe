@@ -74,19 +74,19 @@ jobs:
             
             # 새 nginx 설정 추가
             cat <<EOL | sudo tee /etc/nginx/sites-available/myapp
-server {
-    listen 80;
-    server_name _;
+            server {
+                listen 80;
+                server_name _;
 
-    location / {
-        root /home/${USER}/fe;
-        index index.html index.htm;
-        try_files \$uri \$uri/ /index.html;
-    }
-}
-EOL
+                location / {
+                    root /home/${USER}/fe;
+                    index index.html index.htm;
+                    try_files \$uri \$uri/ /index.html;
+                }
+            }
+            EOL
 
-            sudo ln -sf /etc/nginx/sites-available/myapp /etc/nginx/sites-enabled/myapp
-            sudo nginx -t && sudo systemctl restart nginx
-          EOF
+                        sudo ln -sf /etc/nginx/sites-available/myapp /etc/nginx/sites-enabled/myapp
+                        sudo nginx -t && sudo systemctl restart nginx
+                      EOF
 
