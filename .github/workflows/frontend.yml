@@ -9,48 +9,48 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
-
     steps:
     - uses: actions/checkout@v3
-
     - name: Setup Node.js
       uses: actions/setup-node@v3
       with:
         node-version: '18'
         cache: 'npm'
-
-    - name: Install dependencies
-      run: npm ci
-
-    - name: Build
-      run: npm run build
+    - run: npm ci
+    - run: npm run build
+    - name: Upload dist
+      uses: actions/upload-artifact@v3
+      with:
+        name: dist
+        path: dist/
 
   test:
     runs-on: ubuntu-latest
-
     steps:
     - uses: actions/checkout@v3
-    
-    - name: Setup Node.js
-      uses: actions/setup-node@v3
+    - uses: actions/setup-node@v3
       with:
         node-version: '18'
         cache: 'npm'
-    - name: Install dependencies
-      run: npm ci
-    - name: Test
-      run: npm test
+    - run: npm ci
+    - run: npm test
 
   deploy:
+    needs: [build, test]
     runs-on: ubuntu-latest
-
     steps:
     - uses: actions/checkout@v3
-    - name: Deploy
-      if: github.ref == 'refs/heads/dev'
-      env:
-        GCP_VM_USER: ${{ secrets.GCP_VM_USER }}
-        GCP_VM_IP: ${{ secrets.GCP_VM_IP }}
+    - name: Download dist
+      uses: actions/download-artifact@v3
+      with:
+        name: dist
+        path: dist/
+    - name: Setup SSH
       run: |
-        # 프론트엔드 빌드 파일을 VM으로 복사
-        scp -r dist/* $GCP_VM_USER@$GCP_VM_IP:/home/deploy/be/src/main/resources/static/
+        mkdir -p ~/.ssh
+        echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
+        chmod 600 ~/.ssh/id_rsa
+        ssh-keyscan -H ${{ secrets.GCP_VM_IP }} >> ~/.ssh/known_hosts
+    - name: Deploy
+      run: |
+        scp -r dist/* ${{ secrets.GCP_VM_USER }}@${{ secrets.GCP_VM_IP }}:/home/deploy/be/src/main/resources/static/
