@@ -53,5 +53,5 @@ jobs:
         ssh-keyscan -H ${{ secrets.GCP_VM_IP }} >> ~/.ssh/known_hosts
     - name: Deploy
       run: |
-        scp -r dist/* ${{ secrets.GCP_VM_USER }}@${{ secrets.GCP_VM_IP }}:/home/deploy/be/src/main/resources/static/
+        scp -r dist/* ${{ secrets.GCP_VM_USER }}@${{ secrets.GCP_VM_IP }}:/home/${{ secrets.GCP_VM_USER }}/fe
 
