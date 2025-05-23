@@ -75,6 +75,7 @@ jobs:
       - name: Deploy build files
         run: |
           ssh ${{ secrets.GCP_VM_USER }}@${{ secrets.GCP_VM_IP }} "mkdir -p /home/${{ secrets.GCP_VM_USER }}/fe"
+          rm -rf /home/${{ secrets.GCP_VM_USER }}/fe && \
           scp -r dist/* ${{ secrets.GCP_VM_USER }}@${{ secrets.GCP_VM_IP }}:/home/${{ secrets.GCP_VM_USER }}/fe
 
       - name: Setup Nginx and Configure Site
