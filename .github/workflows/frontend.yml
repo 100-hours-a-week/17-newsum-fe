@@ -11,10 +11,24 @@ jobs:
     steps:
       - uses: actions/checkout@v3
 
+      - name: Install Infisical CLI
+        run: |
+          curl -sSfL https://raw.githubusercontent.com/infisical/infisical/main/scripts/install.sh | sh
+
+      - name: Fetch .env from Infisical
+        run: |
+          infisical export \
+            --env=${{ secrets.INFISICAL_ENV }} \
+            --projectId=${{ secrets.INFISICAL_PROJECT_ID }} \
+            --token=${{ secrets.INFISICAL_TOKEN }} \
+            --format=dotenv \
+            --domain=${{ secrets.INFISICAL_API_URL }} \
+            > .env
+
       - name: Setup Node.js
         uses: actions/setup-node@v3
         with:
-          node-version: '18'
+          node-version: '23.11.0'
           cache: 'npm'
 
       - run: npm ci
