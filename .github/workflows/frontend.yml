@@ -85,12 +85,24 @@ jobs:
           sudo chmod o+x /home/${{ secrets.GCP_VM_USER }} && \
           sudo chmod o+x /home/${{ secrets.GCP_VM_USER }}/fe && \
           echo "server {" | sudo tee /etc/nginx/sites-available/myapp.conf && \
-          echo "  listen 80;" | sudo tee -a /etc/nginx/sites-available/myapp.conf && \
+          echo "  listen 443 ssl;" | sudo tee -a /etc/nginx/sites-available/myapp.conf && \
+          echo "  server_name dev.new-sum.com;" | sudo tee -a /etc/nginx/sites-available/myapp.conf && \
+          echo "" | sudo tee -a /etc/nginx/sites-available/myapp.conf && \
+          echo "  ssl_certificate /etc/letsencrypt/live/dev.new-sum.com/fullchain.pem;" | sudo tee -a /etc/nginx/sites-available/myapp.conf && \
+          echo "  ssl_certificate_key /etc/letsencrypt/live/dev.new-sum.com/privkey.pem;" | sudo tee -a /etc/nginx/sites-available/myapp.conf && \
+          echo "" | sudo tee -a /etc/nginx/sites-available/myapp.conf && \
           echo "  location / {" | sudo tee -a /etc/nginx/sites-available/myapp.conf && \
-          echo "    root /home/${USER}/fe;" | sudo tee -a /etc/nginx/sites-available/myapp.conf && \
+          echo "    root /home/${{ secrets.GCP_VM_USER }}/fe;" | sudo tee -a /etc/nginx/sites-available/myapp.conf && \
           echo "    index index.html index.htm;" | sudo tee -a /etc/nginx/sites-available/myapp.conf && \
           echo "    try_files \$uri \$uri/ /index.html;" | sudo tee -a /etc/nginx/sites-available/myapp.conf && \
           echo "  }" | sudo tee -a /etc/nginx/sites-available/myapp.conf && \
+          echo "}" | sudo tee -a /etc/nginx/sites-available/myapp.conf && \
+          echo "" | sudo tee -a /etc/nginx/sites-available/myapp.conf && \
+          echo "server {" | sudo tee -a /etc/nginx/sites-available/myapp.conf && \
+          echo "  listen 80;" | sudo tee -a /etc/nginx/sites-available/myapp.conf && \
+          echo "  server_name dev.new-sum.com;" | sudo tee -a /etc/nginx/sites-available/myapp.conf && \
+          echo "" | sudo tee -a /etc/nginx/sites-available/myapp.conf && \
+          echo "  return 301 https://\$host\$request_uri;" | sudo tee -a /etc/nginx/sites-available/myapp.conf && \
           echo "}" | sudo tee -a /etc/nginx/sites-available/myapp.conf && \
           sudo ln -sf /etc/nginx/sites-available/myapp.conf /etc/nginx/sites-enabled/myapp.conf && \
           sudo nginx -t && sudo systemctl restart nginx'
