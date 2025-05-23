@@ -13,9 +13,10 @@ jobs:
 
       - name: Install Infisical CLI
         run: |
-          curl -sSfL https://raw.githubusercontent.com/infisical/infisical/main/scripts/install.sh | sh
-          sudo mv infisical /usr/local/bin/infisical
-
+          sudo apt update
+          sudo apt install -y golang-go
+          go install github.com/infisical/infisical@latest
+          sudo cp ~/go/bin/infisical /usr/local/bin/infisical
 
       - name: Fetch .env from Infisical
         run: |
