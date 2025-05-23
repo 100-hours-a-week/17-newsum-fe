@@ -13,9 +13,11 @@ jobs:
 
       - name: Install Infisical CLI
         run: |
-          curl -L https://github.com/infisical/infisical/releases/latest/download/infisical-linux-amd64 -o infisical
-          chmod +x infisical
+          curl -L https://github.com/infisical/infisical/releases/latest/download/infisical_Linux_x86_64.tar.gz -o infisical.tar.gz
+          tar -xzf infisical.tar.gz
           sudo mv infisical /usr/local/bin/infisical
+          infisical --version
+
     
 
       - name: Fetch .env from Infisical
