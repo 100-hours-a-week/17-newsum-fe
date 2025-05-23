@@ -67,7 +67,14 @@ jobs:
           ssh ${{ secrets.GCP_VM_USER }}@${{ secrets.GCP_VM_IP }} 'sudo apt update && sudo apt install -y nginx && \
           sudo rm -f /etc/nginx/sites-available/default && \
           sudo rm -f /etc/nginx/sites-enabled/default && \
-          echo "server {\n  listen 80;\n  location / {\n    root /home/${USER}/fe;\n    index index.html index.htm;\n    try_files \$uri \$uri/ /index.html;\n  }\n}" | sudo tee /etc/nginx/sites-available/myapp && \
-          sudo ln -sf /etc/nginx/sites-available/myapp /etc/nginx/sites-enabled/myapp && \
+          echo "server {" | sudo tee /etc/nginx/sites-available/myapp.conf && \
+          echo "  listen 80;" | sudo tee -a /etc/nginx/sites-available/myapp.conf && \
+          echo "  location / {" | sudo tee -a /etc/nginx/sites-available/myapp.conf && \
+          echo "    root /home/${USER}/fe;" | sudo tee -a /etc/nginx/sites-available/myapp.conf && \
+          echo "    index index.html index.htm;" | sudo tee -a /etc/nginx/sites-available/myapp.conf && \
+          echo "    try_files \$uri \$uri/ /index.html;" | sudo tee -a /etc/nginx/sites-available/myapp.conf && \
+          echo "  }" | sudo tee -a /etc/nginx/sites-available/myapp.conf && \
+          echo "}" | sudo tee -a /etc/nginx/sites-available/myapp.conf && \
+          sudo ln -sf /etc/nginx/sites-available/myapp.conf /etc/nginx/sites-enabled/myapp.conf && \
           sudo nginx -t && sudo systemctl restart nginx'
 
