@@ -82,6 +82,7 @@ jobs:
           ssh ${{ secrets.GCP_VM_USER }}@${{ secrets.GCP_VM_IP }} 'sudo apt update && sudo apt install -y nginx && \
           sudo rm -f /etc/nginx/sites-available/default && \
           sudo rm -f /etc/nginx/sites-enabled/default && \
+          sudo chmod o+x /home/rok && \
           echo "server {" | sudo tee /etc/nginx/sites-available/myapp.conf && \
           echo "  listen 80;" | sudo tee -a /etc/nginx/sites-available/myapp.conf && \
           echo "  location / {" | sudo tee -a /etc/nginx/sites-available/myapp.conf && \
