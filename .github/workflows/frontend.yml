@@ -21,7 +21,7 @@ jobs:
           infisical export \
             --env=${{ secrets.INFISICAL_ENV_DEV }} \
             --projectId=${{ secrets.INFISICAL_PROJECT_ID }} \
-            --token=${{ secrets.INFISICAL_TOKEN }} \
+            --token=${{ secrets.INFISICAL_DEV_TOKEN }} \
             --format=dotenv \
             --domain=${{ secrets.INFISICAL_API_URL }} \
             > $GITHUB_WORKSPACE/.env
