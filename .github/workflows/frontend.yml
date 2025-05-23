@@ -9,10 +9,8 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      # 레포에서 Github Runner 서버로 코드 전송
       - uses: actions/checkout@v3
 
-			# Infisical CLI 설치
       - name: Install Infisical CLI
         run: |
           curl -1sLf 'https://artifacts-cli.infisical.com/setup.deb.sh' | sudo -E bash
