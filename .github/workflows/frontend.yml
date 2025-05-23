@@ -24,7 +24,7 @@ jobs:
             --token=${{ secrets.INFISICAL_TOKEN }} \
             --format=dotenv \
             --domain=${{ secrets.INFISICAL_API_URL }} \
-            > .env
+            > $GITHUB_WORKSPACE/.env
 
       - name: Setup Node.js
         uses: actions/setup-node@v3
