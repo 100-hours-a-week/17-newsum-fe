@@ -14,6 +14,8 @@ jobs:
       - name: Install Infisical CLI
         run: |
           curl -sSfL https://raw.githubusercontent.com/infisical/infisical/main/scripts/install.sh | sh
+          sudo mv infisical /usr/local/bin/infisical
+
 
       - name: Fetch .env from Infisical
         run: |
