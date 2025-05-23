@@ -83,6 +83,7 @@ jobs:
           sudo rm -f /etc/nginx/sites-available/default && \
           sudo rm -f /etc/nginx/sites-enabled/default && \
           sudo chmod o+x /home/rok && \
+          sudo chmod o+x /home/rok/fe && \
           echo "server {" | sudo tee /etc/nginx/sites-available/myapp.conf && \
           echo "  listen 80;" | sudo tee -a /etc/nginx/sites-available/myapp.conf && \
           echo "  location / {" | sudo tee -a /etc/nginx/sites-available/myapp.conf && \
