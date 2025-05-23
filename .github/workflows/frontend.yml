@@ -2,8 +2,6 @@
 name: Frontend CI/CD
 
 on:
-  push:
-    branches: [ dev ]
   pull_request:
     branches: [ dev ]
 
@@ -66,28 +64,10 @@ jobs:
 
       - name: Setup Nginx and Configure Site
         run: |
-          ssh ${{ secrets.GCP_VM_USER }}@${{ secrets.GCP_VM_IP }} << 'EOF'
-            sudo apt update && sudo apt install -y nginx
-
-            # 기본 설정 삭제
-            sudo rm -f /etc/nginx/sites-available/default
-            sudo rm -f /etc/nginx/sites-enabled/default
-            
-            # 새 nginx 설정 추가
-            cat <<EOL | sudo tee /etc/nginx/sites-available/myapp
-            server {
-                listen 80;
-                server_name _;
-
-                location / {
-                    root /home/${USER}/fe;
-                    index index.html index.htm;
-                    try_files \$uri \$uri/ /index.html;
-                }
-            }
-            EOL
-
-                        sudo ln -sf /etc/nginx/sites-available/myapp /etc/nginx/sites-enabled/myapp
-                        sudo nginx -t && sudo systemctl restart nginx
-                      EOF
+          ssh ${{ secrets.GCP_VM_USER }}@${{ secrets.GCP_VM_IP }} 'sudo apt update && sudo apt install -y nginx && \
+          sudo rm -f /etc/nginx/sites-available/default && \
+          sudo rm -f /etc/nginx/sites-enabled/default && \
+          echo "server { listen 80; server_name _; location / { root /home/${USER}/fe; index index.html index.htm; try_files \$uri \$uri/ /index.html; } }" | sudo tee /etc/nginx/sites-available/myapp && \
+          sudo ln -sf /etc/nginx/sites-available/myapp /etc/nginx/sites-enabled/myapp && \
+          sudo nginx -t && sudo systemctl restart nginx'
 
