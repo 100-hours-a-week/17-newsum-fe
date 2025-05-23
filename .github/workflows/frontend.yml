@@ -11,10 +11,25 @@ jobs:
     steps:
       - uses: actions/checkout@v3
 
+      - name: Install Infisical CLI
+        run: |
+          curl -1sLf 'https://artifacts-cli.infisical.com/setup.deb.sh' | sudo -E bash
+          sudo apt-get update && sudo apt-get install -y infisical
+
+      - name: Fetch .env from Infisical
+        run: |
+          infisical export \
+            --env=${{ secrets.INFISICAL_ENV_DEV }} \
+            --projectId=${{ secrets.INFISICAL_PROJECT_ID }} \
+            --token=${{ secrets.INFISICAL_TOKEN }} \
+            --format=dotenv \
+            --domain=${{ secrets.INFISICAL_API_URL }} \
+            > $GITHUB_WORKSPACE/.env
+
       - name: Setup Node.js
         uses: actions/setup-node@v3
         with:
-          node-version: '18'
+          node-version: '23.11.0'
           cache: 'npm'
 
       - run: npm ci
@@ -67,7 +82,28 @@ jobs:
           ssh ${{ secrets.GCP_VM_USER }}@${{ secrets.GCP_VM_IP }} 'sudo apt update && sudo apt install -y nginx && \
           sudo rm -f /etc/nginx/sites-available/default && \
           sudo rm -f /etc/nginx/sites-enabled/default && \
-          echo "server { listen 80; server_name _; location / { root /home/${USER}/fe; index index.html index.htm; try_files \$uri \$uri/ /index.html; } }" | sudo tee /etc/nginx/sites-available/myapp && \
-          sudo ln -sf /etc/nginx/sites-available/myapp /etc/nginx/sites-enabled/myapp && \
+          sudo chmod o+x /home/${{ secrets.GCP_VM_USER }} && \
+          sudo chmod o+x /home/${{ secrets.GCP_VM_USER }}/fe && \
+          echo "server {" | sudo tee /etc/nginx/sites-available/myapp.conf && \
+          echo "  listen 443 ssl;" | sudo tee -a /etc/nginx/sites-available/myapp.conf && \
+          echo "  server_name dev.new-sum.com;" | sudo tee -a /etc/nginx/sites-available/myapp.conf && \
+          echo "" | sudo tee -a /etc/nginx/sites-available/myapp.conf && \
+          echo "  ssl_certificate /etc/letsencrypt/live/dev.new-sum.com/fullchain.pem;" | sudo tee -a /etc/nginx/sites-available/myapp.conf && \
+          echo "  ssl_certificate_key /etc/letsencrypt/live/dev.new-sum.com/privkey.pem;" | sudo tee -a /etc/nginx/sites-available/myapp.conf && \
+          echo "" | sudo tee -a /etc/nginx/sites-available/myapp.conf && \
+          echo "  location / {" | sudo tee -a /etc/nginx/sites-available/myapp.conf && \
+          echo "    root /home/${{ secrets.GCP_VM_USER }}/fe;" | sudo tee -a /etc/nginx/sites-available/myapp.conf && \
+          echo "    index index.html index.htm;" | sudo tee -a /etc/nginx/sites-available/myapp.conf && \
+          echo "    try_files \$uri \$uri/ /index.html;" | sudo tee -a /etc/nginx/sites-available/myapp.conf && \
+          echo "  }" | sudo tee -a /etc/nginx/sites-available/myapp.conf && \
+          echo "}" | sudo tee -a /etc/nginx/sites-available/myapp.conf && \
+          echo "" | sudo tee -a /etc/nginx/sites-available/myapp.conf && \
+          echo "server {" | sudo tee -a /etc/nginx/sites-available/myapp.conf && \
+          echo "  listen 80;" | sudo tee -a /etc/nginx/sites-available/myapp.conf && \
+          echo "  server_name dev.new-sum.com;" | sudo tee -a /etc/nginx/sites-available/myapp.conf && \
+          echo "" | sudo tee -a /etc/nginx/sites-available/myapp.conf && \
+          echo "  return 301 https://\$host\$request_uri;" | sudo tee -a /etc/nginx/sites-available/myapp.conf && \
+          echo "}" | sudo tee -a /etc/nginx/sites-available/myapp.conf && \
+          sudo ln -sf /etc/nginx/sites-available/myapp.conf /etc/nginx/sites-enabled/myapp.conf && \
           sudo nginx -t && sudo systemctl restart nginx'
 
