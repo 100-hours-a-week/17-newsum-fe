@@ -1,0 +1,125 @@
+#1
+name: Frontend CI/CD
+
+on:
+  pull_request:
+    branches: [ dev ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Install Infisical CLI
+        run: |
+          curl -1sLf 'https://artifacts-cli.infisical.com/setup.deb.sh' | sudo -E bash
+          sudo apt-get update && sudo apt-get install -y infisical
+      
+      - name: Fetch .env from Infisical
+        run: |
+          infisical export \
+            --env=${{ secrets.INFISICAL_ENV_DEV }} \
+            --projectId=${{ secrets.INFISICAL_PROJECT_ID }} \
+            --token=${{ secrets.INFISICAL_DEV_TOKEN }} \
+            --format=dotenv \
+            --domain=${{ secrets.INFISICAL_API_URL }} \
+            > $GITHUB_WORKSPACE/.env
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '23.11.0'
+          cache: 'npm'
+
+      - run: npm ci
+
+      - run: npm run build
+
+      - name: Upload dist
+        uses: actions/upload-artifact@v4
+        with:
+          name: dist
+          path: dist/
+
+  # test:
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #     - uses: actions/checkout@v3
+  #     - uses: actions/setup-node@v3
+  #       with:
+  #         node-version: '18'
+  #         cache: 'npm'
+  #     - run: npm ci
+  #     - run: npm test
+
+  deploy:
+    needs: [build] # test
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download dist
+        uses: actions/download-artifact@v4
+        with:
+          name: dist
+          path: dist/
+
+      - name: Setup SSH
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+          ssh-keyscan -H ${{ secrets.GCP_VM_IP }} >> ~/.ssh/known_hosts
+
+      - name: Deploy build files
+        run: |
+          ssh ${{ secrets.GCP_VM_USER }}@${{ secrets.GCP_VM_IP }} "rm -rf /home/${{ secrets.GCP_VM_USER }}/fe && mkdir -p /home/${{ secrets.GCP_VM_USER }}/fe"
+          scp -r dist/* ${{ secrets.GCP_VM_USER }}@${{ secrets.GCP_VM_IP }}:/home/${{ secrets.GCP_VM_USER }}/fe
+
+      - name: Setup Nginx and Configure Site
+        run: |
+          ssh ${{ secrets.GCP_VM_USER }}@${{ secrets.GCP_VM_IP }} 'sudo apt update && sudo apt install -y nginx && \
+          sudo rm -f /etc/nginx/sites-available/default && \
+          sudo rm -f /etc/nginx/sites-enabled/default && \
+          sudo chmod o+x /home/${{ secrets.GCP_VM_USER }} && \
+          sudo chmod o+x /home/${{ secrets.GCP_VM_USER }}/fe && \
+          echo "server {" | sudo tee /etc/nginx/sites-available/myapp.conf && \
+          echo "  listen 443 ssl;" | sudo tee -a /etc/nginx/sites-available/myapp.conf && \
+          echo "  server_name dev.new-sum.com;" | sudo tee -a /etc/nginx/sites-available/myapp.conf && \
+          echo "" | sudo tee -a /etc/nginx/sites-available/myapp.conf && \
+          echo "  ssl_certificate /etc/letsencrypt/live/dev.new-sum.com/fullchain.pem;" | sudo tee -a /etc/nginx/sites-available/myapp.conf && \
+          echo "  ssl_certificate_key /etc/letsencrypt/live/dev.new-sum.com/privkey.pem;" | sudo tee -a /etc/nginx/sites-available/myapp.conf && \
+          echo "" | sudo tee -a /etc/nginx/sites-available/myapp.conf && \
+          echo "  location /api/ {" | sudo tee -a /etc/nginx/sites-available/myapp.conf && \
+          echo "    proxy_pass http://localhost:8080/api/;" | sudo tee -a /etc/nginx/sites-available/myapp.conf && \
+          echo "    proxy_http_version 1.1;" | sudo tee -a /etc/nginx/sites-available/myapp.conf && \
+          echo "    proxy_set_header Host \$host;" | sudo tee -a /etc/nginx/sites-available/myapp.conf && \
+          echo "    proxy_set_header X-Real-IP \$remote_addr;" | sudo tee -a /etc/nginx/sites-available/myapp.conf && \
+          echo "    proxy_set_header X-Forwarded-For \$proxy_add_x_forwarded_for;" | sudo tee -a /etc/nginx/sites-available/myapp.conf && \
+          echo "    proxy_set_header X-Forwarded-Proto \$scheme;" | sudo tee -a /etc/nginx/sites-available/myapp.conf && \
+          echo "  }" | sudo tee -a /etc/nginx/sites-available/myapp.conf && \
+          echo "" | sudo tee -a /etc/nginx/sites-available/myapp.conf && \
+          echo "  location /oauth2/ {" | sudo tee -a /etc/nginx/sites-available/myapp.conf && \
+          echo "    proxy_pass http://localhost:8080/oauth2/;" | sudo tee -a /etc/nginx/sites-available/myapp.conf && \
+          echo "    proxy_http_version 1.1;" | sudo tee -a /etc/nginx/sites-available/myapp.conf && \
+          echo "    proxy_set_header Host \$host;" | sudo tee -a /etc/nginx/sites-available/myapp.conf && \
+          echo "    proxy_set_header X-Real-IP \$remote_addr;" | sudo tee -a /etc/nginx/sites-available/myapp.conf && \
+          echo "    proxy_set_header X-Forwarded-For \$proxy_add_x_forwarded_for;" | sudo tee -a /etc/nginx/sites-available/myapp.conf && \
+          echo "    proxy_set_header X-Forwarded-Proto \$scheme;" | sudo tee -a /etc/nginx/sites-available/myapp.conf && \
+          echo "  }" | sudo tee -a /etc/nginx/sites-available/myapp.conf && \
+          echo "" | sudo tee -a /etc/nginx/sites-available/myapp.conf && \
+          echo "  location / {" | sudo tee -a /etc/nginx/sites-available/myapp.conf && \
+          echo "    root /home/${{ secrets.GCP_VM_USER }}/fe;" | sudo tee -a /etc/nginx/sites-available/myapp.conf && \
+          echo "    index index.html index.htm;" | sudo tee -a /etc/nginx/sites-available/myapp.conf && \
+          echo "    try_files \$uri \$uri/ /index.html;" | sudo tee -a /etc/nginx/sites-available/myapp.conf && \
+          echo "  }" | sudo tee -a /etc/nginx/sites-available/myapp.conf && \
+          echo "}" | sudo tee -a /etc/nginx/sites-available/myapp.conf && \
+          echo "" | sudo tee -a /etc/nginx/sites-available/myapp.conf && \
+          echo "server {" | sudo tee -a /etc/nginx/sites-available/myapp.conf && \
+          echo "  listen 80;" | sudo tee -a /etc/nginx/sites-available/myapp.conf && \
+          echo "  server_name dev.new-sum.com;" | sudo tee -a /etc/nginx/sites-available/myapp.conf && \
+          echo "" | sudo tee -a /etc/nginx/sites-available/myapp.conf && \
+          echo "  return 301 https://\$host\$request_uri;" | sudo tee -a /etc/nginx/sites-available/myapp.conf && \
+          echo "}" | sudo tee -a /etc/nginx/sites-available/myapp.conf && \
+          sudo ln -sf /etc/nginx/sites-available/myapp.conf /etc/nginx/sites-enabled/myapp.conf && \
+          sudo nginx -t && sudo systemctl restart nginx'
+
