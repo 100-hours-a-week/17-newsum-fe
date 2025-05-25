@@ -50,9 +50,6 @@ function ArticlePage() {
         // 웹툰 기본 정보 조회
         const res1 = await axiosInstance.get(`/api/v1/webtoons/${articleId}`);
         const data1 = res1.data?.data;
-        console.log('웹툰 상세 데이터:', data1);
-        console.log('북마크 상태:', data1?.isBookmarked);
-        console.log('좋아요 상태:', data1?.isLiked);
 
         setSlides(data1?.slides || []);
         setAuthor(data1?.author || null);
@@ -68,7 +65,6 @@ function ArticlePage() {
         // 웹툰 상세 정보 조회 (인증 불필요)
         const res2 = await DefaultAxios.get(`/api/v1/webtoons/${articleId}/details`);
         const data2 = res2.data?.data;
-        console.log('웹툰 상세 정보:', data2);
         setSourceNews(data2?.sourceNews || []);
         setCommentCount(data2?.commentCount || 0);
         setRelatedNews((data2?.relatedNews || []).slice(0, 3));
@@ -87,7 +83,6 @@ function ArticlePage() {
   const handleLike = async () => {
     console.log('ArticlePage - handleLike 호출됨');
     console.log('로그인 상태:', isLoggedIn);
-    console.log('토큰:', localStorage.getItem('accessToken'));
     console.log('현재 좋아요 상태:', { isLiked, likeCount });
 
     if (!isLoggedIn) {
@@ -131,7 +126,6 @@ function ArticlePage() {
       if (res.data?.data !== undefined) {
         const bookmarked = res.data.data;
         setIsBookmarked(bookmarked);
-        console.log('북마크 상태 업데이트:', bookmarked);
       } else {
         console.error('서버 응답에 data가 없습니다:', res.data);
       }
