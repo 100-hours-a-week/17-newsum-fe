@@ -44,10 +44,16 @@ function ArticlePage() {
       setLoading(true);
       setError(null);
       try {
-        const res1 = await DefaultAxios.get(`/api/v1/webtoons/${articleId}`);
+        // 로그인 상태에 따라 적절한 axios 인스턴스 선택
+        const axiosInstance = isLoggedIn ? TokenAxios : DefaultAxios;
+
+        // 웹툰 기본 정보 조회
+        const res1 = await axiosInstance.get(`/api/v1/webtoons/${articleId}`);
         const data1 = res1.data?.data;
-        console.log(`/api/v1/webtoons/${articleId}`)
-        console.log(data1)
+        console.log('웹툰 상세 데이터:', data1);
+        console.log('북마크 상태:', data1?.isBookmarked);
+        console.log('좋아요 상태:', data1?.isLiked);
+
         setSlides(data1?.slides || []);
         setAuthor(data1?.author || null);
         setIsLiked(!!data1?.isLiked);
@@ -57,24 +63,24 @@ function ArticlePage() {
         setLikeCount(data1?.likeCount || 0);
         setViewCount(data1?.viewCount || 0);
         setCreatedAt(data1?.createdAt || '');
-        // 실시간 시청자 수를 임의의 값으로 설정 (API에서 받아오는 경우 수정 필요)
-        setActiveViewers(Math.floor(Math.random() * 30) + 10); // 임시: 10-40명 사이의 랜덤 값
+        setActiveViewers(Math.floor(Math.random() * 30) + 10);
 
+        // 웹툰 상세 정보 조회 (인증 불필요)
         const res2 = await DefaultAxios.get(`/api/v1/webtoons/${articleId}/details`);
         const data2 = res2.data?.data;
-        console.log(`/api/v1/webtoons/${articleId}/details :`)
-        console.log(data2)
+        console.log('웹툰 상세 정보:', data2);
         setSourceNews(data2?.sourceNews || []);
         setCommentCount(data2?.commentCount || 0);
         setRelatedNews((data2?.relatedNews || []).slice(0, 3));
       } catch (err) {
+        console.error('데이터 로딩 중 오류:', err);
         setError(err.message || 'An unknown error occurred');
       } finally {
         setLoading(false);
       }
     };
     fetchData();
-  }, [articleId]);
+  }, [articleId, isLoggedIn]);
 
   const handleBack = () => navigate(-1);
 
@@ -120,10 +126,24 @@ function ArticlePage() {
     }
 
     try {
-      // API 호출 추가 가능
-      setIsBookmarked((prev) => !prev);
+      const res = await TokenAxios.post(`/api/v1/webtoons/${articleId}/favorites`);
+
+      if (res.data?.data !== undefined) {
+        const bookmarked = res.data.data;
+        setIsBookmarked(bookmarked);
+        console.log('북마크 상태 업데이트:', bookmarked);
+      } else {
+        console.error('서버 응답에 data가 없습니다:', res.data);
+      }
     } catch (error) {
       console.error("북마크 처리 중 오류 발생:", error);
+      console.error("에러 상세:", error.response?.data);
+
+      if (error.response?.status === 401) {
+        setLoginModalOpen(true);
+      } else {
+        alert('북마크 처리 중 오류가 발생했습니다.');
+      }
     }
   };
 
