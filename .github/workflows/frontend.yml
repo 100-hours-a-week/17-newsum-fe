@@ -1,13 +1,35 @@
 #1
-name: Frontend CI/CD
+name: Frontend CI/CD (DISABLED - New Pipeline Testing)
 
+# Temporarily disabled while testing new pipeline structure
+# on:
+#   pull_request:
+#     branches: [ dev ]
+
+# Emergency manual trigger only
 on:
-  pull_request:
-    branches: [ dev ]
+  workflow_dispatch:
+    inputs:
+      emergency_run:
+        description: 'Emergency run of legacy pipeline'
+        required: false
+        default: 'false'
+        type: boolean
 
 jobs:
+  emergency-check:
+    runs-on: ubuntu-latest
+    if: github.event.inputs.emergency_run == 'true'
+    steps:
+      - name: Emergency mode warning
+        run: |
+          echo "⚠️ EMERGENCY MODE: Legacy pipeline activated"
+          echo "This should only be used if new pipeline fails"
+          echo "Please switch back to new pipeline ASAP"
+  
   build:
     runs-on: ubuntu-latest
+    if: github.event.inputs.emergency_run == 'true'
     steps:
       - uses: actions/checkout@v3
 
