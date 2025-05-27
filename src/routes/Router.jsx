@@ -14,6 +14,7 @@ import GoogleRedirectHandler from '../pages/GoogleRedirectHandler';
 import KakaoRedirectHandler from '../pages/KakaoRedirectHandler';
 import RecentPage from '../pages/RecentPage';
 import EditProfilePage from '../pages/EditProfilePage';
+import BookmarkPage from '../pages/BookmarkPage';
 
 function Router() {
   return (
@@ -31,6 +32,7 @@ function Router() {
       <Route element={<MainLayout />}>
         <Route path="/" element={<HomePage />} />
         <Route path="/category/:category_id" element={<CategoryPage />} />
+        <Route path="/bookmarks" element={<BookmarkPage />} />
       </Route>
 
       <Route element={<ArticleLayout />}>
