@@ -129,6 +129,9 @@ function BottomNav() {
     } else if (newValue === '/bookmarks') {
       setValue(newValue);
       navigate(newValue);
+    } else if (newValue === '/search') {
+      setValue(newValue);
+      navigate(newValue);
     } else {
       showInfoSwal();
     }

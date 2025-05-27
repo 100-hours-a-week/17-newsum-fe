@@ -15,6 +15,7 @@ import KakaoRedirectHandler from '../pages/KakaoRedirectHandler';
 import RecentPage from '../pages/RecentPage';
 import EditProfilePage from '../pages/EditProfilePage';
 import BookmarkPage from '../pages/BookmarkPage';
+import SearchPage from '../pages/SearchPage';
 
 function Router() {
   return (
@@ -44,6 +45,7 @@ function Router() {
         <Route path="/recent" element={<RecentPage />} />
         <Route path="/users/profile" element={<MyProfilePage />} />
         <Route path="/login" element={<LoginPage />} />
+        <Route path="/search" element={<SearchPage />} />
       </Route>
     </Routes>
   );
