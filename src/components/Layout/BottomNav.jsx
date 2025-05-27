@@ -91,27 +91,27 @@ function BottomNav() {
   const [value, setValue] = useState(location.pathname);
 
   const navItems = [
-    { 
-      label: '홈', 
-      value: '/', 
+    {
+      label: '홈',
+      value: '/',
       icon: <HomeOutlinedIcon />,
       selectedIcon: <HomeIcon />
     },
-    { 
-      label: '검색', 
-      value: '/search', 
+    {
+      label: '검색',
+      value: '/search',
       icon: <SearchOutlinedIcon />,
       selectedIcon: <SearchIcon />
     },
-    { 
-      label: '북마크', 
-      value: '/bookmarks', 
+    {
+      label: '북마크',
+      value: '/bookmarks',
       icon: <BookmarkBorderIcon />,
       selectedIcon: <BookmarkIcon />
     },
-    { 
-      label: 'AI 작가', 
-      value: '/my', 
+    {
+      label: 'AI 작가',
+      value: '/my',
       icon: <PersonOutlineIcon />,
       selectedIcon: <PersonIcon />
     },
@@ -126,6 +126,9 @@ function BottomNav() {
     if (newValue === '/') {
       setValue(newValue);
       navigate(newValue);
+    } else if (newValue === '/bookmarks') {
+      setValue(newValue);
+      navigate(newValue);
     } else if (newValue === '/search') {
       setValue(newValue);
       navigate(newValue);
@@ -138,10 +141,10 @@ function BottomNav() {
     <StyledPaper elevation={0}>
       <StyledBottomNavigation showLabels value={value} onChange={handleChange}>
         {navItems.map((item) => (
-          <BottomNavigationAction 
-            key={item.value} 
-            label={item.label} 
-            value={item.value} 
+          <BottomNavigationAction
+            key={item.value}
+            label={item.label}
+            value={item.value}
             icon={value === item.value ? item.selectedIcon : item.icon}
             sx={{
               '& .MuiBottomNavigationAction-label': {
