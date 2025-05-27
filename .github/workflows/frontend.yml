@@ -120,6 +120,10 @@ jobs:
           echo "    proxy_set_header X-Forwarded-Proto \$scheme;" | sudo tee -a /etc/nginx/sites-available/myapp.conf && \
           echo "  }" | sudo tee -a /etc/nginx/sites-available/myapp.conf && \
           echo "" | sudo tee -a /etc/nginx/sites-available/myapp.conf && \
+          echo "  location /api-docs {" | sudo tee -a /etc/nginx/sites-available/myapp.conf && \
+          echo "    proxy_pass http://localhost:8080/api-docs;" | sudo tee -a /etc/nginx/sites-available/myapp.conf && \
+          echo "    proxy_set_header Host \$host;" | sudo tee -a /etc/nginx/sites-available/myapp.conf && \
+          echo "  }" | sudo tee -a /etc/nginx/sites-available/myapp.conf && \
           echo "  location /swagger-ui/ {" | sudo tee -a /etc/nginx/sites-available/myapp.conf && \
           echo "    proxy_pass http://localhost:8080/swagger-ui/;" | sudo tee -a /etc/nginx/sites-available/myapp.conf && \
           echo "    proxy_http_version 1.1;" | sudo tee -a /etc/nginx/sites-available/myapp.conf && \
