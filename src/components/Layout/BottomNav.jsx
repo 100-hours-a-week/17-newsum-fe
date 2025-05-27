@@ -126,6 +126,9 @@ function BottomNav() {
     if (newValue === '/') {
       setValue(newValue);
       navigate(newValue);
+    } else if (newValue === '/search') {
+      setValue(newValue);
+      navigate(newValue);
     } else {
       showInfoSwal();
     }
