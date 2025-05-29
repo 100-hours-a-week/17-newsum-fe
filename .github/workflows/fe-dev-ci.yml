@@ -1,4 +1,3 @@
-#2
 name: Frontend CI Pipeline
 on:
   pull_request:
