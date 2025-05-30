@@ -1,7 +1,7 @@
-name: Frontend Dev CI Pipeline
+name: Frontend Main CI Pipeline
 on:
   pull_request:
-    branches: [ dev ]
+    branches: [ main ]
     types: [ opened, synchronize, reopened ]
 
 jobs:
@@ -18,9 +18,9 @@ jobs:
       - name: Fetch .env from Infisical
         run: |
           infisical export \
-            --env=${{ secrets.INFISICAL_ENV_DEV }} \
+            --env=${{ secrets.INFISICAL_ENV_PROD }} \
             --projectId=${{ secrets.INFISICAL_PROJECT_ID }} \
-            --token=${{ secrets.INFISICAL_TOKEN_DEV }} \
+            --token=${{ secrets.INFISICAL_TOKEN_PROD }} \
             --format=dotenv \
             --domain=${{ secrets.INFISICAL_API_URL }} \
             > $GITHUB_WORKSPACE/.env
@@ -42,4 +42,4 @@ jobs:
           AWS_REGION: ap-northeast-2
         run: |
           zip -r dist.zip dist
-          aws s3 cp dist.zip s3://${{ secrets.AWS_S3_BUCKET_NAME }}/${{ secrets.AWS_S3_UPLOAD_PREFIX_DEV }}dist.zip
+          aws s3 cp dist.zip s3://${{ secrets.AWS_S3_BUCKET_NAME }}/${{ secrets.AWS_S3_UPLOAD_PREFIX_PROD }}dist.zip

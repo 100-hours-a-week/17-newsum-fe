@@ -1,8 +1,8 @@
 #1
-name: Frontend Dev CD Pipeline
+name: Frontend Main CD Pipeline
 on:
   push:
-    branches: [ dev ]
+    branches: [ main ]
 
 jobs:
   deploy:
@@ -14,34 +14,34 @@ jobs:
     steps:
       - name: Download dist.zip from S3
         run: |
-          aws s3 cp s3://${{ secrets.AWS_S3_BUCKET_NAME }}/${{ secrets.AWS_S3_UPLOAD_PREFIX_DEV }}dist.zip dist.zip
+          aws s3 cp s3://${{ secrets.AWS_S3_BUCKET_NAME }}/${{ secrets.AWS_S3_UPLOAD_PREFIX_PROD }}dist.zip dist.zip
           unzip dist.zip -d dist
 
       - name: Setup SSH
         run: |
           mkdir -p ~/.ssh
-          echo "${{ secrets.SSH_PRIVATE_KEY_DEV }}" > ~/.ssh/id_rsa
+          echo "${{ secrets.SSH_PRIVATE_KEY_PROD }}" > ~/.ssh/id_rsa
           chmod 600 ~/.ssh/id_rsa
-          ssh-keyscan -H ${{ secrets.GCP_VM_DOMAIN_DEV }} >> ~/.ssh/known_hosts
+          ssh-keyscan -H ${{ secrets.GCP_VM_DOMAIN_PROD }} >> ~/.ssh/known_hosts
 
       - name: Deploy build files
         run: |
-          ssh ${{ secrets.GCP_VM_USER_DEV }}@${{ secrets.GCP_VM_DOMAIN_DEV }} "rm -rf /home/${{ secrets.GCP_VM_USER_DEV }}/fe && mkdir -p /home/${{ secrets.GCP_VM_USER_DEV }}/fe"
-          scp -r dist/*/* ${{ secrets.GCP_VM_USER_DEV }}@${{ secrets.GCP_VM_DOMAIN_DEV }}:/home/${{ secrets.GCP_VM_USER_DEV }}/fe
+          ssh ${{ secrets.GCP_VM_USER_PROD }}@${{ secrets.GCP_VM_DOMAIN_PROD }} "rm -rf /home/${{ secrets.GCP_VM_USER_PROD }}/fe && mkdir -p /home/${{ secrets.GCP_VM_USER_PROD }}/fe"
+          scp -r dist/*/* ${{ secrets.GCP_VM_USER_PROD }}@${{ secrets.GCP_VM_DOMAIN_PROD }}:/home/${{ secrets.GCP_VM_USER_PROD }}/fe
 
       - name: Setup Nginx and Configure Site
         run: |
-          ssh ${{ secrets.GCP_VM_USER_DEV }}@${{ secrets.GCP_VM_DOMAIN_DEV }} 'sudo apt update && sudo apt install -y nginx && \
+          ssh ${{ secrets.GCP_VM_USER_PROD }}@${{ secrets.GCP_VM_DOMAIN_PROD }} 'sudo apt update && sudo apt install -y nginx && \
           sudo rm -f /etc/nginx/sites-available/default && \
           sudo rm -f /etc/nginx/sites-enabled/default && \
-          sudo chmod o+x /home/${{ secrets.GCP_VM_USER_DEV }} && \
-          sudo chmod o+x /home/${{ secrets.GCP_VM_USER_DEV }}/fe && \
+          sudo chmod o+x /home/${{ secrets.GCP_VM_USER_PROD }} && \
+          sudo chmod o+x /home/${{ secrets.GCP_VM_USER_PROD }}/fe && \
           echo "server {" | sudo tee /etc/nginx/sites-available/myapp.conf && \
           echo "  listen 443 ssl;" | sudo tee -a /etc/nginx/sites-available/myapp.conf && \
-          echo "  server_name ${{secrets.GCP_VM_DOMAIN_DEV}};" | sudo tee -a /etc/nginx/sites-available/myapp.conf && \
+          echo "  server_name ${{ secrets.GCP_VM_DOMAIN_PROD }};" | sudo tee -a /etc/nginx/sites-available/myapp.conf && \
           echo "" | sudo tee -a /etc/nginx/sites-available/myapp.conf && \
-          echo "  ssl_certificate /etc/letsencrypt/live/${{secrets.GCP_VM_DOMAIN_DEV}}/fullchain.pem;" | sudo tee -a /etc/nginx/sites-available/myapp.conf && \
-          echo "  ssl_certificate_key /etc/letsencrypt/live/${{secrets.GCP_VM_DOMAIN_DEV}}/privkey.pem;" | sudo tee -a /etc/nginx/sites-available/myapp.conf && \
+          echo "  ssl_certificate /etc/letsencrypt/live/${{ secrets.GCP_VM_DOMAIN_PROD }}/fullchain.pem;" | sudo tee -a /etc/nginx/sites-available/myapp.conf && \
+          echo "  ssl_certificate_key /etc/letsencrypt/live/${{ secrets.GCP_VM_DOMAIN_PROD }}/privkey.pem;" | sudo tee -a /etc/nginx/sites-available/myapp.conf && \
           echo "" | sudo tee -a /etc/nginx/sites-available/myapp.conf && \
           echo "  location /api/ {" | sudo tee -a /etc/nginx/sites-available/myapp.conf && \
           echo "    proxy_pass http://localhost:8080/api/;" | sudo tee -a /etc/nginx/sites-available/myapp.conf && \
@@ -66,7 +66,7 @@ jobs:
           echo "  }" | sudo tee -a /etc/nginx/sites-available/myapp.conf && \
           echo "" | sudo tee -a /etc/nginx/sites-available/myapp.conf && \
           echo "  location / {" | sudo tee -a /etc/nginx/sites-available/myapp.conf && \
-          echo "    root /home/${{ secrets.GCP_VM_USER_DEV }}/fe;" | sudo tee -a /etc/nginx/sites-available/myapp.conf && \
+          echo "    root /home/${{ secrets.GCP_VM_USER_PROD }}/fe;" | sudo tee -a /etc/nginx/sites-available/myapp.conf && \
           echo "    index index.html index.htm;" | sudo tee -a /etc/nginx/sites-available/myapp.conf && \
           echo "    try_files \$uri \$uri/ /index.html;" | sudo tee -a /etc/nginx/sites-available/myapp.conf && \
           echo "  }" | sudo tee -a /etc/nginx/sites-available/myapp.conf && \
@@ -74,9 +74,17 @@ jobs:
           echo "" | sudo tee -a /etc/nginx/sites-available/myapp.conf && \
           echo "server {" | sudo tee -a /etc/nginx/sites-available/myapp.conf && \
           echo "  listen 80;" | sudo tee -a /etc/nginx/sites-available/myapp.conf && \
-          echo "  server_name ${{secrets.GCP_VM_DOMAIN_DEV}};" | sudo tee -a /etc/nginx/sites-available/myapp.conf && \
+          echo "  server_name ${{ secrets.GCP_VM_DOMAIN_PROD }};" | sudo tee -a /etc/nginx/sites-available/myapp.conf && \
           echo "" | sudo tee -a /etc/nginx/sites-available/myapp.conf && \
           echo "  return 301 https://\$host\$request_uri;" | sudo tee -a /etc/nginx/sites-available/myapp.conf && \
           echo "}" | sudo tee -a /etc/nginx/sites-available/myapp.conf && \
           sudo ln -sf /etc/nginx/sites-available/myapp.conf /etc/nginx/sites-enabled/myapp.conf && \
           sudo nginx -t && sudo systemctl restart nginx'
+
+      - name: Smoke Test after Deployment
+        run: |
+          STATUS_CODE=$(curl -s -o /dev/null -w "%{http_code}" https://${{ secrets.GCP_VM_DOMAIN_PROD }})
+          if [ "$STATUS_CODE" -ne 200 ]; then
+              echo "Smoke test failed: / returned $STATUS_CODE"
+              exit 1
+          fi
