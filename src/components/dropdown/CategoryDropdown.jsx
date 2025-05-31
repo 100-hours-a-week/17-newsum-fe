@@ -56,7 +56,7 @@ const Overlay = styled(Box)`
   height: 100vh;
   background-color: rgba(0, 0, 0, 0.3);
   z-index: 999;
-  clip-path: polygon(0 60px, 100% 60px, 100% 100%, 0 100%);
+  clip-path: polygon(0 60px, 100% 60px, 100% calc(100% - 56px), 0 calc(100% - 56px));
 
   @media (min-width: 768px) and (max-width: 1024px) {
     max-width: 100%;
