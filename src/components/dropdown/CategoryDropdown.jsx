@@ -46,6 +46,40 @@ const MenuItem = styled(Button)`
   }
 `;
 
+const Overlay = styled(Box)`
+  position: fixed;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 100%;
+  max-width: 430px;
+  height: 100vh;
+  background-color: rgba(0, 0, 0, 0.3);
+  z-index: 999;
+  clip-path: polygon(0 60px, 100% 60px, 100% 100%, 0 100%);
+
+  @media (min-width: 768px) and (max-width: 1024px) {
+    max-width: 100%;
+  }
+
+  @media (max-width: 767px) {
+    max-width: 100%;
+  }
+`;
+
+const HeaderContainer = styled(Box)`
+  position: sticky;
+  top: 0;
+  background-color: white;
+  z-index: 10;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.12);
+  padding: 0 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 44px;
+`;
+
 function CategoryDropdown({ selectedCategory, onCategoryChange }) {
     const [isOpen, setIsOpen] = useState(false);
 
@@ -77,18 +111,7 @@ function CategoryDropdown({ selectedCategory, onCategoryChange }) {
             {isOpen && (
                 <>
                     {/* 배경 오버레이 */}
-                    <Box
-                        sx={{
-                            position: 'fixed',
-                            top: 0,
-                            left: 0,
-                            right: 0,
-                            bottom: 0,
-                            bgcolor: 'rgba(0, 0, 0, 0.3)',
-                            zIndex: 999,
-                        }}
-                        onClick={() => setIsOpen(false)}
-                    />
+                    <Overlay onClick={() => setIsOpen(false)} />
                     {/* 드롭다운 메뉴 */}
                     <DropdownMenu>
                         {Object.values(CATEGORY).map((cat) => (
