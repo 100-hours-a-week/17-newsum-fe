@@ -17,7 +17,7 @@ jobs:
         run: |
           # GitHub 조직에 속한 팀 목록을 가져오기
           teams=$(curl -s -H "Authorization: token ${{ secrets.REVIEW_TOKEN }}" \
-          https://api.github.com/orgs/100-hours-a-week/teams?per_page=100 | jq -r '.[].slug'
+          https://api.github.com/orgs/100-hours-a-week/teams?per_page=100 | jq -r '.[].slug')
           
           echo "Teams: $teams"  # 팀 목록 출력
           
@@ -32,7 +32,7 @@ jobs:
         run: |
           # GitHub 조직에 속한 팀 목록을 가져오기
           teams=$(curl -s -H "Authorization: token ${{ secrets.REVIEW_TOKEN }}" \
-          https://api.github.com/orgs/100-hours-a-week/teams?per_page=100 | jq -r '.[].slug'
+          https://api.github.com/orgs/100-hours-a-week/teams?per_page=100 | jq -r '.[].slug')
           
           echo "Teams: $teams"  # 팀 목록 출력
           
