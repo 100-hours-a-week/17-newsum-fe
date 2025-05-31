@@ -8,37 +8,23 @@ import {
   Alert,
   Container,
   IconButton,
-  Menu,
-  MenuItem,
-  Button,
 } from '@mui/material';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
-import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
 import TokenAxios from '../api/TokenAxios';
 import { useAuth } from '../contexts/AuthContext';
 import { useLocation, useNavigate } from 'react-router-dom';
 import MoveLogin from '../components/modal/MoveLogin';
 import CategoryGrid from '../components/grid/CategoryGrid';
 import { showInfoSwal } from '../components/modal/ShowInfoModal';
+import CategoryDropdown from '../components/dropdown/CategoryDropdown';
 
 function BookmarkPage() {
   const { isLoggedIn } = useAuth();
   const location = useLocation();
   const navigate = useNavigate();
 
-  // "AI작가", "키워드", "웹툰" 세 가지 카테고리를 위한 상수
-  const CATEGORY = {
-    WRITERS: 'AI작가 즐겨찾기',
-    KEYWORDS: '키워드 즐겨찾기',
-    WEBTOONS: '웹툰 즐겨찾기',
-  };
-
-  // 드롭다운 메뉴 오픈 여부 및 anchor 엘리먼트
-  const [anchorEl, setAnchorEl] = useState(null);
-  const openMenu = Boolean(anchorEl);
-
   // 현재 선택된 카테고리 (초기값: 웹툰)
-  const [selectedCategory, setSelectedCategory] = useState(CATEGORY.WEBTOONS);
+  const [selectedCategory, setSelectedCategory] = useState('웹툰 즐겨찾기');
 
   // 각 카테고리별 데이터 상태
   const [writers, setWriters] = useState([]);
@@ -54,7 +40,7 @@ function BookmarkPage() {
   const [errorKeywords, setErrorKeywords] = useState(null);
   const [errorWebtoons, setErrorWebtoons] = useState(null);
 
-  // 페이지네이션 정보 (예시)
+  // 페이지네이션 정보
   const [pageInfoWriters, setPageInfoWriters] = useState(null);
   const [pageInfoKeywords, setPageInfoKeywords] = useState(null);
   const [pageInfoWebtoons, setPageInfoWebtoons] = useState(null);
@@ -66,30 +52,16 @@ function BookmarkPage() {
     navigate(-1);
   };
 
-  // 드롭다운 버튼 클릭 → 메뉴 열림
-  const handleDropdownClick = (event) => {
-    setAnchorEl(event.currentTarget);
-  };
-
-  // 메뉴 항목 클릭 → 카테고리 변경, 메뉴 닫기
-  const handleMenuItemClick = (category) => {
-    if (category === CATEGORY.WRITERS || category === CATEGORY.KEYWORDS) {
+  // 카테고리 변경 핸들러
+  const handleCategoryChange = (category) => {
+    if (category === 'AI작가 즐겨찾기' || category === '키워드 즐겨찾기') {
       showInfoSwal();
     } else {
       setSelectedCategory(category);
     }
-    setAnchorEl(null);
   };
 
-  // 메뉴 밖 클릭 시 닫기
-  const handleMenuClose = () => {
-    setAnchorEl(null);
-  };
-
-  /**
-   * API 호출 함수들
-   * (실제 백엔드 엔드포인트에 맞춰서 URL을 수정하세요)
-   */
+  // API 호출 함수들
   const fetchWriters = useCallback(
     async (cursor = null) => {
       if (!isLoggedIn) {
@@ -195,24 +167,20 @@ function BookmarkPage() {
     [isLoggedIn, webtoons.length]
   );
 
-  /**
-   * selectedCategory 가 바뀔 때마다 해당 카테고리 데이터를 새로 불러옴
-   */
+  // selectedCategory 가 바뀔 때마다 해당 카테고리 데이터를 새로 불러옴
   useEffect(() => {
-    if (selectedCategory === CATEGORY.WRITERS) {
+    if (selectedCategory === 'AI작가 즐겨찾기') {
       fetchWriters();
-    } else if (selectedCategory === CATEGORY.KEYWORDS) {
+    } else if (selectedCategory === '키워드 즐겨찾기') {
       fetchKeywords();
-    } else if (selectedCategory === CATEGORY.WEBTOONS) {
+    } else if (selectedCategory === '웹툰 즐겨찾기') {
       fetchWebtoons();
     }
   }, [selectedCategory, fetchWriters, fetchKeywords, fetchWebtoons]);
 
-  /**
-   * 무한 스크롤: 현재 보여지는 카테고리의 다음 페이지가 있으면 스크롤 끝에서 추가 로드
-   */
+  // 무한 스크롤: 현재 보여지는 카테고리의 다음 페이지가 있으면 스크롤 끝에서 추가 로드
   const handleScroll = useCallback(() => {
-    if (selectedCategory === CATEGORY.WRITERS) {
+    if (selectedCategory === 'AI작가 즐겨찾기') {
       if (loadingWriters || !pageInfoWriters?.hasNext) return;
       const scrollHeight = document.documentElement.scrollHeight;
       const scrollTop = window.scrollY;
@@ -221,7 +189,7 @@ function BookmarkPage() {
         fetchWriters(pageInfoWriters.nextCursor);
       }
     }
-    if (selectedCategory === CATEGORY.KEYWORDS) {
+    if (selectedCategory === '키워드 즐겨찾기') {
       if (loadingKeywords || !pageInfoKeywords?.hasNext) return;
       const scrollHeight = document.documentElement.scrollHeight;
       const scrollTop = window.scrollY;
@@ -230,7 +198,7 @@ function BookmarkPage() {
         fetchKeywords(pageInfoKeywords.nextCursor);
       }
     }
-    if (selectedCategory === CATEGORY.WEBTOONS) {
+    if (selectedCategory === '웹툰 즐겨찾기') {
       if (loadingWebtoons || !pageInfoWebtoons?.hasNext) return;
       const scrollHeight = document.documentElement.scrollHeight;
       const scrollTop = window.scrollY;
@@ -259,9 +227,9 @@ function BookmarkPage() {
 
   // 로딩 스피너: 비어 있는 상태에서 로딩 중인 경우
   if (
-    (selectedCategory === CATEGORY.WRITERS && loadingWriters && writers.length === 0) ||
-    (selectedCategory === CATEGORY.KEYWORDS && loadingKeywords && keywords.length === 0) ||
-    (selectedCategory === CATEGORY.WEBTOONS && loadingWebtoons && webtoons.length === 0)
+    (selectedCategory === 'AI작가 즐겨찾기' && loadingWriters && writers.length === 0) ||
+    (selectedCategory === '키워드 즐겨찾기' && loadingKeywords && keywords.length === 0) ||
+    (selectedCategory === '웹툰 즐겨찾기' && loadingWebtoons && webtoons.length === 0)
   ) {
     return (
       <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>
@@ -272,14 +240,14 @@ function BookmarkPage() {
 
   // 에러 메시지 출력
   if (
-    (selectedCategory === CATEGORY.WRITERS && errorWriters) ||
-    (selectedCategory === CATEGORY.KEYWORDS && errorKeywords) ||
-    (selectedCategory === CATEGORY.WEBTOONS && errorWebtoons)
+    (selectedCategory === 'AI작가 즐겨찾기' && errorWriters) ||
+    (selectedCategory === '키워드 즐겨찾기' && errorKeywords) ||
+    (selectedCategory === '웹툰 즐겨찾기' && errorWebtoons)
   ) {
     const errMsg =
-      selectedCategory === CATEGORY.WRITERS
+      selectedCategory === 'AI작가 즐겨찾기'
         ? errorWriters
-        : selectedCategory === CATEGORY.KEYWORDS
+        : selectedCategory === '키워드 즐겨찾기'
           ? errorKeywords
           : errorWebtoons;
     return (
@@ -291,7 +259,7 @@ function BookmarkPage() {
 
   return (
     <Box sx={{ pb: 7 }}>
-      {/** 상단 헤더: 뒤로 가기 + 제목("즐겨찾기") + 드롭다운 버튼 **/}
+      {/* 상단 헤더: 뒤로 가기 + 제목("즐겨찾기") + 드롭다운 버튼 */}
       <Box
         sx={{
           position: 'sticky',
@@ -319,52 +287,17 @@ function BookmarkPage() {
           <ArrowBackIcon sx={{ fontSize: '1.5rem' }} />
         </IconButton>
 
-        {/* 드롭다운을 여는 버튼: 현재 선택된 카테고리 + 아래 화살표 */}
-        <Button
-          onClick={handleDropdownClick}
-          sx={{
-            ml: 1,
-            flexGrow: 1,
-            textTransform: 'none',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            fontSize: '1rem',
-            fontWeight: 'bold',
-            color: 'text.primary',
-            mt: -0.5,
-          }}
-          endIcon={<ArrowDropDownIcon />}
-        >
-          {selectedCategory}
-        </Button>
+        <CategoryDropdown
+          selectedCategory={selectedCategory}
+          onCategoryChange={handleCategoryChange}
+        />
 
         <Box sx={{ width: 35, height: 35, ml: 1, mt: -0.5 }} />
       </Box>
 
-      {/** 드롭다운 메뉴 **/}
-      <Menu
-        anchorEl={anchorEl}
-        open={openMenu}
-        onClose={handleMenuClose}
-        anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
-        transformOrigin={{ vertical: 'top', horizontal: 'center' }}
-      >
-        {Object.values(CATEGORY).map((cat) => (
-          <MenuItem
-            key={cat}
-            selected={cat === selectedCategory && cat === CATEGORY.WEBTOONS}
-            onClick={() => handleMenuItemClick(cat)}
-            sx={{ minWidth: 200, textAlign: 'center' }}
-          >
-            {cat}
-          </MenuItem>
-        ))}
-      </Menu>
-
-      {/** 선택된 카테고리에 따라 내용을 렌더링 **/}
+      {/* 선택된 카테고리에 따라 내용을 렌더링 */}
       <Container maxWidth="lg" sx={{ overflowX: 'hidden', pt: 2 }}>
-        {selectedCategory === CATEGORY.WRITERS && (
+        {selectedCategory === 'AI작가 즐겨찾기' && (
           <Box sx={{ mb: 2 }}>
             {writers.length === 0 && !loadingWriters ? (
               <Box sx={{ textAlign: 'center', py: 4 }}>
@@ -385,7 +318,7 @@ function BookmarkPage() {
           </Box>
         )}
 
-        {selectedCategory === CATEGORY.KEYWORDS && (
+        {selectedCategory === '키워드 즐겨찾기' && (
           <Box sx={{ mb: 2 }}>
             {keywords.length === 0 && !loadingKeywords ? (
               <Box sx={{ textAlign: 'center', py: 4 }}>
@@ -406,7 +339,7 @@ function BookmarkPage() {
           </Box>
         )}
 
-        {selectedCategory === CATEGORY.WEBTOONS && (
+        {selectedCategory === '웹툰 즐겨찾기' && (
           <Box sx={{ mb: 2 }}>
             {webtoons.length === 0 && !loadingWebtoons ? (
               <Box sx={{ textAlign: 'center', py: 4 }}>
