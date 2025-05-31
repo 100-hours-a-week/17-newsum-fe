@@ -2,7 +2,6 @@ name: Set reviewers on main branch
 
 on:
   pull_request:
-    branches: [ main ]
     types: [opened, synchronize, reopened]
 
 jobs:
@@ -13,20 +12,19 @@ jobs:
 
     steps:
       # feature to dev로 PR 올라왔을 때
-      # - name: feature에서 dev로 PR 올라올 때 FullStack팀으로 리뷰어 설정 
-      #   if: github.base_ref == 'dev' && github.head_ref != 'main'
-      #   run: |
-      #     reviewers=$(curl -s -H "Authorization: token ${{ secrets.REVIEW_TOKEN }}" https://api.github.com/repos/${{ github.repository }}/contributors | jq -r '.[].login')
-      #     echo "Reviewers: $reviewers"
-
-      #     reviewer_array=($reviewers)
-      #     random_index=$(($RANDOM % ${#reviewer_array[@]}))
-      #     selected_reviewer=${reviewer_array[$random_index]}
-      #     echo "Selected reviewer: $selected_reviewer"
-      #     echo "::set-output name=reviewer::$selected_reviewer"
+      - name: feature에서 dev로 PR 올라올 때 FullStack팀으로 리뷰어 설정 
+        if: github.base_ref == 'dev' && github.head_ref != 'main'
+        run: |
+          # GitHub 조직에 속한 팀 목록을 가져오기
+          teams=$(curl -s -H "Authorization: token ${{ secrets.REVIEW_TOKEN }}" \
+          https://api.github.com/orgs/100-hours-a-week/teams?per_page=100 | jq -r '.[].slug')
           
-      #     pr_number=${{ github.event.pull_request.number }}
-      #     curl -s -X POST -H "Authorization: token ${{ secrets.REVIEW_TOKEN }}" -d '{"reviewers":["sungjun-singer"]}' "https://api.github.com/repos/${{ github.repository }}/pulls/$pr_number/requested_reviewers"
+          echo "Teams: $teams"  # 팀 목록 출력
+          
+          # 프론트 팀을 리뷰어로 설정
+          curl -s -X POST -H "Authorization: token ${{ secrets.REVIEW_TOKEN }}" \
+          -d '{"team_reviewers": ["newsum_fe"]}' \
+          https://api.github.com/repos/100-hours-a-week/17-newsum-fe/pulls/${{ github.event.pull_request.number }}/requested_reviewers
 
       # dev to main으로 PR 올라왔을 때
       - name: dev에서 main으로 PR 올라올 때 관리자 팀으로 리뷰어 설정
@@ -34,11 +32,12 @@ jobs:
         run: |
           # GitHub 조직에 속한 팀 목록을 가져오기
           teams=$(curl -s -H "Authorization: token ${{ secrets.REVIEW_TOKEN }}" \
-          https://api.github.com/orgs/100-hours-a-week/teams | jq -r '.[].slug')
+          https://api.github.com/orgs/100-hours-a-week/teams?per_page=100 | jq -r '.[].slug')
           
           echo "Teams: $teams"  # 팀 목록 출력
           
-          # 전체 팀을 리뷰어로 설정
-          curl -X POST -H "Authorization: token ${{ secrets.REVIEW_TOKEN }}" \
-          -d "{\"reviewers\": [\"@100-hours-a-week/NewSum_Admin\"]}" \
-          https://api.github.com/repos/${{ github.repository }}/pulls/${{ github.event.pull_request.number }}/requested_reviewers
+          # 관리자 팀을 리뷰어로 설정
+          curl -s -X POST -H "Authorization: token ${{ secrets.REVIEW_TOKEN }}" \
+          -d '{"team_reviewers": ["newsum_admin"]}' \
+          https://api.github.com/repos/100-hours-a-week/17-newsum-fe/pulls/${{ github.event.pull_request.number }}/requested_reviewers
+
