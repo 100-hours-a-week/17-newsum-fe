@@ -1,4 +1,4 @@
-name: Set reviewers on main branch
+name: Set reviewers based on branch
 
 on:
   pull_request:
@@ -12,15 +12,9 @@ jobs:
 
     steps:
       # feature to dev로 PR 올라왔을 때
-      - name: feature에서 dev로 PR 올라올 때 FullStack팀으로 리뷰어 설정 
+      - name: feature에서 dev로 PR 올라올 때 FE팀으로 리뷰어 설정 
         if: github.base_ref == 'dev' && github.head_ref != 'main'
         run: |
-          # GitHub 조직에 속한 팀 목록을 가져오기
-          teams=$(curl -s -H "Authorization: token ${{ secrets.REVIEW_TOKEN }}" \
-          https://api.github.com/orgs/100-hours-a-week/teams?per_page=100 | jq -r '.[].slug')
-          
-          echo "Teams: $teams"  # 팀 목록 출력
-          
           # 프론트 팀을 리뷰어로 설정
           curl -s -X POST -H "Authorization: token ${{ secrets.REVIEW_TOKEN }}" \
           -d '{"team_reviewers": ["newsum_fe"]}' \
@@ -40,4 +34,3 @@ jobs:
           curl -s -X POST -H "Authorization: token ${{ secrets.REVIEW_TOKEN }}" \
           -d '{"team_reviewers": ["newsum_admin"]}' \
           https://api.github.com/repos/100-hours-a-week/17-newsum-fe/pulls/${{ github.event.pull_request.number }}/requested_reviewers
-
