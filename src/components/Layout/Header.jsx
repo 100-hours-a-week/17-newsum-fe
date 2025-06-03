@@ -126,7 +126,7 @@ function Header() {
 
   const handleNotificationClick = (e) => {
     e.preventDefault();
-    showInfoSwal();
+    navigate('/notifications');
   };
 
   return (
