@@ -10,38 +10,29 @@ import { fetchNotifications, deleteAllNotifications, deleteNotification } from '
 import useSseNotifications from '../utils/sseConnect.jsx';
 
 function formatNotification(noti) {
-  // type, content, createdAt 등에서 표시용 데이터 생성
-  let title = '';
-  let message = '';
-  switch (noti.type) {
+  const type = noti.targetType || noti.type;
+  let link = '';
+  switch (type) {
     case 'TOP3':
-      title = '실시간 TOP3';
-      message = '실시간 뉴스가 변경되었습니다!';
+      link = '/';
       break;
     case 'FAVORITE_KEYWORD':
-      title = noti.content;
-      message = `[${noti.content}] 키워드가 포함된 뉴스가 발매되었습니다!`;
-      break;
     case 'FAVORITE_AI_AUTHOR':
-      title = noti.content;
-      message = `[${noti.content}] 작가의 신작이 발표되었습니다!`;
+      link = `/article/${noti.targetId}`;
       break;
     case 'REPLY':
-      title = '답글이 추가되었습니다!';
-      message = noti.content;
-      break;
     case 'COMMENT_LIKE':
-      title = '인기 댓글 알림';
-      message = '많은 사람들이 댓글에 공감해요!';
+      link = `/article/${noti.targetId}/comments`;
       break;
     default:
-      title = noti.type;
-      message = noti.content;
+      link = '';
   }
   return {
     ...noti,
-    title,
-    message,
+    type,
+    link,
+    title: noti.title,
+    message: noti.content,
     time: noti.createdAt ? noti.createdAt.replace('T', ' ').slice(0, 16) : '',
   };
 }
@@ -56,6 +47,7 @@ function NotificationPage() {
   const navigate = useNavigate();
   // 새 알림 반짝임 해제 타이머 관리
   const newTimerRef = useRef(null);
+  const [connectMsg, setConnectMsg] = useState('');
 
   // 알림 불러오기
   const loadNotifications = useCallback(async (init = false) => {
@@ -93,19 +85,19 @@ function NotificationPage() {
   }, [loading, hasMore, loadNotifications]);
 
   // SSE 알림 수신
-  useSseNotifications((newNoti) => {
-    setNotifications((prev) => {
-      // 중복 방지(원하면 targetId 기준)
-      if (prev.some(n => n.targetId === newNoti.targetId && n.targetType === newNoti.targetType)) return prev;
-      // 새 알림을 맨 위에 추가
-      return [newNoti, ...prev];
-    });
-    // 2초 후 isNew 해제
-    if (newTimerRef.current) clearTimeout(newTimerRef.current);
-    newTimerRef.current = setTimeout(() => {
-      setNotifications((prev) => prev.map(n => ({ ...n, isNew: false })));
-    }, 2000);
-  });
+  useSseNotifications(
+    (newNoti) => {
+      const formatted = formatNotification(newNoti);
+      setNotifications((prev) => {
+        if (prev.some(n => n.targetId === formatted.targetId && n.targetType === formatted.targetType)) return prev;
+        return [formatted, ...prev];
+      });
+      if (newTimerRef.current) clearTimeout(newTimerRef.current);
+      newTimerRef.current = setTimeout(() => {
+        setNotifications((prev) => prev.map(n => ({ ...n, isNew: false })));
+      }, 2000);
+    }
+  );
 
   const handleDeleteAll = async () => {
     try {
@@ -123,6 +115,12 @@ function NotificationPage() {
 
   return (
     <Box sx={{ pb: 7 }}>
+      {connectMsg && (
+        <Box sx={{
+          position: 'sticky', top: 0, zIndex: 2000, bgcolor: '#222', color: '#fff',
+          textAlign: 'center', py: 1, fontWeight: 600, fontSize: 15, borderRadius: 2, mb: 1
+        }}>{connectMsg}</Box>
+      )}
       {/* 커스텀 상단바 - 댓글 CommentHeader와 동일하게 */}
       <Box sx={{
         position: 'sticky',
