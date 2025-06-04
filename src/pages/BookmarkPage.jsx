@@ -8,8 +8,12 @@ import {
   Alert,
   Container,
   IconButton,
+  Slide,
+  Paper,
+  Button,
 } from '@mui/material';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
+import MoreVertIcon from '@mui/icons-material/MoreVert';
 import TokenAxios from '../api/TokenAxios';
 import { useAuth } from '../contexts/AuthContext';
 import { useLocation, useNavigate } from 'react-router-dom';
@@ -17,6 +21,7 @@ import MoveLogin from '../components/modal/MoveLogin';
 import CategoryGrid from '../components/grid/CategoryGrid';
 import { showInfoSwal } from '../components/modal/ShowInfoModal';
 import CategoryDropdown from '../components/dropdown/CategoryDropdown';
+import BookmarkMenu from '../components/bookmark/BookmarkMenu';
 
 function BookmarkPage() {
   const { isLoggedIn } = useAuth();
@@ -46,6 +51,7 @@ function BookmarkPage() {
   const [pageInfoWebtoons, setPageInfoWebtoons] = useState(null);
 
   const [loginModalOpen, setLoginModalOpen] = useState(false);
+  const [menuOpen, setMenuOpen] = useState(false);
 
   // 뒤로 가기 버튼 핸들러
   const handleBack = () => {
@@ -225,6 +231,20 @@ function BookmarkPage() {
     return () => window.removeEventListener('scroll', handleScroll);
   }, [handleScroll]);
 
+  const handleMenuClick = () => {
+    setMenuOpen(!menuOpen);
+  };
+
+  const handleAddBookmark = () => {
+    setMenuOpen(false);
+    // 북마크 추가 로직 구현
+  };
+
+  const handleDeleteBookmark = () => {
+    setMenuOpen(false);
+    // 북마크 삭제 로직 구현
+  };
+
   // 로딩 스피너: 비어 있는 상태에서 로딩 중인 경우
   if (
     (selectedCategory === 'AI작가 즐겨찾기' && loadingWriters && writers.length === 0) ||
@@ -292,8 +312,24 @@ function BookmarkPage() {
           onCategoryChange={handleCategoryChange}
         />
 
-        <Box sx={{ width: 35, height: 35, ml: 1, mt: -0.5 }} />
+        <IconButton
+          onClick={handleMenuClick}
+          sx={{
+            p: 0.5,
+            mt: -0.5,
+            '&:hover': { backgroundColor: 'transparent' },
+          }}
+        >
+          <MoreVertIcon sx={{ fontSize: '1.5rem' }} />
+        </IconButton>
       </Box>
+
+      {/* 하단 메뉴 */}
+      <BookmarkMenu
+        open={menuOpen}
+        onAddClick={handleAddBookmark}
+        onDeleteClick={handleDeleteBookmark}
+      />
 
       {/* 선택된 카테고리에 따라 내용을 렌더링 */}
       <Container maxWidth="lg" sx={{ overflowX: 'hidden', pt: 2 }}>
