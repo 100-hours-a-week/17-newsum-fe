@@ -17,6 +17,7 @@ import TokenAxios from '../api/TokenAxios';
 import { useAuth } from '../contexts/AuthContext';
 import Swal from 'sweetalert2';
 import logoutLogo from '../assets/logout_logo.jpeg';
+import InfoAlertModal from '../components/modal/InfoAlertModal';
 
 const MAX_KEYWORDS = 20;
 
@@ -206,21 +207,12 @@ function KeywordAddPage() {
             <BottomNav />
 
             {/* 중복 키워드 안내 모달 */}
-            <Modal open={duplicateModalOpen} onClose={() => setDuplicateModalOpen(false)}>
-                <Box sx={{ position: 'absolute', top: '40%', left: '50%', transform: 'translate(-50%, -50%)', bgcolor: '#fff', borderRadius: 3, boxShadow: 24, width: 320, height: 320, display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', outline: 'none' }}>
-                    <Box component="img" src={logoutLogo} alt="중복 안내" sx={{ width: 90, height: 90, borderRadius: '50%', objectFit: 'cover', mb: 2 }} />
-                    <Typography sx={{ fontWeight: 600, fontSize: 18, textAlign: 'center' }}>
-                        이미 구독한 키워드입니다!
-                    </Typography>
-                    <Button
-                        onClick={() => setDuplicateModalOpen(false)}
-                        variant="contained"
-                        sx={{ mt: 3, bgcolor: '#111', color: '#fff', borderRadius: 2, fontWeight: 600 }}
-                    >
-                        확인
-                    </Button>
-                </Box>
-            </Modal>
+            <InfoAlertModal
+                open={duplicateModalOpen}
+                onClose={() => setDuplicateModalOpen(false)}
+                message="이미 구독한 키워드입니다!"
+                autoCloseMs={1000}
+            />
         </Box>
     );
 }
