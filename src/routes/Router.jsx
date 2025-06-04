@@ -17,6 +17,7 @@ import EditProfilePage from '../pages/EditProfilePage';
 import BookmarkPage from '../pages/BookmarkPage';
 import SearchPage from '../pages/SearchPage';
 import KeywordBookmarkPage from '../pages/KeywordBookmarkPage';
+import KeywordAddPage from '../pages/KeywordAddPage';
 
 function Router() {
   return (
@@ -48,6 +49,7 @@ function Router() {
         <Route path="/search" element={<SearchPage />} />
         <Route path="/bookmarks" element={<BookmarkPage />} />
         <Route path="/keyword-bookmarks" element={<KeywordBookmarkPage />} />
+        <Route path="/keyword-add" element={<KeywordAddPage />} />
       </Route>
     </Routes>
   );

@@ -30,7 +30,7 @@ function KeywordBookmarkPage() {
 
     const handleAddBookmark = () => {
         setMenuOpen(false);
-        // 북마크 추가 로직 구현
+        navigate('/keyword-add');
     };
 
     const handleDeleteBookmark = () => {

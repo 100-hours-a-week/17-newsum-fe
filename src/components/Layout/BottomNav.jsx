@@ -118,8 +118,16 @@ function BottomNav() {
   ];
 
   useEffect(() => {
-    const currentNavItem = navItems.find(item => location.pathname.startsWith(item.value) && item.value !== '/');
-    setValue(currentNavItem ? currentNavItem.value : (location.pathname === '/' ? '/' : ''));
+    if (
+      location.pathname.startsWith('/bookmarks') ||
+      location.pathname.startsWith('/keyword-bookmarks') ||
+      location.pathname.startsWith('/keyword-add')
+    ) {
+      setValue('/bookmarks');
+    } else {
+      const currentNavItem = navItems.find(item => location.pathname.startsWith(item.value) && item.value !== '/');
+      setValue(currentNavItem ? currentNavItem.value : (location.pathname === '/' ? '/' : ''));
+    }
   }, [location.pathname]);
 
   const handleChange = (event, newValue) => {
