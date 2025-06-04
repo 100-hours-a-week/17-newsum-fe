@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
     Box,
     Typography,
@@ -6,32 +6,68 @@ import {
     IconButton,
     Button,
     InputBase,
-    Divider
+    Divider,
+    Modal
 } from '@mui/material';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import CloseIcon from '@mui/icons-material/Close';
 import { useNavigate } from 'react-router-dom';
 import BottomNav from '../components/Layout/BottomNav';
+import TokenAxios from '../api/TokenAxios';
+import { useAuth } from '../contexts/AuthContext';
+import Swal from 'sweetalert2';
+import logoutLogo from '../assets/logout_logo.jpeg';
 
 const MAX_KEYWORDS = 20;
 
 function KeywordAddPage() {
     const navigate = useNavigate();
-    const [keywords, setKeywords] = useState(['머스크', '엔비디아']);
+    const { isLoggedIn } = useAuth();
+    const [keywords, setKeywords] = useState([]);
     const [input, setInput] = useState('');
+    const [loading, setLoading] = useState(false);
+    const [duplicateModalOpen, setDuplicateModalOpen] = useState(false);
+    const [inputError, setInputError] = useState('');
+
+    useEffect(() => {
+        if (!isLoggedIn) {
+            navigate('/login');
+        }
+    }, [isLoggedIn, navigate]);
 
     const handleBack = () => {
         navigate(-1);
     };
 
     const handleInputChange = (e) => {
-        setInput(e.target.value);
+        let value = e.target.value;
+        if (value.length > 20) {
+            value = value.slice(0, 20);
+        }
+        setInput(value);
     };
 
-    const handleAdd = () => {
-        if (input.trim() && keywords.length < MAX_KEYWORDS) {
-            setKeywords([...keywords, input.trim()]);
-            setInput('');
+    const handleAdd = async () => {
+        if (!input.trim() || keywords.length >= MAX_KEYWORDS || input.length > 20) return;
+        setLoading(true);
+        try {
+            const res = await TokenAxios.post('/api/v1/users/keywords/subscriptions', { keyword: input.trim() });
+            if (res.data?.code === 200) {
+                setKeywords([...keywords, input.trim()]);
+                setInput('');
+            } else {
+                Swal.fire({ icon: 'error', text: res.data?.message || '키워드 추가에 실패했습니다.' });
+            }
+        } catch (err) {
+            if (err.response?.data?.message && err.response.data.message.includes('이미 구독')) {
+                setDuplicateModalOpen(true);
+            } else if (err.response?.data?.message) {
+                Swal.fire({ icon: 'error', text: err.response.data.message });
+            } else {
+                Swal.fire({ icon: 'error', text: '키워드 추가에 실패했습니다.' });
+            }
+        } finally {
+            setLoading(false);
         }
     };
 
@@ -74,7 +110,7 @@ function KeywordAddPage() {
                         flex: 1,
                         textAlign: 'center',
                         fontSize: '1.1rem',
-                        fontWeight: 500,
+                        fontWeight: 700,
                     }}
                 >
                     키워드 추가
@@ -91,9 +127,24 @@ function KeywordAddPage() {
                     <Button
                         variant="outlined"
                         size="small"
-                        sx={{ ml: 'auto', borderRadius: 2, minWidth: 56, height: 32, fontWeight: 500 }}
+                        sx={{
+                            ml: 'auto',
+                            borderRadius: 2,
+                            minWidth: 56,
+                            height: 32,
+                            fontWeight: 500,
+                            borderColor: '#222',
+                            color: '#222',
+                            backgroundColor: '#fff',
+                            transition: 'all 0.2s',
+                            '&:hover': {
+                                bgcolor: '#222',
+                                color: '#fff',
+                                borderColor: '#222',
+                            },
+                        }}
                         onClick={handleAdd}
-                        disabled={!input.trim() || keywords.length >= MAX_KEYWORDS}
+                        disabled={!input.trim() || keywords.length >= MAX_KEYWORDS || loading || input.length > 20}
                     >
                         추가
                     </Button>
@@ -102,7 +153,7 @@ function KeywordAddPage() {
                     sx={{
                         display: 'flex',
                         alignItems: 'center',
-                        mb: 1,
+                        mb: 0,
                         pb: 0.5,
                     }}
                 >
@@ -117,7 +168,12 @@ function KeywordAddPage() {
                         {input.length}/20
                     </Typography>
                 </Box>
-                <Divider sx={{ mb: 1 }} />
+                <Divider sx={{ mb: 0.5 }} />
+                {input.length === 20 && (
+                    <Typography sx={{ color: 'error.main', fontSize: '0.95rem', mb: 1, ml: 0.5 }}>
+                        20자 이상은 불가능합니다!
+                    </Typography>
+                )}
                 {/* 키워드 리스트 */}
                 {keywords.map((kw, idx) => (
                     <Box
@@ -138,6 +194,23 @@ function KeywordAddPage() {
                 ))}
             </Container>
             <BottomNav />
+
+            {/* 중복 키워드 안내 모달 */}
+            <Modal open={duplicateModalOpen} onClose={() => setDuplicateModalOpen(false)}>
+                <Box sx={{ position: 'absolute', top: '40%', left: '50%', transform: 'translate(-50%, -50%)', bgcolor: '#fff', borderRadius: 3, boxShadow: 24, width: 320, height: 320, display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', outline: 'none' }}>
+                    <Box component="img" src={logoutLogo} alt="중복 안내" sx={{ width: 90, height: 90, borderRadius: '50%', objectFit: 'cover', mb: 2 }} />
+                    <Typography sx={{ fontWeight: 600, fontSize: 18, textAlign: 'center' }}>
+                        이미 구독한 키워드입니다!
+                    </Typography>
+                    <Button
+                        onClick={() => setDuplicateModalOpen(false)}
+                        variant="contained"
+                        sx={{ mt: 3, bgcolor: '#111', color: '#fff', borderRadius: 2, fontWeight: 600 }}
+                    >
+                        확인
+                    </Button>
+                </Box>
+            </Modal>
         </Box>
     );
 }
