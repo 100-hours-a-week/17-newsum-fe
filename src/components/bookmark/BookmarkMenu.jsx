@@ -24,7 +24,7 @@ function BookmarkMenu({ open, onAddClick, onDeleteClick }) {
                     borderTopLeftRadius: '16px',
                     borderTopRightRadius: '16px',
                     boxShadow: '0 -4px 20px rgba(0, 0, 0, 0.1)',
-                    maxWidth: '430px',
+                    maxWidth: { xs: '430px', md: '100vw', lg: '430px' },
                     margin: '0 auto',
                 }}
             >
