@@ -47,7 +47,15 @@ function KeywordAddPage() {
         setInput(value);
     };
 
+    const handleInputKeyDown = (e) => {
+        if (e.key === 'Enter') {
+            e.preventDefault();
+            handleAdd();
+        }
+    };
+
     const handleAdd = async () => {
+        if (loading) return;
         if (!input.trim() || keywords.length >= MAX_KEYWORDS || input.length > 20) return;
         setLoading(true);
         try {
@@ -127,6 +135,7 @@ function KeywordAddPage() {
                     <Button
                         variant="outlined"
                         size="small"
+                        type="button"
                         sx={{
                             ml: 'auto',
                             borderRadius: 2,
@@ -161,6 +170,7 @@ function KeywordAddPage() {
                         placeholder="예) 삼성전자"
                         value={input}
                         onChange={handleInputChange}
+                        onKeyDown={handleInputKeyDown}
                         inputProps={{ maxLength: 20 }}
                         sx={{ flex: 1, fontSize: '1rem', color: '#aaa' }}
                     />
