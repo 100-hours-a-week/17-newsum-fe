@@ -57,9 +57,12 @@ function KeywordAddPage() {
 
     const fetchKeywords = async () => {
         try {
-            const res = await TokenAxios.get('/api/v1/users/keywords/subscriptions');
-            setKeywords(res.data.data.keywords || []);
+            const res = await TokenAxios.get('/api/v1/users/keywords');
+            if (res.data?.code === 200) {
+                setKeywords(res.data.data.keywords || []);
+            }
         } catch (e) {
+            console.error('키워드 목록 조회 실패:', e);
             setKeywords([]);
         }
     };
