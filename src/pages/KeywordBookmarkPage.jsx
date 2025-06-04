@@ -10,11 +10,15 @@ import MoreVertIcon from '@mui/icons-material/MoreVert';
 import { useNavigate } from 'react-router-dom';
 import CategoryDropdown from '../components/dropdown/CategoryDropdown';
 import BookmarkMenu from '../components/bookmark/BookmarkMenu';
+import MoveLogin from '../components/modal/MoveLogin';
+import { useAuth } from '../contexts/AuthContext';
 
 function KeywordBookmarkPage() {
     const navigate = useNavigate();
+    const { isLoggedIn } = useAuth();
     const [menuOpen, setMenuOpen] = useState(false);
     const [selectedCategory, setSelectedCategory] = useState('키워드 즐겨찾기');
+    const [loginModalOpen, setLoginModalOpen] = useState(false);
 
     const handleBack = () => {
         navigate(-1);
@@ -30,6 +34,10 @@ function KeywordBookmarkPage() {
 
     const handleAddBookmark = () => {
         setMenuOpen(false);
+        if (!isLoggedIn) {
+            setLoginModalOpen(true);
+            return;
+        }
         navigate('/keyword-add');
     };
 
@@ -91,6 +99,8 @@ function KeywordBookmarkPage() {
                 onAddClick={handleAddBookmark}
                 onDeleteClick={handleDeleteBookmark}
             />
+
+            <MoveLogin open={loginModalOpen} onCancel={() => setLoginModalOpen(false)} from={location.pathname} />
 
             {/* 컨텐츠 영역 */}
             <Container maxWidth="lg" sx={{ overflowX: 'hidden', pt: 2 }}>
