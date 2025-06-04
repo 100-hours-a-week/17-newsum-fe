@@ -1,6 +1,8 @@
 import { useState, useEffect } from 'react';
 import DefaultAxios from '../api/DefaultAxios';
 import TokenAxios from '../api/TokenAxios';
+import { useNotificationStore } from '../store/notificationStore';
+import { useAuth } from '../contexts/AuthContext';
 
 /**
  * 웹툰 데이터를 가져오는 커스텀 훅
@@ -13,6 +15,8 @@ const useWebtoonData = () => {
   const [webtoonsData, setWebtoonsData] = useState({});
   const [top3Data, setTop3Data] = useState({});
   const [recentData, setRecentData] = useState({});
+  const setHasNewNotification = useNotificationStore((state) => state.setHasNewNotification);
+  const { isLoggedIn } = useAuth();
 
   // 카테고리별 웹툰 데이터 가져오기
   const getWebtoons = async () => {
@@ -29,9 +33,13 @@ const useWebtoonData = () => {
   // 상위 3개 웹툰 및 오늘의 뉴스 데이터 가져오기
   const getTop3Data = async () => {
     try {
-      const res = await DefaultAxios.get('/api/v1/webtoons/top');
+      // 로그인 상태에 따라 적절한 axios 인스턴스 선택
+      const axiosInstance = isLoggedIn ? TokenAxios : DefaultAxios;
+      const res = await axiosInstance.get('/api/v1/webtoons/top');
       console.log(res.data);
       setTop3Data(res.data?.data || {});
+      // hasNewNotification 값을 store에 저장
+      setHasNewNotification(res.data?.data?.hasNewNotification || false);
     } catch (err) {
       console.log(err);
       setError(err.message || '상위 웹툰을 불러오는 중 오류가 발생했습니다.');
@@ -67,7 +75,7 @@ const useWebtoonData = () => {
   // 컴포넌트 마운트 시 데이터 로드
   useEffect(() => {
     refreshData();
-  }, []);
+  }, [isLoggedIn]); // isLoggedIn이 변경될 때마다 데이터 새로고침
 
   return {
     loading,

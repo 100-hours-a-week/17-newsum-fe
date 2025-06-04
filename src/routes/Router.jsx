@@ -16,6 +16,10 @@ import RecentPage from '../pages/RecentPage';
 import EditProfilePage from '../pages/EditProfilePage';
 import BookmarkPage from '../pages/BookmarkPage';
 import SearchPage from '../pages/SearchPage';
+import NotificationPage from '../pages/NotificationPage';
+import KeywordBookmarkPage from '../pages/KeywordBookmarkPage';
+import KeywordAddPage from '../pages/KeywordAddPage';
+
 
 function Router() {
   return (
@@ -40,12 +44,15 @@ function Router() {
       </Route>
 
       <Route element={<NoHeaderLayout />}>
+        <Route path="/notifications" element={<NotificationPage />} />
         <Route path="/edit-profile" element={<EditProfilePage />} />
         <Route path="/recent" element={<RecentPage />} />
         <Route path="/users/profile" element={<MyProfilePage />} />
         <Route path="/login" element={<LoginPage />} />
         <Route path="/search" element={<SearchPage />} />
         <Route path="/bookmarks" element={<BookmarkPage />} />
+        <Route path="/keyword-bookmarks" element={<KeywordBookmarkPage />} />
+        <Route path="/keyword-add" element={<KeywordAddPage />} />
       </Route>
     </Routes>
   );

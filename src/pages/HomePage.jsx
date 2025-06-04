@@ -77,11 +77,11 @@ function HomePage() {
           {errorMessage && ( <Alert severity="error" sx={{ my: 1 }}>{errorMessage}</Alert> )}
           
           {/* 최상위 3개 웹툰 캐러셀 섹션 */}
-          {!isLoading && !errorMessage && <Top3ToonsSection topToons={top3Data.topToons} />}
+          {!isLoading && !errorMessage && <Top3ToonsSection topToons={top3Data.top3News} />}
 
           {/* 오늘의 뉴스 섹션 */}
           <TodayNewsSection 
-            todaysNews={top3Data.todaysNews} 
+            todaysNews={top3Data.todayNews} 
             onMoreClick={() => handleMoreClick('/today')} 
           />
 
