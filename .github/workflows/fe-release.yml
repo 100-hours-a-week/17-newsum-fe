@@ -2,12 +2,6 @@ name: Frontend Release Deploy
 
 on:
   push:
-    branches: [ dev ]
-    paths-ignore:
-      - '**/README.md'
-      - '**/.gitignore'
-
-  push:
     tags:
       - 'fe-v*.*.*'
 
