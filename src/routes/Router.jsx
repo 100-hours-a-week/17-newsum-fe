@@ -17,6 +17,9 @@ import EditProfilePage from '../pages/EditProfilePage';
 import BookmarkPage from '../pages/BookmarkPage';
 import SearchPage from '../pages/SearchPage';
 import NotificationPage from '../pages/NotificationPage';
+import KeywordBookmarkPage from '../pages/KeywordBookmarkPage';
+import KeywordAddPage from '../pages/KeywordAddPage';
+
 
 function Router() {
   return (
@@ -34,7 +37,6 @@ function Router() {
       <Route element={<MainLayout />}>
         <Route path="/" element={<HomePage />} />
         <Route path="/category/:category_id" element={<CategoryPage />} />
-        <Route path="/bookmarks" element={<BookmarkPage />} />
       </Route>
 
       <Route element={<ArticleLayout />}>
@@ -48,6 +50,9 @@ function Router() {
         <Route path="/users/profile" element={<MyProfilePage />} />
         <Route path="/login" element={<LoginPage />} />
         <Route path="/search" element={<SearchPage />} />
+        <Route path="/bookmarks" element={<BookmarkPage />} />
+        <Route path="/keyword-bookmarks" element={<KeywordBookmarkPage />} />
+        <Route path="/keyword-add" element={<KeywordAddPage />} />
       </Route>
     </Routes>
   );

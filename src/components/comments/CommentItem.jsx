@@ -68,10 +68,11 @@ function CommentItem({ comment, onDelete, onReply, level, isAuthor = false, like
 
     try {
       const res = await TokenAxios.post(`/api/v1/webtoons/${comment.articleId}/comments/${comment.id}/likes`);
-      if (res.data?.data) {
-        const { liked, likeCount } = res.data.data;
-        setIsLiked(liked);
-        setCurrentLikeCount(likeCount);
+      if (res.data?.code === 200) {
+        // 성공 응답을 받으면 좋아요 상태를 토글
+        setIsLiked(!isLiked);
+        // 좋아요 수 업데이트
+        setCurrentLikeCount(prev => isLiked ? prev - 1 : prev + 1);
       }
     } catch (error) {
       console.error("좋아요 처리 중 오류 발생:", error);
