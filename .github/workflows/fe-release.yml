@@ -2,6 +2,12 @@ name: Frontend Release Deploy
 
 on:
   push:
+    branches: [ dev ]
+    paths-ignore:
+      - '**/README.md'
+      - '**/.gitignore'
+
+  push:
     tags:
       - 'fe-v*.*.*'
 
@@ -44,4 +50,4 @@ jobs:
           AWS_REGION: ap-northeast-2
         run: |
           zip -r dist.zip dist
-          aws s3 cp dist.zip s3://${{ secrets.AWS_S3_BUCKET_NAME }}//release/fe-${{ github.ref_name }}.zip
+          aws s3 cp dist.zip s3://${{ secrets.AWS_S3_BUCKET_NAME }}/${{ secrets.AWS_S3_UPLOAD_PREFIX_PROD }}/release/${{ github.ref_name }}.zip
