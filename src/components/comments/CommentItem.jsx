@@ -5,6 +5,10 @@ import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
 import ChatBubbleOutlineIcon from '@mui/icons-material/ChatBubbleOutline';
 import FavoriteBorderIcon from '@mui/icons-material/FavoriteBorder';
 import SendIcon from '@mui/icons-material/SendRounded';
+import FavoriteIcon from '@mui/icons-material/Favorite';
+import TokenAxios from '../../api/TokenAxios';
+import { useAuth } from '../../contexts/AuthContext';
+import MoveLogin from '../modal/MoveLogin';
 
 function getLines(text, maxLines = 4) {
   // 줄바꿈 기준으로 자르기
@@ -17,10 +21,13 @@ function getLines(text, maxLines = 4) {
 }
 
 function CommentItem({ comment, onDelete, onReply, level, isAuthor = false, likeCount = 0, replyCount = 0, onEdit, isReplying = false }) {
+  const { isLoggedIn } = useAuth();
   const [editMode, setEditMode] = useState(false);
   const [editContent, setEditContent] = useState(comment.content);
   const [anchorEl, setAnchorEl] = useState(null);
-  const [isLiked, setIsLiked] = useState(false);
+  const [isLiked, setIsLiked] = useState(comment.isLiked || false);
+  const [currentLikeCount, setCurrentLikeCount] = useState(likeCount);
+  const [loginModalOpen, setLoginModalOpen] = useState(false);
   const open = Boolean(anchorEl);
   const [expanded, setExpanded] = useState(false);
   const contentRef = useRef(null);
@@ -53,8 +60,28 @@ function CommentItem({ comment, onDelete, onReply, level, isAuthor = false, like
     if (onReply) onReply(comment.id);
   };
 
-  const handleLikeClick = () => {
-    setIsLiked(!isLiked);
+  const handleLikeClick = async () => {
+    if (!isLoggedIn) {
+      setLoginModalOpen(true);
+      return;
+    }
+
+    try {
+      const res = await TokenAxios.post(`/api/v1/webtoons/${comment.articleId}/comments/${comment.id}/likes`);
+      if (res.data?.code === 200) {
+        // 성공 응답을 받으면 좋아요 상태를 토글
+        setIsLiked(!isLiked);
+        // 좋아요 수 업데이트
+        setCurrentLikeCount(prev => isLiked ? prev - 1 : prev + 1);
+      }
+    } catch (error) {
+      console.error("좋아요 처리 중 오류 발생:", error);
+      if (error.response?.status === 401) {
+        setLoginModalOpen(true);
+      } else {
+        alert('좋아요 처리 중 오류가 발생했습니다.');
+      }
+    }
   };
 
   const handleEditClick = () => {
@@ -220,12 +247,16 @@ function CommentItem({ comment, onDelete, onReply, level, isAuthor = false, like
             )}
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mt: 1 }}>
               <IconButton size="small" onClick={handleLikeClick}>
-                <FavoriteBorderIcon fontSize="small" />
-                <Typography variant="caption" sx={{ ml: 0.5 }}>{likeCount}</Typography>
+                {isLiked ? (
+                  <FavoriteIcon fontSize="small" sx={{ color: '#f44336' }} />
+                ) : (
+                  <FavoriteBorderIcon fontSize="small" />
+                )}
+                <Typography variant="caption" sx={{ ml: 0.5 }}>{currentLikeCount}</Typography>
               </IconButton>
               {level === 0 && (
-                <IconButton 
-                  size="small" 
+                <IconButton
+                  size="small"
                   onClick={handleReplyClick}
                 >
                   <ChatBubbleOutlineIcon fontSize="small" />
@@ -259,6 +290,7 @@ function CommentItem({ comment, onDelete, onReply, level, isAuthor = false, like
           <MenuItem onClick={handleDeleteClick}>삭제</MenuItem>
         </Menu>
       )}
+      <MoveLogin open={loginModalOpen} onCancel={() => setLoginModalOpen(false)} from={window.location.pathname} />
     </ListItem>
   );
 }

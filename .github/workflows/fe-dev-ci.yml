@@ -1,0 +1,45 @@
+name: Frontend Dev CI Pipeline
+on:
+  pull_request:
+    branches: [ dev ]
+    types: [ opened, synchronize, reopened ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Install Infisical CLI
+        run: |
+          curl -1sLf 'https://artifacts-cli.infisical.com/setup.deb.sh' | sudo -E bash
+          sudo apt-get update && sudo apt-get install -y infisical
+      
+      - name: Fetch .env from Infisical
+        run: |
+          infisical export \
+            --env=${{ secrets.INFISICAL_ENV_DEV }} \
+            --projectId=${{ secrets.INFISICAL_PROJECT_ID }} \
+            --token=${{ secrets.INFISICAL_TOKEN_DEV }} \
+            --format=dotenv \
+            --domain=${{ secrets.INFISICAL_API_URL }} \
+            > $GITHUB_WORKSPACE/.env
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '23.11.0'
+          cache: 'npm'
+
+      - run: npm ci
+
+      - run: npm run build
+
+      - name: Upload dist to S3
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          AWS_REGION: ap-northeast-2
+        run: |
+          zip -r dist.zip dist
+          aws s3 cp dist.zip s3://${{ secrets.AWS_S3_BUCKET_NAME }}/${{ secrets.AWS_S3_UPLOAD_PREFIX_DEV }}dist.zip

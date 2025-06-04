@@ -4,6 +4,9 @@ import { useParams, useNavigate, Link as RouterLink, useLocation } from 'react-r
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import { useAuth } from '../contexts/AuthContext';
 import CommentItem from '../components/comments/CommentItem';
+import CommentInputForm from '../components/comments/CommentInputForm';
+import CommentHeader from '../components/comments/CommentHeader';
+import LoginRequiredAlert from '../components/comments/LoginRequiredAlert';
 import DefaultAxios from '../api/DefaultAxios';
 import TokenAxios from '../api/TokenAxios';
 import Swal from 'sweetalert2';
@@ -38,7 +41,9 @@ function CommentPage() {
         params.cursor = cursor;
       }
 
-      const res = await DefaultAxios.get(`/api/v1/webtoons/${articleId}/comments`, { params });
+      // 로그인 상태에 따라 적절한 axios 인스턴스 선택
+      const axiosInstance = isLoggedIn ? TokenAxios : DefaultAxios;
+      const res = await axiosInstance.get(`/api/v1/webtoons/${articleId}/comments`, { params });
       console.log(res.data);
       const newComments = res.data?.data?.comments || [];
       const newPageInfo = res.data?.data?.pageInfo || null;
@@ -182,32 +187,10 @@ function CommentPage() {
         }}
       >
         {/* 헤더 */}
-        <Box sx={{
-          position: 'sticky',
-          top: 0,
-          bgcolor: 'white',
-          zIndex: 1,
-          borderBottom: '1px solid rgba(0, 0, 0, 0.12)',
-          px: 2,
-          py: 1,
-          display: 'flex',
-          alignItems: 'center'
-        }}>
-          <IconButton onClick={handleBack} edge="start">
-            <ArrowBackIcon />
-          </IconButton>
-          <Typography
-            variant="subtitle1"
-            component="h1"
-            sx={{
-              ml: 1,
-              flexGrow: 1,
-              fontWeight: 'bold'
-            }}
-          >
-            {showReplies ? `답글 ${replies.length}개` : `댓글 ${commentCount}개`}
-          </Typography>
-        </Box>
+        <CommentHeader
+          title={showReplies ? `답글 ${replies.length}개` : `댓글 ${commentCount}개`}
+          onBack={handleBack}
+        />
 
         {/* 댓글 목록 */}
         <Box
@@ -215,7 +198,7 @@ function CommentPage() {
           onScroll={handleScroll}
           sx={{
             position: 'relative',
-            height: 'calc(100vh - 56px - 72px)', // 헤더, 입력창 높이에 맞게 조정
+            height: 'calc(100vh - 56px - 72px)',
             overflowY: 'auto',
             pb: 2,
           }}
@@ -231,7 +214,7 @@ function CommentPage() {
               {topLevelComments.map(comment => (
                 <Box key={comment.id} sx={{ px: 2 }}>
                   <CommentItem
-                    comment={comment}
+                    comment={{ ...comment, articleId }}
                     onReply={() => handleViewReplies(comment.id)}
                     onDelete={handleCommentDelete}
                     onEdit={handleCommentEdit}
@@ -253,88 +236,14 @@ function CommentPage() {
 
         {/* 댓글 입력 영역 (메인) */}
         {isLoggedIn ? (
-          <Box
-            component="form"
+          <CommentInputForm
+            value={commentText}
+            onChange={(e) => setCommentText(e.target.value)}
             onSubmit={handleCommentSubmit}
-            sx={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: 1,
-              mt: 2,
-              p: 2,
-              borderTop: '1px solid #eee',
-              bgcolor: 'white',
-            }}
-          >
-            <TextField
-              fullWidth
-              size="small"
-              multiline
-              minRows={1}
-              maxRows={3}
-              placeholder="댓글을 입력하세요..."
-              value={commentText}
-              onChange={(e) => setCommentText(e.target.value)}
-              onKeyDown={(e) => {
-                if (e.key === 'Enter' && !e.shiftKey && !e.nativeEvent.isComposing && commentText.trim()) {
-                  e.preventDefault();
-                  handleCommentSubmit(e);
-                }
-              }}
-              sx={{
-                '& .MuiOutlinedInput-root': {
-                  borderRadius: '20px',
-                  background: 'white',
-                  color: 'black',
-                  '& fieldset': {
-                    borderColor: 'black',
-                  },
-                  '&:hover fieldset': {
-                    borderColor: 'black',
-                  },
-                  '&.Mui-focused fieldset': {
-                    borderColor: 'black',
-                  },
-                },
-                input: {
-                  color: 'black',
-                },
-              }}
-            />
-            <Button
-              type="submit"
-              variant="contained"
-              sx={{
-                bgcolor: 'black',
-                color: 'white',
-                borderRadius: '20px',
-                minWidth: 48,
-                height: 40,
-                px: 0,
-                boxShadow: 'none',
-                whiteSpace: 'nowrap',
-                '&:hover': { bgcolor: '#222' }
-              }}
-              disabled={!commentText.trim()}
-            >
-              <SendIcon sx={{ fontSize: 24 }} />
-            </Button>
-          </Box>
+            placeholder="댓글을 입력하세요..."
+          />
         ) : (
-          <Alert severity="info" sx={{ mx: 2, my: 2 }}>
-            <Typography variant="body2" display="inline">
-              댓글을 작성하려면&nbsp;
-            </Typography>
-            <Link
-              component={RouterLink}
-              to={`/login?from=${encodeURIComponent(location.pathname)}`}
-              underline="hover"
-              color="inherit"
-              sx={{ fontWeight: 'bold' }}
-            >
-              로그인이 필요합니다.
-            </Link>
-          </Alert>
+          <LoginRequiredAlert currentPath={location.pathname} />
         )}
       </Box>
 
@@ -355,32 +264,10 @@ function CommentPage() {
         }}
       >
         {/* 헤더 (답글 페이지) */}
-        <Box sx={{
-          position: 'sticky',
-          top: 0,
-          bgcolor: 'white',
-          zIndex: 1,
-          borderBottom: '1px solid rgba(0, 0, 0, 0.12)',
-          px: 2,
-          py: 1,
-          display: 'flex',
-          alignItems: 'center'
-        }}>
-          <IconButton onClick={handleBack} edge="start">
-            <ArrowBackIcon />
-          </IconButton>
-          <Typography
-            variant="subtitle1"
-            component="h1"
-            sx={{
-              ml: 1,
-              flexGrow: 1,
-              fontWeight: 'bold'
-            }}
-          >
-            {`답글 ${replies.length}개`}
-          </Typography>
-        </Box>
+        <CommentHeader
+          title={`답글 ${replies.length}개`}
+          onBack={handleBack}
+        />
 
         {/* 답글 목록 */}
         <Box
@@ -394,7 +281,7 @@ function CommentPage() {
           {selectedComment && (
             <Box sx={{ px: 2 }}>
               <CommentItem
-                comment={selectedComment}
+                comment={{ ...selectedComment, articleId }}
                 level={0}
                 isAuthor={user && selectedComment.author === user.nickname}
                 onDelete={handleCommentDelete}
@@ -408,7 +295,7 @@ function CommentPage() {
           {replies.map(reply => (
             <Box key={reply.id} sx={{ pl: 4, pr: 2 }}>
               <CommentItem
-                comment={reply}
+                comment={{ ...reply, articleId }}
                 level={1}
                 isAuthor={user && reply.author === user.nickname}
                 onDelete={handleCommentDelete}
@@ -421,88 +308,14 @@ function CommentPage() {
 
         {/* 댓글 입력 영역 (답글) */}
         {isLoggedIn ? (
-          <Box
-            component="form"
+          <CommentInputForm
+            value={commentText}
+            onChange={(e) => setCommentText(e.target.value)}
             onSubmit={handleCommentSubmit}
-            sx={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: 1,
-              mt: 2,
-              p: 2,
-              borderTop: '1px solid #eee',
-              bgcolor: 'white',
-            }}
-          >
-            <TextField
-              fullWidth
-              size="small"
-              multiline
-              minRows={1}
-              maxRows={3}
-              placeholder="답글을 입력하세요..."
-              value={commentText}
-              onChange={(e) => setCommentText(e.target.value)}
-              onKeyDown={(e) => {
-                if (e.key === 'Enter' && !e.shiftKey && !e.nativeEvent.isComposing && commentText.trim()) {
-                  e.preventDefault();
-                  handleCommentSubmit(e);
-                }
-              }}
-              sx={{
-                '& .MuiOutlinedInput-root': {
-                  borderRadius: '20px',
-                  background: 'white',
-                  color: 'black',
-                  '& fieldset': {
-                    borderColor: 'black',
-                  },
-                  '&:hover fieldset': {
-                    borderColor: 'black',
-                  },
-                  '&.Mui-focused fieldset': {
-                    borderColor: 'black',
-                  },
-                },
-                input: {
-                  color: 'black',
-                },
-              }}
-            />
-            <Button
-              type="submit"
-              variant="contained"
-              sx={{
-                bgcolor: 'black',
-                color: 'white',
-                borderRadius: '20px',
-                minWidth: 48,
-                height: 40,
-                px: 0,
-                boxShadow: 'none',
-                whiteSpace: 'nowrap',
-                '&:hover': { bgcolor: '#222' }
-              }}
-              disabled={!commentText.trim()}
-            >
-              <SendIcon sx={{ fontSize: 24 }} />
-            </Button>
-          </Box>
+            placeholder="답글을 입력하세요..."
+          />
         ) : (
-          <Alert severity="info" sx={{ mx: 2, my: 2 }}>
-            <Typography variant="body2" display="inline">
-              댓글을 작성하려면&nbsp;
-            </Typography>
-            <Link
-              component={RouterLink}
-              to={`/login?from=${encodeURIComponent(location.pathname)}`}
-              underline="hover"
-              color="inherit"
-              sx={{ fontWeight: 'bold' }}
-            >
-              로그인이 필요합니다.
-            </Link>
-          </Alert>
+          <LoginRequiredAlert currentPath={location.pathname} />
         )}
       </Box>
 

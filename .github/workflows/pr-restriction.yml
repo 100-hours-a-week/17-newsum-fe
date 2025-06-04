@@ -7,14 +7,10 @@ on:
 
 jobs:
   check-pr:
+    if: github.head_ref != 'dev'
     runs-on: ubuntu-latest
-
     steps:
-      - name: 리포지토리 체크아웃
-        uses: actions/checkout@v3
-
-      - name: PR이 dev 브랜치에서 왔는지 확인
+      - name: dev 외 브랜치에서 PR 시 실패 처리
         run: |
-          if [[ "${{ github.head_ref }}" != "dev" ]]; then
-            echo "ERROR: Pull request는 dev 브랜치에서만 가능합니다!" && exit 1;
-          fi
+          echo "ERROR: Pull request는 반드시 dev 브랜치에서만 main 브랜치로 가능합니다!"
+          exit 1
