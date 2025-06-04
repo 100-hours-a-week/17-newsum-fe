@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Box, Button } from '@mui/material';
+import { Box, Button, Slide } from '@mui/material';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
 import styled from '@emotion/styled';
@@ -98,48 +98,50 @@ function CategoryDropdown({ selectedCategory, onCategoryChange }) {
   };
 
   return (
-    <DropdownContainer>
-      <Button
-        onClick={() => setIsOpen(!isOpen)}
-        sx={{
-          textTransform: 'none',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          fontSize: '1rem',
-          fontWeight: 'bold',
-          color: 'text.primary',
-          mt: -0.5,
-          '&:hover': { backgroundColor: 'transparent' },
-        }}
-        endIcon={isOpen ? <KeyboardArrowUpIcon /> : <KeyboardArrowDownIcon />}
-      >
-        {selectedCategory}
-      </Button>
+    <Slide direction="down" in={open} mountOnEnter unmountOnExit>
+      <DropdownContainer>
+        <Button
+          onClick={() => setIsOpen(!isOpen)}
+          sx={{
+            textTransform: 'none',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            fontSize: '1rem',
+            fontWeight: 'bold',
+            color: 'text.primary',
+            mt: -0.5,
+            '&:hover': { backgroundColor: 'transparent' },
+          }}
+          endIcon={isOpen ? <KeyboardArrowUpIcon /> : <KeyboardArrowDownIcon />}
+        >
+          {selectedCategory}
+        </Button>
 
-      {isOpen && (
-        <>
-          {/* 배경 오버레이 */}
-          <Overlay onClick={() => setIsOpen(false)} />
-          {/* 드롭다운 메뉴 */}
-          <DropdownMenu>
-            {Object.values(CATEGORY).map((cat) => (
-              <MenuItem
-                key={cat}
-                onClick={() => handleMenuItemClick(cat)}
-                selected={cat === selectedCategory}
-                sx={{
-                  opacity: cat === CATEGORY.WRITERS ? 0.5 : 1,
-                  cursor: cat === CATEGORY.WRITERS ? 'not-allowed' : 'pointer',
-                }}
-              >
-                {cat}
-              </MenuItem>
-            ))}
-          </DropdownMenu>
-        </>
-      )}
-    </DropdownContainer>
+        {isOpen && (
+          <>
+            {/* 배경 오버레이 */}
+            <Overlay onClick={() => setIsOpen(false)} />
+            {/* 드롭다운 메뉴 */}
+            <DropdownMenu>
+              {Object.values(CATEGORY).map((cat) => (
+                <MenuItem
+                  key={cat}
+                  onClick={() => handleMenuItemClick(cat)}
+                  selected={cat === selectedCategory}
+                  sx={{
+                    opacity: cat === CATEGORY.WRITERS ? 0.5 : 1,
+                    cursor: cat === CATEGORY.WRITERS ? 'not-allowed' : 'pointer',
+                  }}
+                >
+                  {cat}
+                </MenuItem>
+              ))}
+            </DropdownMenu>
+          </>
+        )}
+      </DropdownContainer>
+    </Slide>
   );
 }
 
