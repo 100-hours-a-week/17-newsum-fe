@@ -33,7 +33,6 @@ function Router() {
       <Route element={<MainLayout />}>
         <Route path="/" element={<HomePage />} />
         <Route path="/category/:category_id" element={<CategoryPage />} />
-        <Route path="/bookmarks" element={<BookmarkPage />} />
       </Route>
 
       <Route element={<ArticleLayout />}>
@@ -46,6 +45,7 @@ function Router() {
         <Route path="/users/profile" element={<MyProfilePage />} />
         <Route path="/login" element={<LoginPage />} />
         <Route path="/search" element={<SearchPage />} />
+        <Route path="/bookmarks" element={<BookmarkPage />} />
       </Route>
     </Routes>
   );
