@@ -34,30 +34,30 @@ jobs:
           echo "If this works well, we'll fully activate the new pipeline"
 
   # 코드 품질 검사
-  # lint:
-  #   name: Code Quality Check
-  #   runs-on: ubuntu-latest
-  #   steps:
-  #     - name: Checkout code
-  #       uses: actions/checkout@v4
+  lint:
+    name: Code Quality Check
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
 
-  #     - name: Setup Node.js
-  #       uses: actions/setup-node@v4
-  #       with:
-  #         node-version: '23.11.0'
-  #         cache: 'npm'
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '23.11.0'
+          cache: 'npm'
 
-  #     - name: Install dependencies
-  #       run: npm ci
+      - name: Install dependencies
+        run: npm ci
 
-  #     - name: Run ESLint
-  #       run: npm run lint
+      - name: Run ESLint
+        run: npm run lint
 
   # 빌드 테스트
   build:
     name: Build Test
     runs-on: ubuntu-latest
-    # needs: [lint]
+    needs: [lint]
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -100,7 +100,7 @@ jobs:
     name: Test Result Summary
     runs-on: ubuntu-latest
     if: always()
-    # needs: [test-announcement, lint, build]
+    needs: [test-announcement, lint, build]
     steps:
       - name: Create Test Summary
         run: |
