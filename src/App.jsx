@@ -5,15 +5,15 @@ import ThemeProviderWrapper from './theme/ThemeProvider';
 import BottomNav from './components/Layout/BottomNav'; // Import 확인
 
 function App() {
-  console.log("✅ ENV TEST:", import.meta.env.VITE_RELEASE_TEST_TOKEN);
+  //console.log("✅ ENV TEST:", import.meta.env.VITE_RELEASE_TEST_TOKEN);
 
   return (
     <ThemeProviderWrapper>
       <div>
         <Router />
-        <p style={{ color: 'gray' }}>
+        {/* <p style={{ color: 'gray' }}>
           ENV TOKEN: {import.meta.env.VITE_RELEASE_TEST_TOKEN}
-        </p>
+        </p> */}
       </div>
     </ThemeProviderWrapper>
   );
