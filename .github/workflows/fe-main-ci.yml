@@ -12,7 +12,7 @@ jobs:
 
       - name: Install Infisical CLI from CloudFront
         run: |
-          curl -L https://d7y81c1cme7nq.cloudfront.net/tools/infisical-linux-amd64 -o infisical
+          curl -L https://${{secrets.AWS_CLOUDFRONT_URL}}/tools/infisical-linux-amd64 -o infisical
           chmod +x infisical
           sudo mv infisical /usr/local/bin/infisical
       
