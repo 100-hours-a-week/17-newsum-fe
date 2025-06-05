@@ -12,7 +12,7 @@ on:
   pull_request:
     branches: [ dev ]
     paths:
-      - '.github/workflows/fe-dev-ci-test1.yml'
+      - '.github/workflows/fe-dev-ci-test.yml'
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
