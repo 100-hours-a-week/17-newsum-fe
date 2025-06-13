@@ -55,6 +55,22 @@ function KeywordAddPage() {
         }
     };
 
+    const fetchKeywords = async () => {
+        try {
+            const res = await TokenAxios.get('/api/v1/users/keywords');
+            if (res.data?.code === 200) {
+                setKeywords(res.data.data.keywords || []);
+            }
+        } catch (e) {
+            console.error('키워드 목록 조회 실패:', e);
+            setKeywords([]);
+        }
+    };
+
+    useEffect(() => {
+        fetchKeywords();
+    }, []);
+
     const handleAdd = async () => {
         if (loading) return;
         if (!input.trim() || keywords.length >= MAX_KEYWORDS || input.length > 20) return;
@@ -62,7 +78,7 @@ function KeywordAddPage() {
         try {
             const res = await TokenAxios.post('/api/v1/users/keywords/subscriptions', { keyword: input.trim() });
             if (res.data?.code === 200) {
-                setKeywords([...keywords, input.trim()]);
+                await fetchKeywords();
                 setInput('');
             } else {
                 Swal.fire({ icon: 'error', text: res.data?.message || '키워드 추가에 실패했습니다.' });
@@ -80,8 +96,13 @@ function KeywordAddPage() {
         }
     };
 
-    const handleRemove = (idx) => {
-        setKeywords(keywords.filter((_, i) => i !== idx));
+    const handleRemove = async (idx, keywordId) => {
+        try {
+            await TokenAxios.delete(`/api/v1/users/keywords/${keywordId}`);
+            setKeywords(keywords.filter((_, i) => i !== idx));
+        } catch (e) {
+            Swal.fire({ icon: 'error', text: '키워드 삭제에 실패했습니다.' });
+        }
     };
 
     return (
@@ -188,7 +209,7 @@ function KeywordAddPage() {
                 {/* 키워드 리스트 */}
                 {keywords.map((kw, idx) => (
                     <Box
-                        key={kw + idx}
+                        key={kw.id}
                         sx={{
                             display: 'flex',
                             alignItems: 'center',
@@ -197,8 +218,8 @@ function KeywordAddPage() {
                             fontSize: '1.1rem',
                         }}
                     >
-                        <Typography sx={{ flex: 1, fontSize: '1.1rem', color: '#222' }}>{kw}</Typography>
-                        <IconButton onClick={() => handleRemove(idx)} size="small">
+                        <Typography sx={{ flex: 1, fontSize: '1.1rem', color: '#222' }}>{kw.content}</Typography>
+                        <IconButton onClick={() => handleRemove(idx, kw.id)} size="small">
                             <CloseIcon sx={{ fontSize: 22 }} />
                         </IconButton>
                     </Box>
