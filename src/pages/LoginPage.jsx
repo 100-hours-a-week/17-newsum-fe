@@ -129,7 +129,7 @@ function LoginPage() {
   };
 
   const handleBack = () => {
-    if (from) {
+    if (from && from !== 'null' && from !== 'undefined' && from.trim() !== '') {
       navigate(from);
     } else {
       navigate(-1);
