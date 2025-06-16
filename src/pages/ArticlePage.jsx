@@ -203,7 +203,7 @@ function ArticlePage() {
         />
       </Box>
 
-      <MoveLogin open={loginModalOpen} onCancel={() => setLoginModalOpen(false)} from={location.pathname} />
+      <MoveLogin open={loginModalOpen} onClose={() => setLoginModalOpen(false)} from={location.pathname} />
     </Box>
   );
 }

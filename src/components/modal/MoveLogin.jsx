@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { Box, Typography, Button, Modal } from '@mui/material';
 import logoutLogo from '../../assets/logout_logo.jpeg';
 
-function MoveLogin({ open, onCancel, from }) {
+function MoveLogin({ open, onClose, from }) {
     const navigate = useNavigate();
 
     const handleLogin = () => {
@@ -13,7 +13,7 @@ function MoveLogin({ open, onCancel, from }) {
     return (
         <Modal
             open={open}
-            onClose={onCancel}
+            onClose={onClose}
             aria-labelledby="login-modal-title"
             aria-describedby="login-modal-description"
         >
@@ -73,7 +73,7 @@ function MoveLogin({ open, onCancel, from }) {
                         로그인
                     </Button>
                     <Button
-                        onClick={onCancel}
+                        onClick={onClose}
                         variant="outlined"
                         sx={{
                             borderColor: '#111',

@@ -111,7 +111,7 @@ function BottomNav() {
     },
     {
       label: 'AI 작가',
-      value: '/my',
+      value: '/ai-authors',
       icon: <PersonOutlineIcon />,
       selectedIcon: <PersonIcon />
     },
@@ -138,6 +138,9 @@ function BottomNav() {
       setValue(newValue);
       navigate(newValue);
     } else if (newValue === '/search') {
+      setValue(newValue);
+      navigate(newValue);
+    } else if (newValue === '/ai-authors') {
       setValue(newValue);
       navigate(newValue);
     } else {
