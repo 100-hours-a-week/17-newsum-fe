@@ -42,19 +42,7 @@ function BookmarkMenu({ open, onAddClick, onDeleteClick }) {
                     >
                         북마크 추가하기
                     </Button>
-                    <Button
-                        fullWidth
-                        startIcon={<DeleteIcon />}
-                        onClick={onDeleteClick}
-                        sx={{
-                            justifyContent: 'flex-start',
-                            py: 1.5,
-                            color: 'text.primary',
-                            '&:hover': { backgroundColor: 'rgba(0, 0, 0, 0.04)' },
-                        }}
-                    >
-                        북마크 삭제하기
-                    </Button>
+
                 </Box>
             </Paper>
         </Slide>

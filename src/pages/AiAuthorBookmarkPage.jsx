@@ -7,7 +7,6 @@ import {
     CircularProgress,
 } from '@mui/material';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
-import MoreVertIcon from '@mui/icons-material/MoreVert';
 import { useNavigate } from 'react-router-dom';
 import CategoryDropdown from '../components/dropdown/CategoryDropdown';
 import BookmarkMenu from '../components/bookmark/BookmarkMenu';
@@ -124,21 +123,6 @@ function AiAuthorBookmarkPage() {
                     }}
                 >
                     <ArrowBackIcon sx={{ fontSize: '1.5rem' }} />
-                </IconButton>
-                <IconButton
-                    onClick={handleMenuClick}
-                    sx={{
-                        position: 'absolute',
-                        right: 8,
-                        top: '50%',
-                        transform: 'translateY(-50%)',
-                        zIndex: 2,
-                        p: 2,
-                        mt: 0,
-                        '&:hover': { backgroundColor: 'transparent' },
-                    }}
-                >
-                    <MoreVertIcon sx={{ fontSize: '1.5rem' }} />
                 </IconButton>
             </Box>
 
