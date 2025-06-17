@@ -170,7 +170,7 @@ function KeywordBookmarkPage() {
                 onDeleteClick={handleDeleteBookmark}
             />
 
-            <MoveLogin open={loginModalOpen} onCancel={() => setLoginModalOpen(false)} from={location.pathname} />
+            <MoveLogin open={loginModalOpen} onClose={() => setLoginModalOpen(false)} from={location.pathname} />
 
             {/* 컨텐츠 영역 */}
             <Container maxWidth="lg" sx={{ overflowX: 'hidden', pt: 2 }}>

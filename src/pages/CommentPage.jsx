@@ -222,6 +222,7 @@ function CommentPage() {
                     isAuthor={user && comment.author === user.nickname}
                     replyCount={comment.subComments?.length || 0}
                     likeCount={comment.likeCount || 0}
+                    onOpenLoginModal={() => setLoginModalOpen(true)}
                   />
                 </Box>
               ))}
