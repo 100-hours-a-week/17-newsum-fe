@@ -92,7 +92,7 @@ function CategoryDropdown({ selectedCategory, onCategoryChange }) {
     } else if (category === CATEGORY.WEBTOONS) {
       navigate('/bookmarks');
     } else if (category === CATEGORY.WRITERS) {
-      showInfoSwal();
+      navigate('/ai-author-bookmarks');
     }
     setIsOpen(false);
   };
@@ -130,8 +130,8 @@ function CategoryDropdown({ selectedCategory, onCategoryChange }) {
                   onClick={() => handleMenuItemClick(cat)}
                   selected={cat === selectedCategory}
                   sx={{
-                    opacity: cat === CATEGORY.WRITERS ? 0.5 : 1,
-                    cursor: cat === CATEGORY.WRITERS ? 'not-allowed' : 'pointer',
+                    opacity: 1,
+                    cursor: 'pointer',
                   }}
                 >
                   {cat}
