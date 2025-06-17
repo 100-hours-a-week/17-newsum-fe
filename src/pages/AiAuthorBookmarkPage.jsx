@@ -22,9 +22,8 @@ function AiAuthorBookmarkPage() {
     const [menuOpen, setMenuOpen] = useState(false);
     const [selectedCategory, setSelectedCategory] = useState('AI작가 즐겨찾기');
     const [loginModalOpen, setLoginModalOpen] = useState(false);
-    const [writers, setWriters] = useState([]);
+    const [authors, setAuthors] = useState([]);
     const [loading, setLoading] = useState(false);
-    const [pageInfo, setPageInfo] = useState(null);
 
     const handleBack = () => {
         navigate(-1);
@@ -52,7 +51,7 @@ function AiAuthorBookmarkPage() {
         // 북마크 삭제 로직 구현
     };
 
-    const fetchWriters = useCallback(async (cursor = null) => {
+    const fetchAuthors = useCallback(async () => {
         if (!isLoggedIn) {
             setLoading(false);
             setLoginModalOpen(true);
@@ -61,45 +60,25 @@ function AiAuthorBookmarkPage() {
 
         try {
             setLoading(true);
-            const params = { size: 10 };
-            if (cursor) params.cursor = cursor;
-
-            const response = await TokenAxios.get('/api/v1/users/favorites/writers', { params });
+            const response = await TokenAxios.get('/api/v1/users/favorite/ai-authors');
             const data = response.data?.data;
 
-            if (cursor) {
-                setWriters(prev => [...prev, ...data.writers]);
-            } else {
-                setWriters(data.writers);
-            }
-            setPageInfo(data.pageInfo);
+            setAuthors(data || []);
         } catch (err) {
             console.error('AI작가 즐겨찾기 로딩 오류:', err);
+            setAuthors([]);
         } finally {
             setLoading(false);
         }
     }, [isLoggedIn]);
 
     useEffect(() => {
-        fetchWriters();
-    }, [fetchWriters]);
+        fetchAuthors();
+    }, [fetchAuthors]);
 
-    const handleScroll = useCallback(() => {
-        if (loading || !pageInfo?.hasNext) return;
-
-        const scrollHeight = document.documentElement.scrollHeight;
-        const scrollTop = window.scrollY;
-        const clientHeight = document.documentElement.clientHeight;
-
-        if (scrollHeight - scrollTop - clientHeight < 100) {
-            fetchWriters(pageInfo.nextCursor);
-        }
-    }, [loading, pageInfo, fetchWriters]);
-
-    useEffect(() => {
-        window.addEventListener('scroll', handleScroll);
-        return () => window.removeEventListener('scroll', handleScroll);
-    }, [handleScroll]);
+    const handleAuthorClick = (authorId) => {
+        navigate(`/ai-authors/${authorId}`);
+    };
 
     return (
         <Box sx={{ pb: 7 }}>
@@ -174,25 +153,55 @@ function AiAuthorBookmarkPage() {
 
             {/* 컨텐츠 영역 */}
             <Container maxWidth="lg" sx={{ overflowX: 'hidden', pt: 2 }}>
-                {loading && writers.length === 0 ? (
+                {loading ? (
                     <Box sx={{ display: 'flex', justifyContent: 'center', py: 4 }}>
                         <CircularProgress />
                     </Box>
-                ) : writers.length === 0 ? (
+                ) : authors.length === 0 ? (
                     <Box sx={{ textAlign: 'center', py: 4 }}>
                         <Typography variant="h6" color="text.secondary">
                             AI작가 즐겨찾기 항목이 없습니다.
                         </Typography>
                     </Box>
                 ) : (
-                    <>
-                        <CategoryGrid title="" time="" articles={writers} />
-                        {loading && (
-                            <Box sx={{ display: 'flex', justifyContent: 'center', py: 2 }}>
-                                <CircularProgress size={24} />
+                    authors.map(author => (
+                        <Box key={author.id} sx={{ mb: 4 }}>
+                            <Box
+                                sx={{
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    mb: 2,
+                                    cursor: 'pointer',
+                                    '&:hover': { opacity: 0.8 },
+                                }}
+                                onClick={() => handleAuthorClick(author.id)}
+                            >
+                                <Box
+                                    component="img"
+                                    src={author.profileImageUrl || '/path/to/default/profile.png'}
+                                    alt={author.name}
+                                    sx={{
+                                        width: 40,
+                                        height: 40,
+                                        borderRadius: '50%',
+                                        mr: 1,
+                                        objectFit: 'cover',
+                                        border: '1px solid #eee'
+                                    }}
+                                />
+                                <Typography variant="h6" sx={{ fontWeight: 'bold' }}>
+                                    {author.name}
+                                </Typography>
                             </Box>
-                        )}
-                    </>
+                            {author.webtoons && author.webtoons.length > 0 ? (
+                                <CategoryGrid articles={author.webtoons} />
+                            ) : (
+                                <Typography variant="body2" color="text.secondary" sx={{ ml: 6 }}>
+                                    작성한 웹툰이 없습니다.
+                                </Typography>
+                            )}
+                        </Box>
+                    ))
                 )}
             </Container>
         </Box>
