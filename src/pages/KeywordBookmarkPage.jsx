@@ -111,36 +111,51 @@ function KeywordBookmarkPage() {
                     bgcolor: 'white',
                     zIndex: 10,
                     borderBottom: '1px solid rgba(0, 0, 0, 0.12)',
-                    px: 2,
+                    px: 0,
                     py: 0,
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
+                    width: '100%',
+                    maxWidth: { xs: '430px', md: '100vw' },
+                    margin: '0 auto',
                     height: '44px',
+                    minHeight: '44px',
+                    display: 'flex',
+                    justifyContent: 'center',
+                    alignItems: 'center',
                 }}
             >
-                <IconButton
-                    onClick={handleBack}
-                    edge="start"
-                    sx={{
-                        p: 0.5,
-                        mt: -0.5,
-                        '&:hover': { backgroundColor: 'transparent' },
-                    }}
-                >
-                    <ArrowBackIcon sx={{ fontSize: '1.5rem' }} />
-                </IconButton>
-
+                {/* 드롭다운: 항상 100% */}
                 <CategoryDropdown
                     selectedCategory={selectedCategory}
                     onCategoryChange={handleCategoryChange}
                 />
 
+                {/* 아이콘 버튼들: absolute로 위에 겹치게 */}
+                <IconButton
+                    onClick={handleBack}
+                    edge="start"
+                    sx={{
+                        position: 'absolute',
+                        left: 8,
+                        top: '50%',
+                        transform: 'translateY(-50%)',
+                        zIndex: 2,
+                        p: 2,
+                        mt: 0,
+                        '&:hover': { backgroundColor: 'transparent' },
+                    }}
+                >
+                    <ArrowBackIcon sx={{ fontSize: '1.5rem' }} />
+                </IconButton>
                 <IconButton
                     onClick={handleMenuClick}
                     sx={{
-                        p: 0.5,
-                        mt: -0.5,
+                        position: 'absolute',
+                        right: 8,
+                        top: '50%',
+                        transform: 'translateY(-50%)',
+                        zIndex: 2,
+                        p: 2,
+                        mt: 0,
                         '&:hover': { backgroundColor: 'transparent' },
                     }}
                 >
