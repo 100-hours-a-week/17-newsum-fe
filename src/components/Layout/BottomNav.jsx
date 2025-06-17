@@ -121,7 +121,8 @@ function BottomNav() {
     if (
       location.pathname.startsWith('/bookmarks') ||
       location.pathname.startsWith('/keyword-bookmarks') ||
-      location.pathname.startsWith('/keyword-add')
+      location.pathname.startsWith('/keyword-add') ||
+      location.pathname.startsWith('/ai-author-bookmarks')
     ) {
       setValue('/bookmarks');
     } else {

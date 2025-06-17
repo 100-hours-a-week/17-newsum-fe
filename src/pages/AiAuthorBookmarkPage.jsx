@@ -7,7 +7,6 @@ import {
     CircularProgress,
 } from '@mui/material';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
-import MoreVertIcon from '@mui/icons-material/MoreVert';
 import { useNavigate } from 'react-router-dom';
 import CategoryDropdown from '../components/dropdown/CategoryDropdown';
 import BookmarkMenu from '../components/bookmark/BookmarkMenu';
@@ -16,15 +15,14 @@ import { useAuth } from '../contexts/AuthContext';
 import TokenAxios from '../api/TokenAxios';
 import CategoryGrid from '../components/grid/CategoryGrid';
 
-function KeywordBookmarkPage() {
+function AiAuthorBookmarkPage() {
     const navigate = useNavigate();
     const { isLoggedIn } = useAuth();
     const [menuOpen, setMenuOpen] = useState(false);
-    const [selectedCategory, setSelectedCategory] = useState('키워드 즐겨찾기');
+    const [selectedCategory, setSelectedCategory] = useState('AI작가 즐겨찾기');
     const [loginModalOpen, setLoginModalOpen] = useState(false);
-    const [webtoons, setWebtoons] = useState([]);
+    const [authors, setAuthors] = useState([]);
     const [loading, setLoading] = useState(false);
-    const [pageInfo, setPageInfo] = useState(null);
 
     const handleBack = () => {
         navigate(-1);
@@ -44,7 +42,7 @@ function KeywordBookmarkPage() {
             setLoginModalOpen(true);
             return;
         }
-        navigate('/keyword-add');
+        navigate('/ai-authors');
     };
 
     const handleDeleteBookmark = () => {
@@ -52,7 +50,7 @@ function KeywordBookmarkPage() {
         // 북마크 삭제 로직 구현
     };
 
-    const fetchWebtoons = useCallback(async (cursor = null) => {
+    const fetchAuthors = useCallback(async () => {
         if (!isLoggedIn) {
             setLoading(false);
             setLoginModalOpen(true);
@@ -61,45 +59,25 @@ function KeywordBookmarkPage() {
 
         try {
             setLoading(true);
-            const params = { size: 10 };
-            if (cursor) params.cursor = cursor;
-
-            const response = await TokenAxios.get('/api/v1/users/keywords/webtoons', { params });
+            const response = await TokenAxios.get('/api/v1/users/favorite/ai-authors');
             const data = response.data?.data;
 
-            if (cursor) {
-                setWebtoons(prev => [...prev, ...data.webtoons]);
-            } else {
-                setWebtoons(data.webtoons);
-            }
-            setPageInfo(data.pageInfo);
+            setAuthors(data || []);
         } catch (err) {
-            console.error('키워드 기반 웹툰 목록 조회 실패:', err);
+            console.error('AI작가 즐겨찾기 로딩 오류:', err);
+            setAuthors([]);
         } finally {
             setLoading(false);
         }
     }, [isLoggedIn]);
 
     useEffect(() => {
-        fetchWebtoons();
-    }, [fetchWebtoons]);
+        fetchAuthors();
+    }, [fetchAuthors]);
 
-    const handleScroll = useCallback(() => {
-        if (loading || !pageInfo?.hasNext) return;
-
-        const scrollHeight = document.documentElement.scrollHeight;
-        const scrollTop = window.scrollY;
-        const clientHeight = document.documentElement.clientHeight;
-
-        if (scrollHeight - scrollTop - clientHeight < 100) {
-            fetchWebtoons(pageInfo.nextCursor);
-        }
-    }, [loading, pageInfo, fetchWebtoons]);
-
-    useEffect(() => {
-        window.addEventListener('scroll', handleScroll);
-        return () => window.removeEventListener('scroll', handleScroll);
-    }, [handleScroll]);
+    const handleAuthorClick = (authorId) => {
+        navigate(`/ai-authors/${authorId}`);
+    };
 
     return (
         <Box sx={{ pb: 7 }}>
@@ -146,21 +124,6 @@ function KeywordBookmarkPage() {
                 >
                     <ArrowBackIcon sx={{ fontSize: '1.5rem' }} />
                 </IconButton>
-                <IconButton
-                    onClick={handleMenuClick}
-                    sx={{
-                        position: 'absolute',
-                        right: 8,
-                        top: '50%',
-                        transform: 'translateY(-50%)',
-                        zIndex: 2,
-                        p: 2,
-                        mt: 0,
-                        '&:hover': { backgroundColor: 'transparent' },
-                    }}
-                >
-                    <MoreVertIcon sx={{ fontSize: '1.5rem' }} />
-                </IconButton>
             </Box>
 
             {/* 하단 메뉴 */}
@@ -174,29 +137,59 @@ function KeywordBookmarkPage() {
 
             {/* 컨텐츠 영역 */}
             <Container maxWidth="lg" sx={{ overflowX: 'hidden', pt: 2 }}>
-                {loading && webtoons.length === 0 ? (
+                {loading ? (
                     <Box sx={{ display: 'flex', justifyContent: 'center', py: 4 }}>
                         <CircularProgress />
                     </Box>
-                ) : webtoons.length === 0 ? (
+                ) : authors.length === 0 ? (
                     <Box sx={{ textAlign: 'center', py: 4 }}>
                         <Typography variant="h6" color="text.secondary">
-                            키워드 즐겨찾기 항목이 없습니다.
+                            AI작가 즐겨찾기 항목이 없습니다.
                         </Typography>
                     </Box>
                 ) : (
-                    <>
-                        <CategoryGrid title="" time="" articles={webtoons} />
-                        {loading && (
-                            <Box sx={{ display: 'flex', justifyContent: 'center', py: 2 }}>
-                                <CircularProgress size={24} />
+                    authors.map(author => (
+                        <Box key={author.id} sx={{ mb: 4 }}>
+                            <Box
+                                sx={{
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    mb: 2,
+                                    cursor: 'pointer',
+                                    '&:hover': { opacity: 0.8 },
+                                }}
+                                onClick={() => handleAuthorClick(author.id)}
+                            >
+                                <Box
+                                    component="img"
+                                    src={author.profileImageUrl || '/path/to/default/profile.png'}
+                                    alt={author.name}
+                                    sx={{
+                                        width: 40,
+                                        height: 40,
+                                        borderRadius: '50%',
+                                        mr: 1,
+                                        objectFit: 'cover',
+                                        border: '1px solid #eee'
+                                    }}
+                                />
+                                <Typography variant="h6" sx={{ fontWeight: 'bold' }}>
+                                    {author.name}
+                                </Typography>
                             </Box>
-                        )}
-                    </>
+                            {author.webtoons && author.webtoons.length > 0 ? (
+                                <CategoryGrid articles={author.webtoons} />
+                            ) : (
+                                <Typography variant="body2" color="text.secondary" sx={{ ml: 6 }}>
+                                    작성한 웹툰이 없습니다.
+                                </Typography>
+                            )}
+                        </Box>
+                    ))
                 )}
             </Container>
         </Box>
     );
 }
 
-export default KeywordBookmarkPage; 
+export default AiAuthorBookmarkPage; 

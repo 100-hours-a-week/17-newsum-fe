@@ -20,14 +20,13 @@ function getLines(text, maxLines = 4) {
   };
 }
 
-function CommentItem({ comment, onDelete, onReply, level, isAuthor = false, likeCount = 0, replyCount = 0, onEdit, isReplying = false }) {
+function CommentItem({ comment, onDelete, onReply, level, isAuthor = false, likeCount = 0, replyCount = 0, onEdit, isReplying = false, onOpenLoginModal }) {
   const { isLoggedIn } = useAuth();
   const [editMode, setEditMode] = useState(false);
   const [editContent, setEditContent] = useState(comment.content);
   const [anchorEl, setAnchorEl] = useState(null);
   const [isLiked, setIsLiked] = useState(comment.isLiked || false);
   const [currentLikeCount, setCurrentLikeCount] = useState(likeCount);
-  const [loginModalOpen, setLoginModalOpen] = useState(false);
   const open = Boolean(anchorEl);
   const [expanded, setExpanded] = useState(false);
   const contentRef = useRef(null);
@@ -62,7 +61,7 @@ function CommentItem({ comment, onDelete, onReply, level, isAuthor = false, like
 
   const handleLikeClick = async () => {
     if (!isLoggedIn) {
-      setLoginModalOpen(true);
+      onOpenLoginModal();
       return;
     }
 
@@ -77,7 +76,7 @@ function CommentItem({ comment, onDelete, onReply, level, isAuthor = false, like
     } catch (error) {
       console.error("좋아요 처리 중 오류 발생:", error);
       if (error.response?.status === 401) {
-        setLoginModalOpen(true);
+        onOpenLoginModal();
       } else {
         alert('좋아요 처리 중 오류가 발생했습니다.');
       }
@@ -290,7 +289,6 @@ function CommentItem({ comment, onDelete, onReply, level, isAuthor = false, like
           <MenuItem onClick={handleDeleteClick}>삭제</MenuItem>
         </Menu>
       )}
-      <MoveLogin open={loginModalOpen} onCancel={() => setLoginModalOpen(false)} from={window.location.pathname} />
     </ListItem>
   );
 }
