@@ -34,7 +34,7 @@ const MenuItem = styled(Button)`
   width: 100%;
   padding: 16px;
   text-align: center;
-  color: ${props => props.theme.palette.text.primary};
+  color: black;
   font-weight: 500;
   border-bottom: 1px solid rgba(0, 0, 0, 0.08);
   background-color: ${props => props.selected ? 'rgba(0, 0, 0, 0.04)' : 'transparent'};
@@ -132,6 +132,7 @@ function CategoryDropdown({ selectedCategory, onCategoryChange }) {
                   sx={{
                     opacity: 1,
                     cursor: 'pointer',
+                    color: 'black',
                   }}
                 >
                   {cat}
