@@ -1,82 +1,69 @@
-#1
-name: Frontend Dev CD Pipeline
+name: Deploy React App to Dev S3
+
 on:
   push:
-    branches: [ dev ]
+    branches: [dev]
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
-    env:  # 여기에서 설정 시 전체 step에 자동 적용됨
-      AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-      AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-      AWS_REGION: ap-northeast-2
+    env:
+      AWS_REGION: ${{secrets.AWS_REGION}}     # AWS CLI 기본 리전
+
     steps:
-      - name: Download dist.zip from S3
-        run: |
-          aws s3 cp s3://${{ secrets.AWS_S3_BUCKET_NAME }}/${{ secrets.AWS_S3_UPLOAD_PREFIX_DEV }}dist.zip dist.zip
-          unzip dist.zip -d dist
+    # 1) 소스 체크아웃
+    - name: Checkout Code
+      uses: actions/checkout@v3
 
-      - name: Setup SSH
-        run: |
-          mkdir -p ~/.ssh
-          echo "${{ secrets.SSH_PRIVATE_KEY_DEV }}" > ~/.ssh/id_rsa
-          chmod 600 ~/.ssh/id_rsa
-          ssh-keyscan -H ${{ secrets.GCP_VM_DOMAIN_DEV }} >> ~/.ssh/known_hosts
+    # 2) Node.js 설치
+    - name: Setup Node
+      uses: actions/setup-node@v3
+      with:
+        node-version: '23.11.0'      # 프로젝트 버전에 맞춰 변경
 
-      - name: Deploy build files
-        run: |
-          ssh ${{ secrets.GCP_VM_USER_DEV }}@${{ secrets.GCP_VM_DOMAIN_DEV }} "rm -rf /home/${{ secrets.GCP_VM_USER_DEV }}/fe && mkdir -p /home/${{ secrets.GCP_VM_USER_DEV }}/fe"
-          scp -r dist/*/* ${{ secrets.GCP_VM_USER_DEV }}@${{ secrets.GCP_VM_DOMAIN_DEV }}:/home/${{ secrets.GCP_VM_USER_DEV }}/fe
+    # 3) Infisical CLI로 .env 생성
+    - name: Fetch environment variables from Infisical
+      env:
+        INFISICAL_ENV:           ${{ secrets.INFISICAL_ENV_DEV }}
+        INFISICAL_PROJECT_ID:    ${{ secrets.INFISICAL_PROJECT_ID }}
+        INFISICAL_TOKEN:         ${{ secrets.INFISICAL_TOKEN_DEV }}
+        INFISICAL_API_URL:       ${{ secrets.INFISICAL_API_URL }}
+        INFISICAL_CLOUDFRONT:    ${{ secrets.AWS_CLOUDFRONT_URL }}
+      run: |
+        echo "⬇️ Downloading Infisical CLI..."
+        curl -Ls https://${INFISICAL_CLOUDFRONT}/tools/infisical-linux-amd64 -o infisical
+        chmod +x infisical
+        echo "🔐 Exporting secrets to .env..."
+        ./infisical export \
+          --env=$INFISICAL_ENV \
+          --projectId=$INFISICAL_PROJECT_ID \
+          --token=$INFISICAL_TOKEN \
+          --format=dotenv \
+          --domain=$INFISICAL_API_URL > .env
 
-      - name: Setup Nginx and Configure Site
-        run: |
-          ssh ${{ secrets.GCP_VM_USER_DEV }}@${{ secrets.GCP_VM_DOMAIN_DEV }} 'sudo apt update && sudo apt install -y nginx && \
-          sudo rm -f /etc/nginx/sites-available/default && \
-          sudo rm -f /etc/nginx/sites-enabled/default && \
-          sudo chmod o+x /home/${{ secrets.GCP_VM_USER_DEV }} && \
-          sudo chmod o+x /home/${{ secrets.GCP_VM_USER_DEV }}/fe && \
-          echo "server {" | sudo tee /etc/nginx/sites-available/myapp.conf && \
-          echo "  listen 443 ssl;" | sudo tee -a /etc/nginx/sites-available/myapp.conf && \
-          echo "  server_name ${{secrets.GCP_VM_DOMAIN_DEV}};" | sudo tee -a /etc/nginx/sites-available/myapp.conf && \
-          echo "" | sudo tee -a /etc/nginx/sites-available/myapp.conf && \
-          echo "  ssl_certificate /etc/letsencrypt/live/${{secrets.GCP_VM_DOMAIN_DEV}}/fullchain.pem;" | sudo tee -a /etc/nginx/sites-available/myapp.conf && \
-          echo "  ssl_certificate_key /etc/letsencrypt/live/${{secrets.GCP_VM_DOMAIN_DEV}}/privkey.pem;" | sudo tee -a /etc/nginx/sites-available/myapp.conf && \
-          echo "" | sudo tee -a /etc/nginx/sites-available/myapp.conf && \
-          echo "  location /api/ {" | sudo tee -a /etc/nginx/sites-available/myapp.conf && \
-          echo "    proxy_pass http://localhost:8080/api/;" | sudo tee -a /etc/nginx/sites-available/myapp.conf && \
-          echo "    proxy_http_version 1.1;" | sudo tee -a /etc/nginx/sites-available/myapp.conf && \
-          echo "    proxy_set_header Host \$host;" | sudo tee -a /etc/nginx/sites-available/myapp.conf && \
-          echo "    proxy_set_header X-Real-IP \$remote_addr;" | sudo tee -a /etc/nginx/sites-available/myapp.conf && \
-          echo "    proxy_set_header X-Forwarded-For \$proxy_add_x_forwarded_for;" | sudo tee -a /etc/nginx/sites-available/myapp.conf && \
-          echo "    proxy_set_header X-Forwarded-Proto \$scheme;" | sudo tee -a /etc/nginx/sites-available/myapp.conf && \
-          echo "  }" | sudo tee -a /etc/nginx/sites-available/myapp.conf && \
-          echo "" | sudo tee -a /etc/nginx/sites-available/myapp.conf && \
-          echo "  location /api-docs {" | sudo tee -a /etc/nginx/sites-available/myapp.conf && \
-          echo "    proxy_pass http://localhost:8080/api-docs;" | sudo tee -a /etc/nginx/sites-available/myapp.conf && \
-          echo "    proxy_set_header Host \$host;" | sudo tee -a /etc/nginx/sites-available/myapp.conf && \
-          echo "  }" | sudo tee -a /etc/nginx/sites-available/myapp.conf && \
-          echo "  location /swagger-ui/ {" | sudo tee -a /etc/nginx/sites-available/myapp.conf && \
-          echo "    proxy_pass http://localhost:8080/swagger-ui/;" | sudo tee -a /etc/nginx/sites-available/myapp.conf && \
-          echo "    proxy_http_version 1.1;" | sudo tee -a /etc/nginx/sites-available/myapp.conf && \
-          echo "    proxy_set_header Host \$host;" | sudo tee -a /etc/nginx/sites-available/myapp.conf && \
-          echo "    proxy_set_header X-Real-IP \$remote_addr;" | sudo tee -a /etc/nginx/sites-available/myapp.conf && \
-          echo "    proxy_set_header X-Forwarded-For \$proxy_add_x_forwarded_for;" | sudo tee -a /etc/nginx/sites-available/myapp.conf && \
-          echo "    proxy_set_header X-Forwarded-Proto \$scheme;" | sudo tee -a /etc/nginx/sites-available/myapp.conf && \
-          echo "  }" | sudo tee -a /etc/nginx/sites-available/myapp.conf && \
-          echo "" | sudo tee -a /etc/nginx/sites-available/myapp.conf && \
-          echo "  location / {" | sudo tee -a /etc/nginx/sites-available/myapp.conf && \
-          echo "    root /home/${{ secrets.GCP_VM_USER_DEV }}/fe;" | sudo tee -a /etc/nginx/sites-available/myapp.conf && \
-          echo "    index index.html index.htm;" | sudo tee -a /etc/nginx/sites-available/myapp.conf && \
-          echo "    try_files \$uri \$uri/ /index.html;" | sudo tee -a /etc/nginx/sites-available/myapp.conf && \
-          echo "  }" | sudo tee -a /etc/nginx/sites-available/myapp.conf && \
-          echo "}" | sudo tee -a /etc/nginx/sites-available/myapp.conf && \
-          echo "" | sudo tee -a /etc/nginx/sites-available/myapp.conf && \
-          echo "server {" | sudo tee -a /etc/nginx/sites-available/myapp.conf && \
-          echo "  listen 80;" | sudo tee -a /etc/nginx/sites-available/myapp.conf && \
-          echo "  server_name ${{secrets.GCP_VM_DOMAIN_DEV}};" | sudo tee -a /etc/nginx/sites-available/myapp.conf && \
-          echo "" | sudo tee -a /etc/nginx/sites-available/myapp.conf && \
-          echo "  return 301 https://\$host\$request_uri;" | sudo tee -a /etc/nginx/sites-available/myapp.conf && \
-          echo "}" | sudo tee -a /etc/nginx/sites-available/myapp.conf && \
-          sudo ln -sf /etc/nginx/sites-available/myapp.conf /etc/nginx/sites-enabled/myapp.conf && \
-          sudo nginx -t && sudo systemctl restart nginx'
+    # 4) 의존성 설치
+    - name: Install Dependencies
+      run: npm ci                # npm install 대신 ci 사용 권장
+
+    # 5) 빌드 (env 로드 완료 상태)
+    - name: Build React App
+      run: npm run build         # 빌드 결과물은 dist/ 에 생성된다고 가정
+
+    # 6) AWS 자격 증명 설정
+    - name: Configure AWS Credentials
+      uses: aws-actions/configure-aws-credentials@v2
+      with:
+        aws-access-key-id:     ${{ secrets.AWS_ACCESS_KEY_ID_S3_FE }}
+        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY_S3_FE }}
+        aws-region:            ${{ env.AWS_REGION }}
+
+    # 7) S3 동기화 (dist/ 내부만)
+    - name: Sync to S3
+      run: aws s3 sync dist/ s3://${{ secrets.AWS_S3_BUCKET_NAME_DEV }} --delete
+
+    # 8) CloudFront 캐시 무효화
+    - name: Invalidate CloudFront Cache
+      run: |
+        aws cloudfront create-invalidation \
+          --distribution-id ${{ secrets.AWS_CLOUDFRONT_DISTRIBUTION_ID_FE_DEV }} \
+          --paths "/*"
