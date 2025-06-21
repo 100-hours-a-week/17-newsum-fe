@@ -2,7 +2,7 @@ name: Deploy React App to S3
 
 on:
   push:
-    branches: [main]          # 필요 시 main 등으로 교체
+    branches: [dev]          # 필요 시 main 등으로 교체
 
 jobs:
   deploy:
@@ -24,9 +24,9 @@ jobs:
     # 3) Infisical CLI로 .env 생성
     - name: Fetch environment variables from Infisical
       env:
-        INFISICAL_ENV:           ${{ secrets.INFISICAL_ENV_PROD }}
+        INFISICAL_ENV:           ${{ secrets.INFISICAL_ENV_DEV }}
         INFISICAL_PROJECT_ID:    ${{ secrets.INFISICAL_PROJECT_ID }}
-        INFISICAL_TOKEN:         ${{ secrets.INFISICAL_TOKEN_PROD }}
+        INFISICAL_TOKEN:         ${{ secrets.INFISICAL_TOKEN_DEV }}
         INFISICAL_API_URL:       ${{ secrets.INFISICAL_API_URL }}
         INFISICAL_CLOUDFRONT:    ${{ secrets.AWS_CLOUDFRONT_URL }}
       run: |
@@ -60,11 +60,11 @@ jobs:
 
     # 7) S3 동기화 (dist/ 내부만)
     - name: Sync to S3
-      run: aws s3 sync dist/ s3://${{ secrets.S3_BUCKET_NAME_FE }} --delete
+      run: aws s3 sync dist/ s3://${{ secrets.S3_BUCKET_NAME_FE_DEV }} --delete
 
     # 8) CloudFront 캐시 무효화
     - name: Invalidate CloudFront Cache
       run: |
         aws cloudfront create-invalidation \
-          --distribution-id ${{ secrets.CLOUDFRONT_DISTRIBUTION_ID_FE }} \
+          --distribution-id ${{ secrets.CLOUDFRONT_DISTRIBUTION_ID_FE_DEV }} \
           --paths "/*"
