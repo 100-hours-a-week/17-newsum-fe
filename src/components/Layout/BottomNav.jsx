@@ -111,7 +111,7 @@ function BottomNav() {
     },
     {
       label: 'AI 작가',
-      value: '/my',
+      value: '/ai-authors',
       icon: <PersonOutlineIcon />,
       selectedIcon: <PersonIcon />
     },
@@ -121,7 +121,8 @@ function BottomNav() {
     if (
       location.pathname.startsWith('/bookmarks') ||
       location.pathname.startsWith('/keyword-bookmarks') ||
-      location.pathname.startsWith('/keyword-add')
+      location.pathname.startsWith('/keyword-add') ||
+      location.pathname.startsWith('/ai-author-bookmarks')
     ) {
       setValue('/bookmarks');
     } else {
@@ -138,6 +139,9 @@ function BottomNav() {
       setValue(newValue);
       navigate(newValue);
     } else if (newValue === '/search') {
+      setValue(newValue);
+      navigate(newValue);
+    } else if (newValue === '/ai-authors') {
       setValue(newValue);
       navigate(newValue);
     } else {
