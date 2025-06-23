@@ -22,6 +22,7 @@ import KeywordAddPage from '../pages/KeywordAddPage';
 import AiAuthorListPage from '../pages/AiAuthorListPage';
 import AiAuthorDetailPage from '../pages/AiAuthorDetailPage';
 import AiAuthorBookmarkPage from '../pages/AiAuthorBookmarkPage';
+import TodayWebtoonsPage from '../pages/TodayWebtoonsPage';
 
 
 function Router() {
@@ -59,6 +60,7 @@ function Router() {
         <Route path="/ai-authors" element={<AiAuthorListPage />} />
         <Route path="/ai-authors/:id" element={<AiAuthorDetailPage />} />
         <Route path="/ai-author-bookmarks" element={<AiAuthorBookmarkPage />} />
+        <Route path="/today" element={<TodayWebtoonsPage />} />
       </Route>
     </Routes>
   );
