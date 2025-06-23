@@ -34,4 +34,21 @@ function useSseNotifications(onNewNotification, onConnect) {
   }, [onNewNotification, onConnect]);
 }
 
+// 웹툰 실시간 시청자 수 SSE 연결 함수
+export function connectWebtoonSSE(webtoonId, clientId, onViewerCount) {
+  const url = `${import.meta.env.VITE_API_BASE_URL}/api/v1/sse/webtoon/connect?webtoonId=${webtoonId}&clientId=${clientId}`;
+  const eventSource = new window.EventSource(url);
+
+  eventSource.addEventListener('viewer-count', (event) => {
+    // "viewerCount: 1" 형태로 오므로 파싱
+    const count = Number(event.data.replace('viewerCount: ', ''));
+    onViewerCount(count);
+  });
+
+  eventSource.onerror = (err) => {
+    eventSource.close();
+  };
+  return eventSource;
+}
+
 export default useSseNotifications; 
