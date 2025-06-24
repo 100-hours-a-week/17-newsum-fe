@@ -1,6 +1,6 @@
 // src/components/Layout/Header.jsx
 import React from 'react';
-import { AppBar, Toolbar, IconButton, Box, Avatar } from '@mui/material';
+import { AppBar, Toolbar, IconButton, Box, Avatar, Badge } from '@mui/material';
 import { Link as RouterLink, useLocation, useNavigate } from 'react-router-dom';
 import NotificationsOutlinedIcon from '@mui/icons-material/NotificationsOutlined';
 import PersonOutlineOutlinedIcon from '@mui/icons-material/PersonOutlineOutlined';
@@ -8,6 +8,7 @@ import styled from '@emotion/styled';
 import logo from '../../assets/logo.png';
 import { useAuth } from '../../contexts/AuthContext';
 import { showInfoSwal } from '../modal/ShowInfoModal';
+import { useNotificationStore } from '../../store/notificationStore';
 
 const StyledAppBar = styled(AppBar)`
   max-width: 430px;
@@ -100,6 +101,7 @@ function Header() {
   const location = useLocation();
   const navigate = useNavigate();
   const { user } = useAuth();
+  const hasNewNotification = useNotificationStore((state) => state.hasNewNotification);
 
   // 프로필 이미지(1순위: localStorage의 user, 2순위: user.picture)
   let profileImg = '';
@@ -126,7 +128,7 @@ function Header() {
 
   const handleNotificationClick = (e) => {
     e.preventDefault();
-    showInfoSwal();
+    navigate('/notifications');
   };
 
   return (
@@ -140,7 +142,19 @@ function Header() {
             onClick={handleNotificationClick}
             className={location.pathname === '/notifications' ? 'selected' : ''}
           >
-            <NotificationsOutlinedIcon />
+            <Badge
+              color="error"
+              variant="dot"
+              invisible={!hasNewNotification}
+              sx={{
+                '& .MuiBadge-badge': {
+                  right: 3,
+                  top: 3,
+                }
+              }}
+            >
+              <NotificationsOutlinedIcon />
+            </Badge>
           </StyledIconButton>
           <StyledIconButton
             onClick={handleUserIconClick}

@@ -222,6 +222,7 @@ function CommentPage() {
                     isAuthor={user && comment.author === user.nickname}
                     replyCount={comment.subComments?.length || 0}
                     likeCount={comment.likeCount || 0}
+                    onOpenLoginModal={() => setLoginModalOpen(true)}
                   />
                 </Box>
               ))}
@@ -319,7 +320,7 @@ function CommentPage() {
         )}
       </Box>
 
-      <MoveLogin open={loginModalOpen} onCancel={() => setLoginModalOpen(false)} from={location.pathname} />
+      <MoveLogin open={loginModalOpen} onClose={() => setLoginModalOpen(false)} from={location.pathname} />
     </Box>
   );
 }

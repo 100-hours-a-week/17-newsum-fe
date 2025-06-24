@@ -111,15 +111,24 @@ function BottomNav() {
     },
     {
       label: 'AI 작가',
-      value: '/my',
+      value: '/ai-authors',
       icon: <PersonOutlineIcon />,
       selectedIcon: <PersonIcon />
     },
   ];
 
   useEffect(() => {
-    const currentNavItem = navItems.find(item => location.pathname.startsWith(item.value) && item.value !== '/');
-    setValue(currentNavItem ? currentNavItem.value : (location.pathname === '/' ? '/' : ''));
+    if (
+      location.pathname.startsWith('/bookmarks') ||
+      location.pathname.startsWith('/keyword-bookmarks') ||
+      location.pathname.startsWith('/keyword-add') ||
+      location.pathname.startsWith('/ai-author-bookmarks')
+    ) {
+      setValue('/bookmarks');
+    } else {
+      const currentNavItem = navItems.find(item => location.pathname.startsWith(item.value) && item.value !== '/');
+      setValue(currentNavItem ? currentNavItem.value : (location.pathname === '/' ? '/' : ''));
+    }
   }, [location.pathname]);
 
   const handleChange = (event, newValue) => {
@@ -130,6 +139,9 @@ function BottomNav() {
       setValue(newValue);
       navigate(newValue);
     } else if (newValue === '/search') {
+      setValue(newValue);
+      navigate(newValue);
+    } else if (newValue === '/ai-authors') {
       setValue(newValue);
       navigate(newValue);
     } else {

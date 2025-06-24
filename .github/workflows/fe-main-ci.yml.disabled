@@ -1,0 +1,24 @@
+# FE 태스트코드가 없어 CI 파이프라인이 돌 필요가 없기 때문에 disable
+
+name: Frontend Main CI Pipeline
+on:
+  pull_request:
+    branches: [ main ]
+    types: [ opened, synchronize, reopened ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '23.11.0'
+          cache: 'npm'
+
+      # lint 문법 검사 -> 시간 되면 추가 예정
+      # - run: npm run lint
+
+      # 다른 테스트 추가할 거 있는지 확인하기

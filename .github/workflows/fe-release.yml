@@ -1,20 +1,23 @@
-name: Frontend Main CI Pipeline
+name: Frontend Release Deploy
+
 on:
-  pull_request:
-    branches: [ main ]
-    types: [ opened, synchronize, reopened ]
+  push:
+    tags:
+      - 'fe-v*.*.*'
 
 jobs:
-  build:
+  deploy-fe:
     runs-on: ubuntu-latest
+
     steps:
-      - uses: actions/checkout@v3
+      - name: Checkout Code
+        uses: actions/checkout@v3
 
       - name: Install Infisical CLI
         run: |
           curl -1sLf 'https://artifacts-cli.infisical.com/setup.deb.sh' | sudo -E bash
           sudo apt-get update && sudo apt-get install -y infisical
-      
+
       - name: Fetch .env from Infisical
         run: |
           infisical export \
@@ -29,17 +32,16 @@ jobs:
         uses: actions/setup-node@v3
         with:
           node-version: '23.11.0'
-          cache: 'npm'
 
       - run: npm ci
 
       - run: npm run build
 
-      - name: Upload dist to S3
+      - name: Upload to S3
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           AWS_REGION: ap-northeast-2
         run: |
           zip -r dist.zip dist
-          aws s3 cp dist.zip s3://${{ secrets.AWS_S3_BUCKET_NAME }}/${{ secrets.AWS_S3_UPLOAD_PREFIX_PROD }}dist.zip
+          aws s3 cp dist.zip s3://${{ secrets.AWS_S3_BUCKET_NAME }}/${{ secrets.AWS_S3_UPLOAD_PREFIX_PROD }}release/${{ github.ref_name }}.zip

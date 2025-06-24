@@ -129,7 +129,11 @@ function LoginPage() {
   };
 
   const handleBack = () => {
-    navigate(from);
+    if (from && from !== 'null' && from !== 'undefined' && from.trim() !== '') {
+      navigate(from);
+    } else {
+      navigate(-1);
+    }
   };
 
   // 컴포넌트 마운트 시 토큰 확인

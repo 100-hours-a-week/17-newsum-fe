@@ -11,6 +11,8 @@ import ArticleInfo from '../components/article/ArticleInfo';
 import CommentButton from '../components/article/CommentButton';
 import { useAuth } from '../contexts/AuthContext';
 import MoveLogin from '../components/modal/MoveLogin';
+import { connectWebtoonSSE } from '../utils/sseConnect';
+import getOrCreateClientId from '../utils/getOrCreateClientId';
 
 function ArticlePage() {
   const { articleId } = useParams();
@@ -60,7 +62,6 @@ function ArticlePage() {
         setLikeCount(data1?.likeCount || 0);
         setViewCount(data1?.viewCount || 0);
         setCreatedAt(data1?.createdAt || '');
-        setActiveViewers(Math.floor(Math.random() * 30) + 10);
 
         // 웹툰 상세 정보 조회 (인증 불필요)
         const res2 = await DefaultAxios.get(`/api/v1/webtoons/${articleId}/details`);
@@ -77,6 +78,15 @@ function ArticlePage() {
     };
     fetchData();
   }, [articleId, isLoggedIn]);
+
+  // 실시간 시청자 수 SSE 연결
+  useEffect(() => {
+    const clientId = getOrCreateClientId();
+    const eventSource = connectWebtoonSSE(articleId, clientId, setActiveViewers);
+    return () => {
+      eventSource.close();
+    };
+  }, [articleId]);
 
   const handleBack = () => navigate(-1);
 
@@ -203,7 +213,7 @@ function ArticlePage() {
         />
       </Box>
 
-      <MoveLogin open={loginModalOpen} onCancel={() => setLoginModalOpen(false)} from={location.pathname} />
+      <MoveLogin open={loginModalOpen} onClose={() => setLoginModalOpen(false)} from={location.pathname} />
     </Box>
   );
 }

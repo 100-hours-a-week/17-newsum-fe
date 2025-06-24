@@ -1,13 +1,15 @@
 import React, { useState } from 'react';
-import { Box, Button } from '@mui/material';
+import { Box, Button, Slide } from '@mui/material';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
 import styled from '@emotion/styled';
+import { useNavigate } from 'react-router-dom';
+import { showInfoSwal } from '../modal/ShowInfoModal';
 
 const CATEGORY = {
-    WRITERS: 'AI작가 즐겨찾기',
-    KEYWORDS: '키워드 즐겨찾기',
-    WEBTOONS: '웹툰 즐겨찾기',
+  WRITERS: 'AI작가 즐겨찾기',
+  KEYWORDS: '키워드 즐겨찾기',
+  WEBTOONS: '웹툰 즐겨찾기',
 };
 
 const DropdownContainer = styled(Box)`
@@ -32,7 +34,7 @@ const MenuItem = styled(Button)`
   width: 100%;
   padding: 16px;
   text-align: center;
-  color: ${props => props.theme.palette.text.primary};
+  color: black;
   font-weight: 500;
   border-bottom: 1px solid rgba(0, 0, 0, 0.08);
   background-color: ${props => props.selected ? 'rgba(0, 0, 0, 0.04)' : 'transparent'};
@@ -81,53 +83,67 @@ const HeaderContainer = styled(Box)`
 `;
 
 function CategoryDropdown({ selectedCategory, onCategoryChange }) {
-    const [isOpen, setIsOpen] = useState(false);
+  const [isOpen, setIsOpen] = useState(false);
+  const navigate = useNavigate();
 
-    const handleMenuItemClick = (category) => {
-        onCategoryChange(category);
-        setIsOpen(false);
-    };
+  const handleMenuItemClick = (category) => {
+    if (category === CATEGORY.KEYWORDS) {
+      navigate('/keyword-bookmarks');
+    } else if (category === CATEGORY.WEBTOONS) {
+      navigate('/bookmarks');
+    } else if (category === CATEGORY.WRITERS) {
+      navigate('/ai-author-bookmarks');
+    }
+    setIsOpen(false);
+  };
 
-    return (
-        <DropdownContainer>
-            <Button
-                onClick={() => setIsOpen(!isOpen)}
-                sx={{
-                    textTransform: 'none',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    fontSize: '1rem',
-                    fontWeight: 'bold',
-                    color: 'text.primary',
-                    mt: -0.5,
-                    '&:hover': { backgroundColor: 'transparent' },
-                }}
-                endIcon={isOpen ? <KeyboardArrowUpIcon /> : <KeyboardArrowDownIcon />}
-            >
-                {selectedCategory}
-            </Button>
+  return (
+    <Slide direction="down" in={open} mountOnEnter unmountOnExit>
+      <DropdownContainer>
+        <Button
+          onClick={() => setIsOpen(!isOpen)}
+          sx={{
+            textTransform: 'none',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            fontSize: '1rem',
+            fontWeight: 'bold',
+            color: 'text.primary',
+            mt: -0.5,
+            '&:hover': { backgroundColor: 'transparent' },
+          }}
+          endIcon={isOpen ? <KeyboardArrowUpIcon /> : <KeyboardArrowDownIcon />}
+        >
+          {selectedCategory}
+        </Button>
 
-            {isOpen && (
-                <>
-                    {/* 배경 오버레이 */}
-                    <Overlay onClick={() => setIsOpen(false)} />
-                    {/* 드롭다운 메뉴 */}
-                    <DropdownMenu>
-                        {Object.values(CATEGORY).map((cat) => (
-                            <MenuItem
-                                key={cat}
-                                onClick={() => handleMenuItemClick(cat)}
-                                selected={cat === selectedCategory}
-                            >
-                                {cat}
-                            </MenuItem>
-                        ))}
-                    </DropdownMenu>
-                </>
-            )}
-        </DropdownContainer>
-    );
+        {isOpen && (
+          <>
+            {/* 배경 오버레이 */}
+            <Overlay onClick={() => setIsOpen(false)} />
+            {/* 드롭다운 메뉴 */}
+            <DropdownMenu>
+              {Object.values(CATEGORY).map((cat) => (
+                <MenuItem
+                  key={cat}
+                  onClick={() => handleMenuItemClick(cat)}
+                  selected={cat === selectedCategory}
+                  sx={{
+                    opacity: 1,
+                    cursor: 'pointer',
+                    color: 'black',
+                  }}
+                >
+                  {cat}
+                </MenuItem>
+              ))}
+            </DropdownMenu>
+          </>
+        )}
+      </DropdownContainer>
+    </Slide>
+  );
 }
 
 export default CategoryDropdown; 
