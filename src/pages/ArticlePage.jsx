@@ -83,7 +83,21 @@ function ArticlePage() {
   useEffect(() => {
     const clientId = getOrCreateClientId();
     const eventSource = connectWebtoonSSE(articleId, clientId, setActiveViewers);
+
+    // 페이지 이탈 시 leave API 호출
+    const handleLeave = () => {
+      const data = JSON.stringify({ webtoonId: Number(articleId), clientId });
+      const blob = new Blob([data], { type: "application/json" });
+      navigator.sendBeacon(
+        `${import.meta.env.VITE_API_BASE_URL}/api/v1/sse/webtoon/leave`,
+        blob
+      );
+    };
+    window.addEventListener('beforeunload', handleLeave);
+
     return () => {
+      window.removeEventListener('beforeunload', handleLeave);
+      handleLeave(); // cleanup 시에도 호출 (SPA 내 라우팅 등)
       eventSource.close();
     };
   }, [articleId]);
