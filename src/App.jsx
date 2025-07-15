@@ -5,7 +5,6 @@ import ThemeProviderWrapper from './theme/ThemeProvider';
 import BottomNav from './components/Layout/BottomNav'; // Import 확인
 
 function App() {
-  //console.log("✅ ENV TEST:", import.meta.env.VITE_RELEASE_TEST_TOKEN);
 
   return (
     <ThemeProviderWrapper>

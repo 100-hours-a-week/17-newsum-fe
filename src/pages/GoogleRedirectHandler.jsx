@@ -29,7 +29,6 @@ function GoogleRedirectHandler() {
           }
         );
 
-        console.log('구글 로그인 응답:', response.data);
 
         // 2️⃣ 응답 데이터 구조 확인 및 처리
         const { accessToken, refreshToken, user } = response.data;
