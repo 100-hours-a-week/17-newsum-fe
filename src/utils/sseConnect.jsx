@@ -21,7 +21,7 @@ function useSseNotifications(onNewNotification, onConnect) {
           onNewNotification({ ...parsed, isNew: true });
         }
       } catch (e) {
-        console.log('[SSE] 메시지 파싱 에러:', e);
+        console.error(e);
       }
     });
 

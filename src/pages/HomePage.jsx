@@ -53,7 +53,6 @@ function HomePage() {
   };
 
   const handleMoreClick = (section) => {
-    console.log(`More clicked for ${section}`);
     if (section === '/today') {
       navigate('/today');
     } else {

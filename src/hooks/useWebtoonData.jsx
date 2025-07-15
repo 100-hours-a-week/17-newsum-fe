@@ -22,10 +22,8 @@ const useWebtoonData = () => {
   const getWebtoons = async () => {
     try {
       const res = await DefaultAxios.get('/api/v1/webtoons/main');
-      console.log(res.data?.data);
       setWebtoonsData(res.data?.data || {});
     } catch (err) {
-      console.log(err);
       setError(err.message || '카테고리별 웹툰을 불러오는 중 오류가 발생했습니다.');
     }
   };
@@ -36,12 +34,10 @@ const useWebtoonData = () => {
       // 로그인 상태에 따라 적절한 axios 인스턴스 선택
       const axiosInstance = isLoggedIn ? TokenAxios : DefaultAxios;
       const res = await axiosInstance.get('/api/v1/webtoons/top');
-      console.log(res.data);
       setTop3Data(res.data?.data || {});
       // hasNewNotification 값을 store에 저장
       setHasNewNotification(res.data?.data?.hasNewNotification || false);
     } catch (err) {
-      console.log(err);
       setError(err.message || '상위 웹툰을 불러오는 중 오류가 발생했습니다.');
     }
   };
@@ -50,10 +46,8 @@ const useWebtoonData = () => {
   const getRecentData = async () => {
     try {
       const res = await TokenAxios.get('/api/v1/webtoons/recent');
-      console.log(res.data);
       setRecentData(res.data?.data || {});
     } catch (err) {
-      console.log(err);
       // 최근 본 웹툰은 로그인이 필요할 수 있으므로 오류 메시지를 설정하지 않음
     }
   };

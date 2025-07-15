@@ -73,7 +73,6 @@ const mockArticles = [
 
 // --- 기사 목록 함수 ---
 export const fetchArticles = async (page = 1, limit = 10, category = 'all') => {
-  console.log(`Workspaceing articles - page: ${page}, limit: ${limit}, category: ${category}`);
   await new Promise(resolve => setTimeout(resolve, 500));
 
   const filteredArticles = category === 'all'
@@ -91,7 +90,6 @@ export const fetchArticles = async (page = 1, limit = 10, category = 'all') => {
 
 // --- 상세 기사 함수 ---
 export const fetchArticleById = async (id) => {
-  console.log(`Workspaceing article detail for id: ${id}`);
   await new Promise(resolve => setTimeout(resolve, 300));
   const article = mockArticles.find(article => article.id === id);
   return article || null;

@@ -44,7 +44,6 @@ function CommentPage() {
       // 로그인 상태에 따라 적절한 axios 인스턴스 선택
       const axiosInstance = isLoggedIn ? TokenAxios : DefaultAxios;
       const res = await axiosInstance.get(`/api/v1/webtoons/${articleId}/comments`, { params });
-      console.log(res.data);
       const newComments = res.data?.data?.comments || [];
       const newPageInfo = res.data?.data?.pageInfo || null;
       setCommentCount(res.data?.data?.commentCount)
