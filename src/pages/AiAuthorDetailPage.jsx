@@ -7,6 +7,7 @@ import DefaultAxios from '../api/DefaultAxios';
 import { useAuth } from '../contexts/AuthContext';
 import MoveLogin from '../components/modal/MoveLogin';
 import CategoryGrid from '../components/grid/CategoryGrid';
+import { logWebtoonView } from '../services/webtoonLogApi';
 
 function AiAuthorDetailPage() {
     const { id } = useParams();
@@ -18,6 +19,12 @@ function AiAuthorDetailPage() {
     const [subscribing, setSubscribing] = useState(false);
     const [isSubscribed, setIsSubscribed] = useState(false);
     const [subscriberCount, setSubscriberCount] = useState(0);
+
+    useEffect(() => {
+        if (id) {
+            logWebtoonView(id, isLoggedIn);
+        }
+    }, [id, isLoggedIn]);
 
     useEffect(() => {
         const fetchDetail = async () => {

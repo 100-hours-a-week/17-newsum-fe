@@ -13,6 +13,7 @@ import { useAuth } from '../contexts/AuthContext';
 import MoveLogin from '../components/modal/MoveLogin';
 import { connectWebtoonSSE } from '../utils/sseConnect';
 import getOrCreateClientId from '../utils/getOrCreateClientId';
+import { logWebtoonView } from '../services/webtoonLogApi';
 
 function ArticlePage() {
   const { articleId } = useParams();
@@ -38,6 +39,12 @@ function ArticlePage() {
 
   useEffect(() => {
   }, [isLoggedIn, user]);
+
+  useEffect(() => {
+    if (articleId) {
+      logWebtoonView(articleId, isLoggedIn);
+    }
+  }, [articleId, isLoggedIn]);
 
   useEffect(() => {
     const fetchData = async () => {
