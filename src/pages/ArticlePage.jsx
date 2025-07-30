@@ -234,6 +234,14 @@ function SlideWithMoreButton({ slide }) {
   // 한 줄일 때만 gradient mask 적용
   const gradientMask = 'linear-gradient(to right, #fff 80%, transparent 100%)';
 
+  // 대화 텍스트 처리 함수
+  const formatDialogue = (text) => {
+    // 방법 1: 따옴표로 감싸진 대화를 찾아서 개행 추가
+    return text.replace(/("[^"]*")/g, '\n$1').trim();
+  };
+
+  const formattedContent = formatDialogue(slide.content);
+
   return (
     <Box sx={{ width: '100%', aspectRatio: '1/1', position: 'relative', borderRadius: 2, overflow: 'hidden' }}>
       <img
@@ -271,7 +279,7 @@ function SlideWithMoreButton({ slide }) {
                 overflow: 'hidden',
                 display: '-webkit-box',
                 WebkitBoxOrient: 'vertical',
-                whiteSpace: 'normal',
+                whiteSpace: 'pre-line', // 개행 문자를 실제 줄바꿈으로 처리
                 WebkitLineClamp: 1,
                 textOverflow: 'ellipsis',
                 WebkitMaskImage: gradientMask,
@@ -280,7 +288,7 @@ function SlideWithMoreButton({ slide }) {
                 transition: 'all 0.2s',
               }}
             >
-              {slide.content}
+              {formattedContent}
             </Box>
             {isLong && (
               <button
@@ -306,12 +314,12 @@ function SlideWithMoreButton({ slide }) {
             <Box
               sx={{
                 overflow: 'hidden',
-                whiteSpace: 'normal',
+                whiteSpace: 'pre-line', // 개행 문자를 실제 줄바꿈으로 처리
                 wordBreak: 'break-all',
                 mb: 1,
               }}
             >
-              {slide.content}
+              {formattedContent}
             </Box>
             <Box sx={{ display: 'flex', justifyContent: 'flex-end', width: '100%' }}>
               <button
