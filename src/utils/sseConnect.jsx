@@ -5,7 +5,7 @@ function useSseNotifications(onNewNotification, onConnect) {
   useEffect(() => {
     const clientId = getOrCreateClientId();
     const token = localStorage.getItem('accessToken');
-    const url = `${import.meta.env.VITE_API_BASE_URL}/api/v1/sse/connect?clientId=${clientId}&accessToken=${token}`;
+    const url = `${import.meta.env.VITE_API_BASE_URL}api/v1/sse/connect?clientId=${clientId}&accessToken=${token}`;
     const eventSource = new window.EventSource(url);
 
     // 연결 성공 이벤트
@@ -21,7 +21,7 @@ function useSseNotifications(onNewNotification, onConnect) {
           onNewNotification({ ...parsed, isNew: true });
         }
       } catch (e) {
-        console.log('[SSE] 메시지 파싱 에러:', e);
+        console.error(e);
       }
     });
 

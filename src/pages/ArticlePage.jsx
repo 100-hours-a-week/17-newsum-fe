@@ -37,8 +37,6 @@ function ArticlePage() {
   const [loginModalOpen, setLoginModalOpen] = useState(false);
 
   useEffect(() => {
-    console.log('로그인 상태:', isLoggedIn);
-    console.log('사용자 정보:', user);
   }, [isLoggedIn, user]);
 
   useEffect(() => {
@@ -68,7 +66,8 @@ function ArticlePage() {
         const data2 = res2.data?.data;
         setSourceNews(data2?.sourceNews || []);
         setCommentCount(data2?.commentCount || 0);
-        setRelatedNews((data2?.relatedNews || []).slice(0, 3));
+        setRelatedNews((data2?.relatedNews || []).slice(0, 4));
+
       } catch (err) {
         console.error('데이터 로딩 중 오류:', err);
         setError(err.message || 'An unknown error occurred');
@@ -83,7 +82,21 @@ function ArticlePage() {
   useEffect(() => {
     const clientId = getOrCreateClientId();
     const eventSource = connectWebtoonSSE(articleId, clientId, setActiveViewers);
+
+    // 페이지 이탈 시 leave API 호출
+    const handleLeave = () => {
+      const data = JSON.stringify({ webtoonId: Number(articleId), clientId });
+      const blob = new Blob([data], { type: "application/json" });
+      navigator.sendBeacon(
+        `${import.meta.env.VITE_API_BASE_URL}/api/v1/sse/webtoon/leave`,
+        blob
+      );
+    };
+    window.addEventListener('beforeunload', handleLeave);
+
     return () => {
+      window.removeEventListener('beforeunload', handleLeave);
+      handleLeave(); // cleanup 시에도 호출 (SPA 내 라우팅 등)
       eventSource.close();
     };
   }, [articleId]);
@@ -91,9 +104,6 @@ function ArticlePage() {
   const handleBack = () => navigate(-1);
 
   const handleLike = async () => {
-    console.log('ArticlePage - handleLike 호출됨');
-    console.log('로그인 상태:', isLoggedIn);
-    console.log('현재 좋아요 상태:', { isLiked, likeCount });
 
     if (!isLoggedIn) {
       setLoginModalOpen(true);
@@ -108,7 +118,6 @@ function ArticlePage() {
         const { liked, likeCount } = res.data.data;
         setIsLiked(liked);
         setLikeCount(likeCount);
-        console.log('상태 업데이트 후:', { isLiked: liked, likeCount });
       } else {
         console.error('서버 응답에 data가 없습니다:', res.data);
       }
