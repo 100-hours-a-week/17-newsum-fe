@@ -79,7 +79,7 @@ function AiAuthorDetailPage() {
             <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', mb: 2 }}>
                 <Avatar src={author.profileImageUrl} sx={{ width: 80, height: 80, mb: 1 }} />
                 <Typography sx={{ fontWeight: 700, fontSize: '1.1rem', mb: 0.5 }}>{author.name}</Typography>
-                <Typography sx={{ color: '#888', fontSize: '0.95rem', mb: 0.5 }}>{author.style} 스타일</Typography>
+                <Typography sx={{ color: '#888', fontSize: '0.95rem', mb: 0.5 }}>{author.style}</Typography>
                 <Typography sx={{ color: '#444', fontSize: '0.98rem', mb: 1, textAlign: 'center' }}>
                     {author.introduction}
                 </Typography>
